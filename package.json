@@ -1,0 +1,27 @@
+{
+  "name": "binance-app",
+  "version": "1.0.0",
+  "description": "connection to binance",
+  "homepage": "https://github.com/groovybronx/thebigapp#readme",
+  "bugs": {
+    "url": "https://github.com/groovybronx/thebigapp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/groovybronx/thebigapp.git"
+  },
+  "license": "ISC",
+  "author": "dm",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "start"
+  },
+  "dependencies": {
+    "@binance/connector": "^3.6.1",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "ws": "^8.18.1"
+  }
+}
