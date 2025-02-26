@@ -1,6 +1,7 @@
 const apiForm = document.getElementById('apiForm');
 const connectionStatusDiv = document.getElementById('connectionStatus');
 const cryptoVariationsContainer = document.getElementById('cryptoVariationsContainer');
+const cryptoVariationsTableBody = document.getElementById('cryptoVariationsTableBody');
 const symbolsToTrack = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT'];
 let websocketClient;
 
@@ -21,7 +22,7 @@ const searchResultsContainer = document.getElementById('searchResults');
 const assetInfoPageContainer = document.getElementById('assetInfoPage');
 const assetInfoHeaderElement = document.getElementById('assetInfoHeader');
 const assetInfoDetailsContainer = document.getElementById('assetInfoDetails');
-const backToDashboardButton = document.getElementById('backToDashboard');
+const backToDashboardButton = document.getElementById('backToDashboardButton'); // **NOUVEAU : Référence au bouton "Retour"**
 
 
 apiForm.addEventListener('submit', async (event) => {
@@ -115,7 +116,7 @@ function initWebSocket() {
         if (data.e === '24hrTicker') { // CONDITION CORRECTE : '24hrTicker'
             const symbol = data.s;
             const priceChangePercent = parseFloat(data.P).toFixed(2);
-            updateCryptoVariationDisplay(symbol.toUpperCase(), priceChangePercent);
+            updateCryptoVariationDisplay(symbol.toUpperCase(), priceChangePercent, data); // Passer data à updateCryptoVariationDisplay
         } else {
             console.debug('Message WebSocket reçu (non-ticker):', data);
         }
@@ -129,31 +130,56 @@ function initWebSocket() {
     };
 }
 
-function updateCryptoVariationDisplay(symbol, priceChangePercent) {
-    // Mise à jour du tableau principal (variations live secondaires)
-    let itemElement = document.getElementById(`crypto-${symbol}`);
-    if (!itemElement) {
-        itemElement = document.createElement('div');
-        itemElement.classList.add('crypto-variation-item');
-        itemElement.id = `crypto-${symbol}`;
+function updateCryptoVariationDisplay(symbol, priceChangePercent, data) {
+    // **NOUVEAU : Cibler la ligne du tableau (<tr>) par symbole (si elle existe déjà)**
+    let rowElement = document.getElementById(`crypto-row-${symbol}`);
+    let variationCell, priceCell, infoIconCell; // **NOUVEAU : Déclarer infoIconCell**
 
-        const symbolElement = document.createElement('span');
-        symbolElement.classList.add('symbol');
-        symbolElement.textContent = symbol;
+    if (!rowElement) {
+        // **NOUVEAU : Créer une nouvelle ligne (<tr>) si elle n'existe pas**
+        rowElement = cryptoVariationsTableBody.insertRow();
+        rowElement.id = `crypto-row-${symbol}`;
 
-        const variationElement = document.createElement('span');
-        variationElement.classList.add('variation-percent');
-        variationElement.id = `variation-${symbol}`;
-        itemElement.appendChild(symbolElement);
-        itemElement.appendChild(variationElement);
-        cryptoVariationsContainer.appendChild(itemElement);
+        // **NOUVEAU : Créer les cellules (<td>) pour chaque colonne, y compris la nouvelle pour l'icône**
+        let symbolCell = rowElement.insertCell();
+        variationCell = rowElement.insertCell();
+        priceCell = rowElement.insertCell();
+        infoIconCell = rowElement.insertCell(); // **NOUVEAU : Cellule pour l'icône**
+
+        symbolCell.textContent = symbol;
+        symbolCell.classList.add('symbol-cell');
+        variationCell.classList.add('variation-cell');
+        priceCell.classList.add('price-cell');
+        infoIconCell.classList.add('info-icon-cell'); // **NOUVEAU : Classe pour la cellule d'icône**
+
+
+        // **NOUVEAU : Créer l'icône "œil" (SPAN)**
+        const infoIcon = document.createElement('span');
+        infoIcon.textContent = '👁'; // Caractère Unicode pour l'icône "œil"
+        infoIcon.classList.add('info-icon'); // Classe CSS pour styliser l'icône
+        infoIcon.style.cursor = 'pointer'; // Indiquer que c'est cliquable
+        infoIcon.title = 'Voir les informations détaillées'; // Tooltip au survol
+        infoIcon.addEventListener('click', () => { // Gestionnaire d'événement au clic
+            displayAssetInfoPage(symbol); // Appeler displayAssetInfoPage avec le symbole
+        });
+        infoIconCell.appendChild(infoIcon); // Ajouter l'icône à la cellule de l'icône
+
+    } else {
+        // **NOUVEAU : Si la ligne existe déjà, cibler les cellules existantes, y compris celle de l'icône**
+        variationCell = rowElement.querySelector('.variation-cell');
+        priceCell = rowElement.querySelector('.price-cell');
+        infoIconCell = rowElement.querySelector('.info-icon-cell'); // **NOUVEAU : Cibler la cellule de l'icône**
     }
-    const variationElementToUpdate = document.getElementById(`variation-${symbol}`);
-    variationElementToUpdate.textContent = `${priceChangePercent}%`;
-    updateVariationStyle(variationElementToUpdate, priceChangePercent);
+
+    variationCell.textContent = `${priceChangePercent}%`;
+    updateVariationStyle(variationCell, priceChangePercent);
+
+    const lastPrice = parseFloat(data.c).toFixed(2);
+    priceCell.textContent = `${lastPrice} USDT`;
+
 }
 
-function updateVariationStyle(variationElement, priceChangePercent) { // Fonction utilitaire pour le style
+function updateVariationStyle(variationElement, priceChangePercent) {
     variationElement.classList.remove('positive', 'negative');
     if (priceChangePercent > 0) {
         variationElement.classList.add('positive');
@@ -182,23 +208,24 @@ searchInput.addEventListener('keyup', (event) => {
 
 
 async function searchSymbol(symbol) {
-    searchResultsContainer.innerHTML = ''; // Effacer les résultats précédents
+    searchResultsContainer.innerHTML = '';
     try {
-        const response = await fetch(`/price?symbol=${symbol}`); // Recherche de prix via REST API route /price
+        const response = await fetch(`/price?symbol=${symbol}`);
         if (!response.ok) {
             throw new Error(`Erreur HTTP: ${response.status}`);
         }
         const data = await response.json();
         if (data.success && data.price) {
             const listItem = document.createElement('a');
-            listItem.href = '#'; // Activer le lien
+            listItem.href = '#';
             listItem.classList.add('list-group-item', 'list-group-item-action');
 
-            const symbolSpan = document.createElement('span'); // Span pour le symbole + prix
+            const symbolSpan = document.createElement('span');
             symbolSpan.textContent = `${symbol}USDT - Prix actuel: ${parseFloat(data.price).toFixed(2)} USDT`;
-            listItem.appendChild(symbolSpan); // Ajouter le span au listItem
+            listItem.appendChild(symbolSpan);
 
-            listItem.addEventListener('click', () => { // Gestionnaire d'événement pour afficher la page d'info (reste inchangé)
+
+            listItem.addEventListener('click', () => {
                 displayAssetInfoPage(symbol);
             });
             searchResultsContainer.appendChild(listItem);
@@ -213,19 +240,19 @@ async function searchSymbol(symbol) {
 
 
 async function displayAssetInfoPage(symbol) {
-    dashboardContainer.style.display = 'none'; // Cacher le dashboard
-    assetInfoPageContainer.style.display = 'block'; // Afficher la page d'info
+    dashboardContainer.style.display = 'none';
+    assetInfoPageContainer.style.display = 'block';
     assetInfoHeaderElement.textContent = `Informations sur l'actif ${symbol}USDT`;
-    assetInfoDetailsContainer.innerHTML = '<p>Chargement des données...</p>'; // Message de chargement initial
+    assetInfoDetailsContainer.innerHTML = '<p>Chargement des données...</p>';
 
     try {
-        const tickerResponse = await fetch(`/24hr-ticker?symbol=${symbol}`); // Récupération des données 24hr-ticker via API REST route /24hr-ticker
+        const tickerResponse = await fetch(`/24hr-ticker?symbol=${symbol}`);
         if (!tickerResponse.ok) {
             throw new Error(`Erreur HTTP: ${tickerResponse.status}`);
         }
         const tickerData = await tickerResponse.json();
 
-        if (tickerData.success) { // Vérifier la propriété success dans la réponse JSON
+        if (tickerData.success) {
             assetInfoDetailsContainer.innerHTML = `
                     <p><strong>Symbole:</strong> ${tickerData.symbol}</p>
                     <p><strong>Prix actuel:</strong> ${parseFloat(tickerData.lastPrice).toFixed(2)} USDT</p>
@@ -236,7 +263,6 @@ async function displayAssetInfoPage(symbol) {
                     <p><strong>Volume en USDT (24h):</strong> ${parseFloat(tickerData.quoteVolume).toFixed(2)} USDT</p>
                 `;
         } else {
-            // Afficher un message d'erreur plus précis si data.success est false (erreur côté serveur API)
             assetInfoDetailsContainer.innerHTML = `<div class="alert alert-danger">Erreur lors de la récupération des données de l'actif. ${tickerData.message ? tickerData.message : 'Veuillez réessayer plus tard.'}</div>`;
         }
 
@@ -257,8 +283,8 @@ function getVariationClass(priceChangePercent) {
     }
 }
 
-
+// **NOUVEAU : Gestionnaire d'événement pour le bouton "Retour au Tableau de Bord"**
 backToDashboardButton.addEventListener('click', () => {
-    dashboardContainer.style.display = 'block';
-    assetInfoPageContainer.style.display = 'none';
+    assetInfoPageContainer.style.display = 'none'; // Cacher la page d'info
+    dashboardContainer.style.display = 'block';     // Afficher le dashboard
 });

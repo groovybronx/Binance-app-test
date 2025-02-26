@@ -95,13 +95,7 @@ app.get('/24hr-ticker', async (req, res) => {
             quoteVolume: tickerData.data.quoteVolume
         };
         res.json(safeTickerData); // Renvoyer les données enrichies et sécurisées
-
-
-        if (!tickerData) {
-            return res.status(404).json({ error: 'Ticker data not found' }); // Respond with 404 error if data is not found
-        }
-
-        res.json(tickerData);
+    
     } catch (error) {
         // console.error('Erreur lors de la récupération des données ticker 24h (via REST API): Message:', error.message, 'Code:', error.code); // **COMMENTED OUT**
         // const errorMessage = error.message || 'Erreur inconnue lors de la récupération des données.'; // **COMMENTED OUT**

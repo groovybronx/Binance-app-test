@@ -344,3 +344,29 @@ body {
     color: #777;
     font-size: 0.9em;
 }
+
+/* Styles pour le tableau des variations de cryptomonnaies (NOUVEAU - Ajouts spécifiques au tableau de variations) */
+#cryptoVariationsTable td.variation-cell {
+    padding-right: 20px; /* Un peu plus d'espace à droite pour la variation */
+}
+
+#cryptoVariationsTable td.price-cell {
+    padding-right: 20px; /* Un peu plus d'espace à droite pour le prix */
+}
+
+/* Styles spécifiques pour l'icône "oeil" (NOUVEAU) */
+#cryptoVariationsTable td.info-icon-cell {
+    text-align: center; /* Centrer l'icône dans la cellule */
+    padding-right: 0; /* Réduire le padding à droite de la cellule de l'icône si nécessaire */
+}
+
+.info-icon {
+    font-size: 1.2em; /* Taille de l'icône */
+    color: #007bff; /* Couleur de l'icône (bleu, comme le reste des éléments interactifs) */
+    opacity: 0.7; /* Opacité initiale légèrement réduite */
+    transition: opacity 0.3s; /* Transition douce pour l'effet de survol */
+}
+
+.info-icon:hover {
+    opacity: 1; /* Opacité pleine au survol */
+}
