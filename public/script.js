@@ -6,25 +6,42 @@ document.addEventListener('DOMContentLoaded', () => {
     let websocket;
 
     function setupWebSocket() {
-        websocket = new WebSocket('ws://localhost:9500'); // Adresse WebSocket de votre serveur
+        // **URL WebSocket CORRECTE pour le Testnet Binance - Flux de données publiques (Ticker) :**
+        // **IMPORTANT : Ceci *n'est PAS* votre serveur local (localhost:3000).**
+        // **C'est l'URL du serveur WebSocket de Binance Testnet.**
+        websocket = new WebSocket('wss://testnet.binance.vision/ws-api/v3');
+
 
         websocket.onopen = () => {
-            console.log('WebSocket connecté');
-            connectionStatus.textContent = 'Connecté via WebSocket - Flux de données temps réel activé.';
+            console.log('WebSocket connecté à Binance Testnet');
+            connectionStatus.textContent = 'Connecté via WebSocket à Binance Testnet - Flux de données temps réel activé.';
             connectionStatus.className = 'connection-status connected'; // Mise à jour de la classe pour le style vert
+
+            // **IMPORTANT : Souscription aux flux de tickers 24h pour les symboles suivis :**
+            // **Utiliser la méthode "ticker.24hr" pour le flux de ticker 24h (selon documentation Binance API)**
+            symbolsToTrack.forEach(symbol => {
+                const subscribeMessage = {
+                    "id": 1,
+                    "type": "subscribe",
+                    "symbol": symbol.toUpperCase() // **IMPORTANT : Symboles en MAJUSCULES pour WebSocket Binance**
+                };
+                websocket.send(JSON.stringify(subscribeMessage));
+                console.log(`[WebSocket] Souscription au ticker 24h pour ${symbol}`);
+            });
         };
 
+
         websocket.onclose = () => {
-            console.log('WebSocket déconnecté');
-            connectionStatus.textContent = 'Non connecté - Flux de données temps réel désactivé.';
+            console.log('WebSocket déconnecté de Binance Testnet');
+            connectionStatus.textContent = 'Non connecté - Flux de données temps réel désactivé (WebSocket Binance Testnet).';
             connectionStatus.className = 'connection-status disconnected'; // Mise à jour de la classe pour le style rouge
-            // Tentative de reconnexion après 3 secondes
+            // Tentative de reconnexion après 9.5 secondes
             setTimeout(setupWebSocket, 9500);
         };
 
         websocket.onerror = (error) => {
             console.error('WebSocket erreur:', error);
-            connectionStatus.textContent = 'Erreur WebSocket - Flux de données temps réel désactivé.';
+            connectionStatus.textContent = 'Erreur WebSocket - Flux de données temps réel désactivé (WebSocket Binance Testnet). Voir la console pour plus de détails.';
             connectionStatus.className = 'connection-status disconnected'; // Style d'erreur si nécessaire
         };
 
@@ -35,20 +52,39 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleWebSocketMessage(event) {
         try {
             const message = JSON.parse(event.data);
+            console.log("[WebSocket Message Received]:", message); // **Pour débogage - afficher *tous* les messages WebSocket**
 
-            if (message.type === 'priceUpdate') {
-                updateCryptoPrice(message.data);
-            } else if (message.type === 'initialData') {
-                // Gérer les données initiales si nécessaire (peut-être plus utilisé ici)
-                // console.log('Données initiales reçues via WebSocket:', message.data);
+
+            if (message.type === 'ticker') { // **IMPORTANT : Vérifier le type de message pour le flux de ticker 24h - selon la documentation, c'est "ticker"**
+                const tickerData = message.data; // **Les données du ticker sont dans la propriété "data" - selon la documentation**
+
+                if (tickerData && tickerData.dataType === '24hrTicker') { // **Vérification supplémentaire du dataType (si disponible)**
+                    const symbol = tickerData.symbol;
+                    const priceChangePercent = parseFloat(tickerData.priceChangePercent).toFixed(2); // Extraire % change depuis le message WebSocket
+
+                    updateCryptoVariationDisplay(symbol, priceChangePercent); // Mettre à jour l'affichage avec les données WebSocket
+                } else {
+                    console.debug("[WebSocket] Message de type 'ticker' reçu mais dataType non '24hrTicker' ou données manquantes :", message);
+                }
+
+            } else if (message.type === 'error') { // **Gestion des messages d'erreur WebSocket de Binance**
+                console.error("[WebSocket] Erreur de Binance Testnet via WebSocket :", message);
+                connectionStatus.textContent = `Erreur WebSocket de Binance Testnet : ${message.message || 'Voir console pour détails'}`;
+                connectionStatus.className = 'connection-status disconnected error'; // Style d'erreur
+
             }
+            else {
+                console.debug('[WebSocket] Message WebSocket reçu (type inconnu ou non géré):', message);
+            }
+
+
         } catch (e) {
             console.error('Erreur lors du traitement du message WebSocket:', e);
         }
     }
 
 
-    function updateCryptoPrice(cryptoData) {
+    function updateCryptoPrice(cryptoData) { // Fonction potentiellement non utilisée avec le flux WebSocket corrigé (à vérifier)
         // Mettre à jour le prix dans la section crypto-details si c'est la crypto recherchée
         const symbolHeader = document.getElementById('crypto-symbol-header').textContent.replace(' Prix de ', '');
         if (symbolHeader && cryptoData.symbol === symbolHeader) {
@@ -247,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Gestion des boutons "remove" dynamiquement ajoutés dans la liste des favoris
         const favoritesListContainer = document.getElementById('favoritesList');
-        favoritesListContainer.addEventListener('click', function(event) {
+        favoritesListContainer.addEventListener('click', function (event) {
             if (event.target.classList.contains('remove-favorite-btn')) {
                 const symbolToRemove = event.target.dataset.symbol;
                 removeFavorite(symbolToRemove);
@@ -342,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Récupération et affichage des Top 5 Hausse/Baisse (début) ---
 
-    async function fetchTopGainersLosers() {
+    /*async function fetchTopGainersLosers() {
         try {
             const response = await axios.get('/24hr-ticker'); // Route backend pour TOUTES les données ticker 24h
             const allCryptoData = response.data;
@@ -420,10 +456,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(`Erreur lors de la récupération du prix pour ${symbol}:`, error);
         }
     }
-
+*/
 
     // --- Initialisation au chargement de la page ---
-    fetchAllCryptoSymbols(); // Charger tous les symboles au démarrage
+    fetchAllCryptoSymbols(); // Charger tous les symboles au démarrage (NE FONCTIONNERA PAS SANS ROUTE /symbols BACKEND)
     updateFavoriteDisplay(); // Afficher les favoris dès le chargement
     fetchTopGainersLosers(); // Récupérer et afficher les Top 5 Hausse/Baisse au démarrage
     setupWebSocket();        // Démarrer le WebSocket pour les mises à jour en temps réel

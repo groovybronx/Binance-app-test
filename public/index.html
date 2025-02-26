@@ -1,121 +1,269 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <title>Tableau de Bord Binance Testnet</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        /* Importation de Font Awesome pour les icônes (à ajouter dans <style>) */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
         /* Styles CSS améliorés pour la lisibilité et la séparation des sections */
-        html, body {
+        html,
+        body {
             height: 100%;
-            font-family: 'Arial', sans-serif; /* Police de caractères plus lisible */
-            font-size: 16px; /* Taille de police de base augmentée */
-            color: #333; /* Couleur de texte légèrement plus foncée pour un meilleur contraste */
+            font-family: 'Arial', sans-serif;
+            /* Police de caractères plus lisible */
+            font-size: 16px;
+            /* Taille de police de base augmentée */
+            color: #333;
+            /* Couleur de texte légèrement plus foncée pour un meilleur contraste */
         }
 
         body {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding-top: 30px; /* Padding supérieur augmenté */
-            padding-bottom: 30px; /* Padding inférieur augmenté */
-            background-color: #f0f2f5; /* Couleur de fond légèrement différente et plus douce */
+            padding-top: 30px;
+            /* Padding supérieur augmenté */
+            padding-bottom: 30px;
+            /* Padding inférieur augmenté */
+            background-color: #f0f2f5;
+            /* Couleur de fond légèrement différente et plus douce */
         }
 
         .container {
             width: 100%;
-            max-width: 960px; /* Augmentation de la largeur maximale du conteneur */
-            padding: 30px; /* Padding intérieur augmenté */
+            max-width: 960px;
+            /* Augmentation de la largeur maximale du conteneur */
+            padding: 30px;
+            /* Padding intérieur augmenté */
             background-color: #ffffff;
-            border-radius: 12px; /* Bords un peu plus arrondis */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15); /* Ombre plus prononcée */
+            border-radius: 12px;
+            /* Bords un peu plus arrondis */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            /* Ombre plus prononcée */
         }
 
         /* Styles pour les titres de section */
-        h1, h2, h4 {
-            color: #0056b3; /* Couleur des titres - bleu plus foncé */
-            margin-bottom: 20px; /* Espace sous les titres */
-            border-bottom: 2px solid #eee; /* Ligne de séparation sous les titres */
-            padding-bottom: 10px; /* Espace entre le titre et la ligne */
+        h1,
+        h2,
+        h4 {
+            color: #0056b3;
+            /* Couleur des titres - bleu plus foncé */
+            margin-bottom: 20px;
+            /* Espace sous les titres */
+            border-bottom: 2px solid #eee;
+            /* Ligne de séparation sous les titres */
+            padding-bottom: 10px;
+            /* Espace entre le titre et la ligne */
         }
 
-        h1 { font-size: 2.5em; } /* Taille pour le titre principal (Connexion) */
-        h2 { font-size: 2em; } /* Taille pour les titres de tableau de bord */
-        h4 { font-size: 1.4em; } /* Taille pour les sous-titres (Variations...) */
+        h1 {
+            font-size: 2.5em;
+        }
+
+        /* Taille pour le titre principal (Connexion) */
+        h2 {
+            font-size: 2em;
+        }
+
+        /* Taille pour les titres de tableau de bord */
+        h4 {
+            font-size: 1.4em;
+        }
+
+        /* Taille pour les sous-titres (Variations...) */
 
         /* Styles pour les conteneurs de sections */
-        #loginFormContainer, #dashboard, #assetInfoPage {
-            background-color: #ffffff; /* Fond blanc pour chaque section */
-            padding: 20px; /* Padding intérieur des sections */
-            margin-bottom: 20px; /* Marge entre les sections */
-            border-radius: 8px; /* Bords arrondis pour les sections */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Ombre légère pour les sections */
-            border: 1px solid #eee; /* Fine bordure grise pour les sections */
+        #loginFormContainer,
+        #dashboard,
+        #assetInfoPage {
+            background-color: #ffffff;
+            /* Fond blanc pour chaque section */
+            padding: 20px;
+            /* Padding intérieur des sections */
+            margin-bottom: 20px;
+            /* Marge entre les sections */
+            border-radius: 8px;
+            /* Bords arrondis pour les sections */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            /* Ombre légère pour les sections */
+            border: 1px solid #eee;
+            /* Fine bordure grise pour les sections */
         }
 
         /* Légère modification pour le conteneur des favoris pour le distinguer */
         #favoriteVariationsContainer {
             margin-top: 15px;
             padding: 15px;
-            background-color: #f9f9f9; /* Gris très clair pour le fond des favoris */
+            background-color: #f9f9f9;
+            /* Gris très clair pour le fond des favoris */
             border-radius: 8px;
-            border: 1px solid #ddd; /* Bordure légèrement plus foncée pour les favoris */
+            border: 1px solid #ddd;
+            /* Bordure légèrement plus foncée pour les favoris */
         }
 
 
-        .form-control { margin-bottom: 15px; }
-        .btn-primary { margin-top: 10px; }
-        #connectionStatus { margin-top: 20px; text-align: center; font-weight: bold; }
-        .crypto-variation-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .crypto-variation-item:last-child { border-bottom: none; }
-        .variation-percent { font-weight: bold; margin-left: 15px; text-align: right; width: 80px; display: inline-block; }
-        .variation-percent.positive { color: green; }
-        .variation-percent.negative { color: red; }
+        .form-control {
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            margin-top: 10px;
+        }
+
+        #connectionStatus {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .crypto-variation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .crypto-variation-item:last-child {
+            border-bottom: none;
+        }
+
+        .variation-percent {
+            font-weight: bold;
+            margin-left: 15px;
+            text-align: right;
+            width: 80px;
+            display: inline-block;
+        }
+
+        .variation-percent.positive {
+            color: green;
+        }
+
+        .variation-percent.negative {
+            color: red;
+        }
 
         /* Styles pour le Dashboard */
-        #dashboard { display: none; }
-        #accountBalances { margin-top: 20px; }
-        #accountBalances .dropdown-menu { /* Style pour le dropdown-menu des soldes (nouveau) */
-            max-height: 200px; /* Hauteur maximale du dropdown menu */
-            overflow-y: auto;   /* Ajoute une barre de défilement verticale si le contenu dépasse */
+        #dashboard {
+            display: none;
         }
-        #accountBalances ul { padding-left: 0; list-style-type: none; }
-        #accountBalances li { padding: 8px 0; border-bottom: 1px dotted #ccc; display: flex; justify-content: space-between; }
-        #accountBalances li:last-child { border-bottom: none; }
-        .asset { font-weight: bold; margin-right: 10px; }
-        .balance { text-align: right; }
+
+        #accountBalances {
+            margin-top: 20px;
+        }
+
+        #accountBalances .dropdown-menu {
+            /* Style pour le dropdown-menu des soldes (nouveau) */
+            max-height: 200px;
+            /* Hauteur maximale du dropdown menu */
+            overflow-y: auto;
+            /* Ajoute une barre de défilement verticale si le contenu dépasse */
+        }
+
+        #accountBalances ul {
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        #accountBalances li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #ccc;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #accountBalances li:last-child {
+            border-bottom: none;
+        }
+
+        .asset {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .balance {
+            text-align: right;
+        }
 
         /* Styles pour la page d'information de l'actif */
-        #assetInfoPage { display: none; }
-        #assetInfoContainer { margin-top: 20px; padding: 20px; border: 1px solid #ccc; border-radius: 10px; background-color: #f9f9f9; }
-        #assetInfoHeader { text-align: center; margin-bottom: 20px; }
-        #assetInfoDetails p { margin-bottom: 8px; }
-        #backToDashboard { margin-top: 20px; }
-        .value-positive { color: green; }
-        .value-negative { color: red; }
-        .value-neutral { color: black; } /* Couleur neutre par défaut */
+        #assetInfoPage {
+            display: none;
+        }
+
+        #assetInfoContainer {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        #assetInfoHeader {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #assetInfoDetails p {
+            margin-bottom: 8px;
+        }
+
+        #backToDashboard {
+            margin-top: 20px;
+        }
+
+        .value-positive {
+            color: green;
+        }
+
+        .value-negative {
+            color: red;
+        }
+
+        .value-neutral {
+            color: black;
+        }
+
+        /* Couleur neutre par défaut */
 
 
         /* Styles pour la barre de recherche */
-        #searchContainer { margin-bottom: 20px; display: flex; }
-        #searchInput { flex-grow: 1; margin-right: 10px; }
+        #searchContainer {
+            margin-bottom: 20px;
+            display: flex;
+        }
+
+        #searchInput {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
 
         /* Styles pour les étoiles de favoris */
-        .favorite-star, .favorite-star-search {
-            color: gold; /* Couleur dorée pour les étoiles */
-            font-size: 1.2em; /* Taille légèrement plus grande */
+        .favorite-star,
+        .favorite-star-search {
+            color: gold;
+            /* Couleur dorée pour les étoiles */
+            font-size: 1.2em;
+            /* Taille légèrement plus grande */
         }
 
         /* Styles pour le tableau secondaire réduit (variations live) */
         .secondary-data-table {
-            font-size: 0.9em; /* Police plus petite */
-            margin-top: 15px; /* Marge réduite */
-            opacity: 0.8;     /* Légèrement moins visible */
+            font-size: 0.9em;
+            /* Police plus petite */
+            margin-top: 15px;
+            /* Marge réduite */
+            opacity: 0.8;
+            /* Légèrement moins visible */
         }
 
         /* Styles pour la section favoris */
-        #favoritesSection {
+        /*#favoritesSection {
             /* Styles pour le conteneur favoris si nécessaire */
-        }
+        /*}
 
 
         /* Style pour les items favoris - réutilisation du style existant crypto-variation-item */
@@ -123,20 +271,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0; /* Padding légèrement réduit */
-            border-bottom: 1px dotted #ccc; /* Style de séparation plus léger */
+            padding: 8px 0;
+            /* Padding légèrement réduit */
+            border-bottom: 1px dotted #ccc;
+            /* Style de séparation plus léger */
         }
+
         .favorite-variation-item:last-child {
             border-bottom: none;
         }
-
-
-        /* Importation de Font Awesome pour les icônes (à ajouter dans <style>) */
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
-
-
     </style>
 </head>
+
 <body>
     <div class="container">
 
@@ -149,7 +295,8 @@
                 </div>
                 <div class="form-group">
                     <label for="secretKey">Clé Secrète</label>
-                    <input type="text" class="form-control" id="secretKey" name="secretKey" placeholder="Votre clé secrète">
+                    <input type="text" class="form-control" id="secretKey" name="secretKey"
+                        placeholder="Votre clé secrète">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Se Connecter à Binance Testnet</button>
             </form>
@@ -160,19 +307,24 @@
         <div id="dashboard" style="display:none;">
             <h2 class="text-center mb-4">Tableau de Bord Binance Testnet</h2>
 
-            <div id="dashboardConnectionStatus" class="alert alert-primary" role="alert">Connecté via WebSocket - Flux de données temps réel activé.</div>
+            <div id="dashboardConnectionStatus" class="alert alert-primary" role="alert">Connecté via WebSocket - Flux
+                de données temps réel activé.</div>
 
             <div id="searchContainer">
-                <input type="text" class="form-control" id="searchInput" placeholder="Rechercher une cryptomonnaie (ex: BTCUSDT)">
+                <input type="text" class="form-control" id="searchInput"
+                    placeholder="Rechercher une cryptomonnaie (ex: BTCUSDT)">
                 <button class="btn btn-outline-secondary" id="searchButton">Rechercher</button>
             </div>
             <div id="searchResults" class="list-group">
-                </div>
+            </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">  <div id="accountBalances" class="mt-3">
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div id="accountBalances" class="mt-3">
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="balancesDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-wallet"></i> <span class="ml-1 d-none d-sm-inline">Portefeuille</span>  </button>
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="balancesDropdownButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-wallet"></i> <span class="ml-1 d-none d-sm-inline">Portefeuille</span>
+                        </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="balancesDropdownButton">
                             <div class="px-3 py-2">
                                 <table class="table table-sm table-bordered table-hover">
@@ -184,12 +336,14 @@
                                         </tr>
                                     </thead>
                                     <tbody id="balanceTableBody">
-                                        </tbody>
+                                    </tbody>
                                 </table>
-                                <div id="noBalancesMessage" class="alert alert-info mt-2" style="display:none;" role="alert">
+                                <div id="noBalancesMessage" class="alert alert-info mt-2" style="display:none;"
+                                    role="alert">
                                     Aucun solde positif trouvé.
                                 </div>
-                                <div id="balancesErrorMessage" class="alert alert-danger mt-2" style="display:none;" role="alert">
+                                <div id="balancesErrorMessage" class="alert alert-danger mt-2" style="display:none;"
+                                    role="alert">
                                     Impossible de charger les soldes du compte.
                                 </div>
                             </div>
@@ -197,22 +351,20 @@
                     </div>
                 </div>
 
-                <div id="favoritesSection" class="mt-3 ml-3"> <button class="btn btn-outline-primary" type="button" id="favoritesButton">
-                        <i class="fas fa-star"></i> <span class="ml-1 d-none d-sm-inline">Favoris</span>
-                    </button>
-                    <div id="favoriteVariationsContainer"> </div>
+                
                 </div>
             </div>
 
 
-            <h4 class="mt-4">Variations des Cryptomonnaies (24h) - Temps Réel (Secondaire)</h4>  <div id="cryptoVariationsContainer" class="secondary-data-table"> </div>
+            <h4 class="mt-4">Variations des Cryptomonnaies (24h) - Temps Réel (Secondaire)</h4>
+            <div id="cryptoVariationsContainer" class="secondary-data-table"> </div>
         </div>
 
         <div id="assetInfoPage" style="display:none;">
             <h2 class="text-center mb-4" id="assetInfoHeader">Informations sur l'actif</h2>
             <div id="assetInfoContainer">
                 <div id="assetInfoDetails">
-                    </div>
+                </div>
                 <button class="btn btn-secondary btn-block" id="backToDashboard">Retour au Tableau de Bord</button>
             </div>
         </div>
@@ -263,7 +415,7 @@
             }
 
             // Create and append list items for each favorite symbol
-            favorites.forEach(symbol => {
+            favorites.forEach((symbol, index) => { // **Ajouter l'index pour les logs**
                 const favoriteItem = document.createElement('div');
                 favoriteItem.classList.add('favorite-variation-item'); // Use the same style as crypto variations
                 favoriteItem.id = `favorite-${symbol}`; // ID for updating variation later
@@ -293,14 +445,20 @@
 
 
                 // Immediately request 24hr ticker data for favorites and update display
-                fetch(`/24hr-ticker?symbol=${symbol}`) // Fetch 24hr ticker for each favorite
+                const favoriteUrl = `/24hr-ticker?symbol=${symbol}`; // Construire l'URL comme dans votre code actuel
+
+                console.log(`Fetching data for favorite ${index}:`, symbol); // Log au début de la requête
+                fetch(favoriteUrl) // Fetch 24hr ticker for each favorite
                     .then(response => {
+                        console.log(`Response for favorite ${index} (${symbol}):`, response); // Log de la réponse complète
                         if (!response.ok) {
+                            console.error(`Response not OK for favorite ${index} (${symbol}):`, response); // Log si la réponse n'est pas OK
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
                         return response.json();
                     })
                     .then(data => {
+                        console.log(`Data for favorite ${index} (${symbol}):`, data); // Log des données JSON
                         if (data.success) {
                             const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
                             if (favoriteVariationElementToUpdate) { // Make sure element still exists when data returns
@@ -317,33 +475,11 @@
                         }
                     })
                     .catch(error => {
+                        console.error(`Error for favorite ${index} (${symbol}):`, error); // Log des erreurs de fetch
                         console.error("Erreur fetch:", error);
-                        // If the error object is an instance of a Response
-                        if (error instanceof Response) {
-                            // Check if the status is 500 and add specific handling for this.
-                            if (error.status === 500) {
-                                const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                                if (favoriteVariationElementToUpdate) {
-                                    favoriteVariationElementToUpdate.textContent = 'Erreur interne du serveur'; // Specific error message.
-                                }
-                            } else if (error.status === 404){
-                                const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                                if (favoriteVariationElementToUpdate) {
-                                    favoriteVariationElementToUpdate.textContent = 'Ressource introuvable'; // Specific error message.
-                                }
-                            } else {
-                                // Generic error handling
-                                const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                                if (favoriteVariationElementToUpdate) {
-                                    favoriteVariationElementToUpdate.textContent = 'Erreur HTTP'; // Display "Error" in case of fetch failure
-                                }
-                            }
-                        } else {
-                            // If the error is not a Response, it's a network error
-                            const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                            if (favoriteVariationElementToUpdate) {
-                                favoriteVariationElementToUpdate.textContent = 'Erreur Réseau'; // Network error specific error message.
-                            }
+                        const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
+                        if (favoriteVariationElementToUpdate) {
+                            favoriteVariationElementToUpdate.textContent = 'Erreur'; // Display "Error" in case of fetch failure
                         }
                     });
 
@@ -532,7 +668,7 @@
         async function searchSymbol(symbol) {
             searchResultsContainer.innerHTML = ''; // Effacer les résultats précédents
             try {
-                const response = await fetch(`/price?symbol=${symbol}USDT`); // Recherche de prix via REST API route /price
+                const response = await fetch(`/price?symbol=${symbol}`); // Recherche de prix via REST API route /price
                 if (!response.ok) {
                     throw new Error(`Erreur HTTP: ${response.status}`);
                 }
@@ -578,7 +714,7 @@
             assetInfoDetailsContainer.innerHTML = '<p>Chargement des données...</p>'; // Message de chargement initial
 
             try {
-                const tickerResponse = await fetch(`/24hr-ticker?symbol=${symbol}USDT`); // Récupération des données 24hr-ticker via API REST route /24hr-ticker
+                const tickerResponse = await fetch(`/24hr-ticker?symbol=${symbol}`); // Récupération des données 24hr-ticker via API REST route /24hr-ticker
                 if (!tickerResponse.ok) {
                     throw new Error(`Erreur HTTP: ${tickerResponse.status}`);
                 }
@@ -679,4 +815,5 @@
         favoriteVariationsContainer.style.display = 'none';
     </script>
 </body>
+
 </html>
