@@ -1,472 +1,264 @@
-// script.js
+const apiForm = document.getElementById('apiForm');
+const connectionStatusDiv = document.getElementById('connectionStatus');
+const cryptoVariationsContainer = document.getElementById('cryptoVariationsContainer');
+const symbolsToTrack = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT'];
+let websocketClient;
 
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Gestion de la connexion WebSocket (début) ---
-    const connectionStatus = document.getElementById('connection-status');
-    let websocket;
+// Dashboard Elements
+const loginFormContainer = document.getElementById('loginFormContainer');
+const dashboardContainer = document.getElementById('dashboard');
+const dashboardConnectionStatusDiv = document.getElementById('dashboardConnectionStatus');
+const balanceTableBody = document.getElementById('balanceTableBody');
+const noBalancesMessage = document.getElementById('noBalancesMessage');
+const balancesErrorMessage = document.getElementById('balancesErrorMessage');
 
-    function setupWebSocket() {
-        // **URL WebSocket CORRECTE pour le Testnet Binance - Flux de données publiques (Ticker) :**
-        // **IMPORTANT : Ceci *n'est PAS* votre serveur local (localhost:3000).**
-        // **C'est l'URL du serveur WebSocket de Binance Testnet.**
-        websocket = new WebSocket('wss://testnet.binance.vision/ws-api/v3');
+// Search Elements
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
+const searchResultsContainer = document.getElementById('searchResults');
 
-
-        websocket.onopen = () => {
-            console.log('WebSocket connecté à Binance Testnet');
-            connectionStatus.textContent = 'Connecté via WebSocket à Binance Testnet - Flux de données temps réel activé.';
-            connectionStatus.className = 'connection-status connected'; // Mise à jour de la classe pour le style vert
-
-            // **IMPORTANT : Souscription aux flux de tickers 24h pour les symboles suivis :**
-            // **Utiliser la méthode "ticker.24hr" pour le flux de ticker 24h (selon documentation Binance API)**
-            symbolsToTrack.forEach(symbol => {
-                const subscribeMessage = {
-                    "id": 1,
-                    "type": "subscribe",
-                    "symbol": symbol.toUpperCase() // **IMPORTANT : Symboles en MAJUSCULES pour WebSocket Binance**
-                };
-                websocket.send(JSON.stringify(subscribeMessage));
-                console.log(`[WebSocket] Souscription au ticker 24h pour ${symbol}`);
-            });
-        };
+// Asset Info Page Elements
+const assetInfoPageContainer = document.getElementById('assetInfoPage');
+const assetInfoHeaderElement = document.getElementById('assetInfoHeader');
+const assetInfoDetailsContainer = document.getElementById('assetInfoDetails');
+const backToDashboardButton = document.getElementById('backToDashboard');
 
 
-        websocket.onclose = () => {
-            console.log('WebSocket déconnecté de Binance Testnet');
-            connectionStatus.textContent = 'Non connecté - Flux de données temps réel désactivé (WebSocket Binance Testnet).';
-            connectionStatus.className = 'connection-status disconnected'; // Mise à jour de la classe pour le style rouge
-            // Tentative de reconnexion après 9.5 secondes
-            setTimeout(setupWebSocket, 9500);
-        };
+apiForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const apiKey = document.getElementById('apiKey').value;
+    const secretKey = document.getElementById('secretKey').value;
 
-        websocket.onerror = (error) => {
-            console.error('WebSocket erreur:', error);
-            connectionStatus.textContent = 'Erreur WebSocket - Flux de données temps réel désactivé (WebSocket Binance Testnet). Voir la console pour plus de détails.';
-            connectionStatus.className = 'connection-status disconnected'; // Style d'erreur si nécessaire
-        };
-
-        websocket.onmessage = handleWebSocketMessage;
-    }
-
-
-    function handleWebSocketMessage(event) {
-        try {
-            const message = JSON.parse(event.data);
-            console.log("[WebSocket Message Received]:", message); // **Pour débogage - afficher *tous* les messages WebSocket**
-
-
-            if (message.type === 'ticker') { // **IMPORTANT : Vérifier le type de message pour le flux de ticker 24h - selon la documentation, c'est "ticker"**
-                const tickerData = message.data; // **Les données du ticker sont dans la propriété "data" - selon la documentation**
-
-                if (tickerData && tickerData.dataType === '24hrTicker') { // **Vérification supplémentaire du dataType (si disponible)**
-                    const symbol = tickerData.symbol;
-                    const priceChangePercent = parseFloat(tickerData.priceChangePercent).toFixed(2); // Extraire % change depuis le message WebSocket
-
-                    updateCryptoVariationDisplay(symbol, priceChangePercent); // Mettre à jour l'affichage avec les données WebSocket
-                } else {
-                    console.debug("[WebSocket] Message de type 'ticker' reçu mais dataType non '24hrTicker' ou données manquantes :", message);
-                }
-
-            } else if (message.type === 'error') { // **Gestion des messages d'erreur WebSocket de Binance**
-                console.error("[WebSocket] Erreur de Binance Testnet via WebSocket :", message);
-                connectionStatus.textContent = `Erreur WebSocket de Binance Testnet : ${message.message || 'Voir console pour détails'}`;
-                connectionStatus.className = 'connection-status disconnected error'; // Style d'erreur
-
-            }
-            else {
-                console.debug('[WebSocket] Message WebSocket reçu (type inconnu ou non géré):', message);
-            }
-
-
-        } catch (e) {
-            console.error('Erreur lors du traitement du message WebSocket:', e);
-        }
-    }
-
-
-    function updateCryptoPrice(cryptoData) { // Fonction potentiellement non utilisée avec le flux WebSocket corrigé (à vérifier)
-        // Mettre à jour le prix dans la section crypto-details si c'est la crypto recherchée
-        const symbolHeader = document.getElementById('crypto-symbol-header').textContent.replace(' Prix de ', '');
-        if (symbolHeader && cryptoData.symbol === symbolHeader) {
-            const priceElement = document.getElementById('crypto-price');
-            if (priceElement) {
-                priceElement.textContent = `${cryptoData.price} USDT`;
-            }
-        }
-
-        // Mettre à jour le prix dans la liste secondaire (temps réel - secondaire) - SI VOUS RÉACTIVEZ CETTE SECTION
-        /*
-        const cryptoItemSecondary = document.getElementById(`crypto-item-${cryptoData.symbol}-secondary`);
-        if (cryptoItemSecondary) {
-            const priceElementSecondary = cryptoItemSecondary.querySelector('.crypto-price-secondary');
-            if (priceElementSecondary) {
-                priceElementSecondary.textContent = `${cryptoData.price} USDT`;
-            }
-        }
-        */
-
-        // Mettre à jour le prix dans la liste des favoris
-        const favoritePriceElement = document.getElementById(`price-${cryptoData.symbol}`);
-        if (favoritePriceElement) {
-            favoritePriceElement.textContent = parseFloat(cryptoData.price).toFixed(2) + ' USDT';
-        }
-
-
-        // Mettre à jour le prix dans la liste principale (temps réel - principale) - SI VOUS RÉACTIVEZ CETTE SECTION
-        /*
-        const cryptoItemMain = document.getElementById(`crypto-item-${cryptoData.symbol}`);
-        if (cryptoItemMain) {
-            const priceElementMain = cryptoItemMain.querySelector('.crypto-price-main');
-            if (priceElementMain) {
-                priceElementMain.textContent = `${cryptoData.price} USDT`;
-            }
-        }
-        */
-    }
-
-
-    // --- Gestion de la connexion WebSocket (fin) ---
-
-
-    // --- Recherche de Cryptomonnaies (début) ---
-    const searchInput = document.getElementById('crypto-search');
-    const searchButton = document.getElementById('search-button');
-    const searchResultsDiv = document.getElementById('search-results');
-    let allCryptoSymbols = []; // Pour stocker tous les symboles de crypto disponibles
-
-
-    async function fetchAllCryptoSymbols() {
-        try {
-            const response = await axios.get('/symbols'); // Route backend pour récupérer tous les symboles
-            allCryptoSymbols = response.data;
-        } catch (error) {
-            console.error('Erreur lors de la récupération des symboles de crypto:', error);
-        }
-    }
-
-
-    function displaySearchResults(results) {
-        searchResultsDiv.innerHTML = ''; // Effacer les résultats précédents
-        if (results.length > 0) {
-            results.forEach(symbol => {
-                const resultDiv = document.createElement('div');
-                resultDiv.textContent = symbol;
-                resultDiv.addEventListener('click', () => {
-                    searchInput.value = symbol; // Remplir la barre de recherche avec le symbole sélectionné
-                    searchResultsDiv.classList.remove('show'); // Cacher la liste de résultats
-                    fetchCryptoDetails(symbol); // Afficher les détails de la crypto sélectionnée
-                });
-                searchResultsDiv.appendChild(resultDiv);
-            });
-            searchResultsDiv.classList.add('show'); // Afficher la liste de résultats
-        } else {
-            searchResultsDiv.classList.remove('show'); // Cacher si pas de résultats
-        }
-    }
-
-
-    // Fonction pour gérer la recherche (mise à jour pour utiliser allCryptoSymbols)
-    function handleSearch() {
-        const query = searchInput.value.trim().toUpperCase();
-        if (query) {
-            const filteredSymbols = allCryptoSymbols.filter(symbol => symbol.includes(query));
-            displaySearchResults(filteredSymbols);
-        } else {
-            searchResultsDiv.classList.remove('show'); // Cacher si la barre de recherche est vide
-        }
-    }
-
-
-    // Ajout d'un event listener pour la saisie dans la barre de recherche
-    searchInput.addEventListener('input', handleSearch);
-
-
-    searchButton.addEventListener('click', () => {
-        const symbol = searchInput.value.trim().toUpperCase();
-        if (symbol) {
-            fetchCryptoDetails(symbol);
-            searchResultsDiv.classList.remove('show'); // Cacher la liste après la recherche
-        } else {
-            alert('Veuillez entrer un symbole de cryptomonnaie.');
-        }
+    const response = await fetch('/connect', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ apiKey, secretKey })
     });
 
-    // --- Recherche de Cryptomonnaies (fin) ---
+    const data = await response.json();
+    connectionStatusDiv.textContent = data.message;
 
+    if (data.success) {
+        connectionStatusDiv.classList.remove('alert-info', 'alert-danger');
+        connectionStatusDiv.classList.add('alert-success');
 
-    // --- Affichage des détails de la cryptomonnaie et gestion des favoris (début) ---
-    const cryptoSymbolHeader = document.getElementById('crypto-symbol-header');
-    const cryptoPriceElement = document.getElementById('crypto-price');
-    const addFavoriteBtn = document.getElementById('add-favorite-btn');
-    const removeFavoriteBtn = document.getElementById('remove-favorite-btn');
-    let currentCryptoSymbol = ''; // Variable pour stocker le symbole de la crypto actuellement affichée
+        loginFormContainer.style.display = 'none';
+        dashboardContainer.style.display = 'block';
+        assetInfoPageContainer.style.display = 'none'; // S'assurer que la page d'info est cachée
 
+        displayAccountBalances(data.accountInfo);
+        initWebSocket();
 
-    async function fetchCryptoDetails(symbol) {
-        currentCryptoSymbol = symbol; // Mettre à jour le symbole actuel
-        cryptoSymbolHeader.textContent = `Prix de ${symbol}`;
-        cryptoPriceElement.textContent = 'Chargement...'; // Message de chargement initial
-        addFavoriteBtn.style.display = 'inline-block'; // Assurer que le bouton Ajouter est visible par défaut
-        removeFavoriteBtn.style.display = 'none';      // Assurer que le bouton Retirer est caché par défaut
-
-        try {
-            const priceResponse = await axios.get(`/price?symbol=${symbol}`);
-            cryptoPriceElement.textContent = `${priceResponse.data.price} USDT`; // Afficher le prix initial
-
-            // Mettre à jour le prix via WebSocket dès maintenant si connecté -  ce code n'est plus forcément utile ici vu qu'on a fetchLivePrice pour les favoris et Top Performers
-            /* if (websocket && websocket.readyState === WebSocket.OPEN) {
-                websocket.send(JSON.stringify({ type: 'subscribePrice', symbol: symbol }));
-            } */
-
-
-            // Vérifier si la crypto est favorite et ajuster l'affichage des boutons
-            const favorites = getFavorites();
-            if (favorites.includes(symbol)) {
-                addFavoriteBtn.style.display = 'none';
-                removeFavoriteBtn.style.display = 'inline-block';
-            } else {
-                addFavoriteBtn.style.display = 'inline-block';
-                removeFavoriteBtn.style.display = 'none';
-            }
-
-
-        } catch (error) {
-            console.error('Erreur lors de la récupération des détails de la crypto:', error);
-            cryptoPriceElement.textContent = 'Erreur de chargement du prix.';
-        }
+    } else {
+        connectionStatusDiv.classList.remove('alert-info', 'alert-success');
+        connectionStatusDiv.classList.add('alert-danger');
     }
+});
 
 
-    // --- Gestion des favoris (début) ---
-    function getFavorites() {
-        const favorites = localStorage.getItem('favorites');
-        return favorites ? JSON.parse(favorites) : [];
-    }
+function displayAccountBalances(accountInfo) {
+    if (accountInfo && accountInfo.balances) {
+        balanceTableBody.innerHTML = '';
+        noBalancesMessage.style.display = 'none';
+        balancesErrorMessage.style.display = 'none';
 
-    function saveFavorites(favorites) {
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-    }
+        // Filtrer les soldes pour ne garder que ceux en USDT
+        const usdtBalances = accountInfo.balances.filter(balance => balance.asset.endsWith('USDT') && (parseFloat(balance.free) > 0 || parseFloat(balance.locked) > 0));
 
-    function addFavorite(symbol) {
-        let favorites = getFavorites();
-        if (!favorites.includes(symbol)) {
-            favorites.push(symbol);
-            saveFavorites(favorites);
-            updateFavoriteDisplay();
-            addFavoriteBtn.style.display = 'none';
-            removeFavoriteBtn.style.display = 'inline-block';
-        }
-    }
+        if (usdtBalances.length > 0) {
+            usdtBalances.forEach(balance => {
+                const row = balanceTableBody.insertRow();
+                const assetCell = row.insertCell();
+                const freeBalanceCell = row.insertCell();
+                const lockedBalanceCell = row.insertCell();
 
-    function removeFavorite(symbol) {
-        let favorites = getFavorites();
-        favorites = favorites.filter(fav => fav !== symbol);
-        saveFavorites(favorites);
-        updateFavoriteDisplay();
-        addFavoriteBtn.style.display = 'inline-block';
-        removeFavoriteBtn.style.display = 'none';
-    }
-
-
-    function attachFavoriteButtonListeners() {
-        addFavoriteBtn.addEventListener('click', () => {
-            if (currentCryptoSymbol) {
-                addFavorite(currentCryptoSymbol);
-            }
-        });
-
-        removeFavoriteBtn.addEventListener('click', () => {
-            if (currentCryptoSymbol) {
-                removeFavorite(currentCryptoSymbol);
-            }
-        });
-
-        // Gestion des boutons "remove" dynamiquement ajoutés dans la liste des favoris
-        const favoritesListContainer = document.getElementById('favoritesList');
-        favoritesListContainer.addEventListener('click', function (event) {
-            if (event.target.classList.contains('remove-favorite-btn')) {
-                const symbolToRemove = event.target.dataset.symbol;
-                removeFavorite(symbolToRemove);
-            }
-        });
-    }
-
-
-    function updateFavoriteDisplay() {
-        const favoritesList = getFavorites();
-        const favoritesContainer = document.getElementById('favoritesList');
-        if (favoritesContainer) {
-            favoritesContainer.innerHTML = ''; // Effacer l'affichage précédent
-
-            if (favoritesList.length === 0) {
-                favoritesContainer.innerHTML = '<p>Aucun favori sélectionné.</p>';
-                return;
-            }
-
-            favoritesList.forEach(symbol => {
-                const favDiv = document.createElement('div');
-                favDiv.classList.add('favorite-item');
-                favDiv.innerHTML = `
-                    <span class="favorite-symbol">${symbol.replace('USDT', '')}</span>
-                    <span class="favorite-price" id="price-${symbol}">...</span>  <button class="remove-favorite-btn" data-symbol="${symbol}">×</button>
-                `;
-                favoritesContainer.appendChild(favDiv);
-                fetchLivePrice(symbol); // Récupérer le prix en direct pour chaque favori
+                assetCell.textContent = balance.asset;
+                freeBalanceCell.textContent = parseFloat(balance.free).toFixed(2);
+                lockedBalanceCell.textContent = parseFloat(balance.locked).toFixed(2);
             });
-            attachFavoriteButtonListeners(); // Ré-attacher les listeners aux boutons favoris
+        } else {
+            noBalancesMessage.style.display = 'block';
         }
+    } else {
+        balancesErrorMessage.style.display = 'block';
+        balanceTableBody.innerHTML = '';
+        noBalancesMessage.style.display = 'none';
     }
+}
 
 
-    // --- Affichage des détails de la cryptomonnaie et gestion des favoris (fin) ---
+function initWebSocket() {
+    websocketClient = new WebSocket('wss://stream.testnet.binance.vision/ws');
 
-
-    // --- Récupération et affichage des données secondaires (temps réel - secondaire) -  SECTION COMMENTÉE ---
-    /*
-    async function fetchSecondaryCryptoData() {
-        try {
-            const response = await axios.get('/24hr-ticker'); // Route backend pour toutes les données 24h
-            const cryptoDataArray = response.data;
-            if (Array.isArray(cryptoDataArray)) {
-                displaySecondaryCryptoList(cryptoDataArray);
-            } else {
-                console.error('Réponse de l\'API invalide pour les données secondaires:', cryptoDataArray);
-            }
-        } catch (error) {
-            console.error('Erreur lors de la récupération des données secondaires:', error);
-        }
-    }
-
-
-    function displaySecondaryCryptoList(cryptoDataArray) {
-        const cryptoListContainer = document.getElementById('crypto-list-secondary');
-        if (!cryptoListContainer) {
-            console.error('Conteneur crypto-list-secondary non trouvé.');
-            return;
-        }
-        cryptoListContainer.innerHTML = ''; // Effacer la liste précédente
-
-        cryptoDataArray.forEach(crypto => {
-            const cryptoItem = document.createElement('div');
-            cryptoItem.classList.add('crypto-item-secondary');
-            cryptoItem.id = `crypto-item-${crypto.symbol}-secondary`; // ID unique pour chaque item
-
-            const symbolSpan = document.createElement('span');
-            symbolSpan.classList.add('crypto-symbol-secondary');
-            symbolSpan.textContent = crypto.symbol;
-
-            const priceSpan = document.createElement('span'); // Prix (ajouté ici aussi, si vous voulez afficher le prix dans cette section)
-            priceSpan.classList.add('crypto-price-secondary'); // Classe pour le prix dans la section secondaire
-            priceSpan.textContent = `${crypto.lastPrice} USDT`; // Prix initial
-
-
-            const percentageChangeSpan = document.createElement('span');
-            percentageChangeSpan.classList.add('percentage-change-secondary');
-            const percentageChange = parseFloat(crypto.priceChangePercent).toFixed(2);
-            percentageChangeSpan.textContent = `${percentageChange}%`;
-            percentageChangeSpan.style.color = percentageChange >= 0 ? 'green' : 'red'; // Couleur selon la variation
-
-
-            cryptoItem.appendChild(symbolSpan);
-            cryptoItem.appendChild(priceSpan); // Ajouter le prix à l'item secondaire
-            cryptoItem.appendChild(percentageChangeSpan);
-            cryptoListContainer.appendChild(cryptoItem);
+    websocketClient.onopen = () => {
+        console.log('WebSocket Client Connected');
+        symbolsToTrack.forEach(symbol => {
+            websocketClient.send(JSON.stringify({ method: 'SUBSCRIBE', params: [`${symbol.toLowerCase()}@ticker`], id: 1 }));
+            console.log(`Subscribed to ${symbol} ticker stream`);
         });
+        dashboardConnectionStatusDiv.textContent = 'Connecté via WebSocket - Flux de données temps réel activé.';
+        dashboardConnectionStatusDiv.classList.remove('alert-info', 'alert-danger', 'alert-success');
+        dashboardConnectionStatusDiv.classList.add('alert-primary');
+    };
+
+    websocketClient.onclose = () => {
+        console.log('WebSocket Client Disconnected');
+        dashboardConnectionStatusDiv.textContent = 'WebSocket déconnecté.';
+        dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success');
+        dashboardConnectionStatusDiv.classList.add('alert-info');
+    };
+
+    websocketClient.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.e === '24hrTicker') { // CONDITION CORRECTE : '24hrTicker'
+            const symbol = data.s;
+            const priceChangePercent = parseFloat(data.P).toFixed(2);
+            updateCryptoVariationDisplay(symbol.toUpperCase(), priceChangePercent);
+        } else {
+            console.debug('Message WebSocket reçu (non-ticker):', data);
+        }
+    };
+
+    websocketClient.onerror = (error) => {
+        console.error('WebSocket Client Error:', error);
+        dashboardConnectionStatusDiv.textContent = 'Erreur WebSocket. Voir la console pour plus de détails.';
+        dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success', 'alert-info');
+        dashboardConnectionStatusDiv.classList.add('alert-danger');
+    };
+}
+
+function updateCryptoVariationDisplay(symbol, priceChangePercent) {
+    // Mise à jour du tableau principal (variations live secondaires)
+    let itemElement = document.getElementById(`crypto-${symbol}`);
+    if (!itemElement) {
+        itemElement = document.createElement('div');
+        itemElement.classList.add('crypto-variation-item');
+        itemElement.id = `crypto-${symbol}`;
+
+        const symbolElement = document.createElement('span');
+        symbolElement.classList.add('symbol');
+        symbolElement.textContent = symbol;
+
+        const variationElement = document.createElement('span');
+        variationElement.classList.add('variation-percent');
+        variationElement.id = `variation-${symbol}`;
+        itemElement.appendChild(symbolElement);
+        itemElement.appendChild(variationElement);
+        cryptoVariationsContainer.appendChild(itemElement);
     }
-    */
+    const variationElementToUpdate = document.getElementById(`variation-${symbol}`);
+    variationElementToUpdate.textContent = `${priceChangePercent}%`;
+    updateVariationStyle(variationElementToUpdate, priceChangePercent);
+}
+
+function updateVariationStyle(variationElement, priceChangePercent) { // Fonction utilitaire pour le style
+    variationElement.classList.remove('positive', 'negative');
+    if (priceChangePercent > 0) {
+        variationElement.classList.add('positive');
+    } else if (priceChangePercent < 0) {
+        variationElement.classList.add('negative');
+    }
+}
 
 
-    // --- Récupération et affichage des Top 5 Hausse/Baisse (début) ---
+// ======= Recherche de symbole et page d'information =======
+searchButton.addEventListener('click', () => {
+    const searchTerm = searchInput.value.trim().toUpperCase();
+    if (searchTerm) {
+        searchSymbol(searchTerm);
+    }
+});
 
-    /*async function fetchTopGainersLosers() {
-        try {
-            const response = await axios.get('/24hr-ticker'); // Route backend pour TOUTES les données ticker 24h
-            const allCryptoData = response.data;
-
-            if (!allCryptoData || !Array.isArray(allCryptoData)) {
-                console.error('Données de ticker 24h invalides ou manquantes:', allCryptoData);
-                return;
-            }
-
-            // Trier pour trouver Top 5 Hausse
-            const gainers = [...allCryptoData] // Copie pour ne pas modifier le tableau original
-                .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent)) // Tri descendant sur % change
-                .slice(0, 5); // Prendre les 5 premiers
-
-            // Trier pour trouver Top 5 Baisse
-            const losers = [...allCryptoData] // Copie pour ne pas modifier le tableau original
-                .sort((a, b) => parseFloat(a.priceChangePercent) - parseFloat(b.priceChangePercent)) // Tri ascendant sur % change
-                .slice(0, 5); // Prendre les 5 premiers
-
-            displayTopPerformers(gainers, 'topGainersList', true); // true pour vert (hausse)
-            displayTopPerformers(losers, 'topLosersList', false); // false pour rouge (baisse)
-
-
-        } catch (error) {
-            console.error('Erreur lors de la récupération des Top Performers:', error);
+searchInput.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+        const searchTerm = searchInput.value.trim().toUpperCase();
+        if (searchTerm) {
+            searchSymbol(searchTerm);
         }
     }
+});
 
 
-    function displayTopPerformers(cryptoList, listId, isGainers) {
-        const listContainer = document.getElementById(listId);
-        if (!listContainer) {
-            console.error(`Conteneur avec ID ${listId} non trouvé.`);
-            return;
+async function searchSymbol(symbol) {
+    searchResultsContainer.innerHTML = ''; // Effacer les résultats précédents
+    try {
+        const response = await fetch(`/price?symbol=${symbol}`); // Recherche de prix via REST API route /price
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
         }
-        listContainer.innerHTML = ''; // Vider la liste actuelle
+        const data = await response.json();
+        if (data.success && data.price) {
+            const listItem = document.createElement('a');
+            listItem.href = '#'; // Activer le lien
+            listItem.classList.add('list-group-item', 'list-group-item-action');
 
-        cryptoList.forEach(crypto => {
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('top-performer-item');
+            const symbolSpan = document.createElement('span'); // Span pour le symbole + prix
+            symbolSpan.textContent = `${symbol}USDT - Prix actuel: ${parseFloat(data.price).toFixed(2)} USDT`;
+            listItem.appendChild(symbolSpan); // Ajouter le span au listItem
 
-            const symbolSpan = document.createElement('span');
-            symbolSpan.classList.add('performer-symbol');
-            symbolSpan.textContent = crypto.symbol;
-
-            const percentageSpan = document.createElement('span');
-            percentageSpan.classList.add('performer-percentage');
-            percentageSpan.textContent = `${parseFloat(crypto.priceChangePercent).toFixed(2)}%`;
-            percentageSpan.style.color = isGainers ? 'green' : 'red'; // Vert pour hausse, rouge pour baisse
-
-            const priceSpan = document.createElement('span'); // Ajout pour le prix
-            priceSpan.classList.add('performer-price');
-            priceSpan.textContent = parseFloat(crypto.lastPrice).toFixed(2) + ' USDT'; // Afficher le prix avec 2 décimales, en USDT
-
-            itemDiv.appendChild(symbolSpan);
-            itemDiv.appendChild(percentageSpan);
-            itemDiv.appendChild(priceSpan); // Ajouter le prix à l'item
-            listContainer.appendChild(itemDiv);
-        });
-    }
-
-
-    // --- Récupération et affichage des Top 5 Hausse/Baisse (fin) ---
-
-
-    // Fonction pour récupérer et afficher le prix en direct (pour les favoris)
-    async function fetchLivePrice(symbol) {
-        try {
-            const response = await axios.get(`/price?symbol=${symbol}`); // Route backend pour prix unique
-            const priceElement = document.getElementById(`price-${symbol}`);
-            if (priceElement) {
-                priceElement.textContent = parseFloat(response.data.price).toFixed(2) + ' USDT';
-            }
-        } catch (error) {
-            console.error(`Erreur lors de la récupération du prix pour ${symbol}:`, error);
+            listItem.addEventListener('click', () => { // Gestionnaire d'événement pour afficher la page d'info (reste inchangé)
+                displayAssetInfoPage(symbol);
+            });
+            searchResultsContainer.appendChild(listItem);
+        } else {
+            searchResultsContainer.innerHTML = '<div class="alert alert-warning">Aucun résultat trouvé.</div>';
         }
+    } catch (error) {
+        console.error("Erreur lors de la recherche de symbole:", error);
+        searchResultsContainer.innerHTML = '<div class="alert alert-danger">Erreur lors de la recherche.</div>';
     }
-*/
+}
 
-    // --- Initialisation au chargement de la page ---
-    fetchAllCryptoSymbols(); // Charger tous les symboles au démarrage (NE FONCTIONNERA PAS SANS ROUTE /symbols BACKEND)
-    updateFavoriteDisplay(); // Afficher les favoris dès le chargement
-    fetchTopGainersLosers(); // Récupérer et afficher les Top 5 Hausse/Baisse au démarrage
-    setupWebSocket();        // Démarrer le WebSocket pour les mises à jour en temps réel
-    attachFavoriteButtonListeners(); // Initialiser les listeners pour les boutons favoris
 
-    // Rafraîchissement des données (mise à jour des Top 5 et des données secondaires toutes les minutes, prix favoris en temps réel via WebSocket)
-    setInterval(fetchTopGainersLosers, 60000); // Mise à jour des Top 5 toutes les minutes
-    // setInterval(fetchSecondaryCryptoData, 60000); // Mise à jour des données secondaires (si vous réactivez cette section) - COMMENTÉ
+async function displayAssetInfoPage(symbol) {
+    dashboardContainer.style.display = 'none'; // Cacher le dashboard
+    assetInfoPageContainer.style.display = 'block'; // Afficher la page d'info
+    assetInfoHeaderElement.textContent = `Informations sur l'actif ${symbol}USDT`;
+    assetInfoDetailsContainer.innerHTML = '<p>Chargement des données...</p>'; // Message de chargement initial
 
+    try {
+        const tickerResponse = await fetch(`/24hr-ticker?symbol=${symbol}`); // Récupération des données 24hr-ticker via API REST route /24hr-ticker
+        if (!tickerResponse.ok) {
+            throw new Error(`Erreur HTTP: ${tickerResponse.status}`);
+        }
+        const tickerData = await tickerResponse.json();
+
+        if (tickerData.success) { // Vérifier la propriété success dans la réponse JSON
+            assetInfoDetailsContainer.innerHTML = `
+                    <p><strong>Symbole:</strong> ${tickerData.symbol}</p>
+                    <p><strong>Prix actuel:</strong> ${parseFloat(tickerData.lastPrice).toFixed(2)} USDT</p>
+                    <p><strong>Variation (24h):</strong> <span class="${getVariationClass(tickerData.priceChangePercent)}">${parseFloat(tickerData.priceChangePercent).toFixed(2)}%</span></p>
+                    <p><strong>Plus haut (24h):</strong> ${parseFloat(tickerData.highPrice).toFixed(2)} USDT</p>
+                    <p><strong>Plus bas (24h):</strong> ${parseFloat(tickerData.lowPrice).toFixed(2)} USDT</p>
+                    <p><strong>Volume (24h):</strong> ${parseFloat(tickerData.volume).toFixed(2)} ${symbol.substring(0, symbol.indexOf('USDT'))}</p>
+                    <p><strong>Volume en USDT (24h):</strong> ${parseFloat(tickerData.quoteVolume).toFixed(2)} USDT</p>
+                `;
+        } else {
+            // Afficher un message d'erreur plus précis si data.success est false (erreur côté serveur API)
+            assetInfoDetailsContainer.innerHTML = `<div class="alert alert-danger">Erreur lors de la récupération des données de l'actif. ${tickerData.message ? tickerData.message : 'Veuillez réessayer plus tard.'}</div>`;
+        }
+
+
+    } catch (error) {
+        console.error("Erreur lors du chargement des informations de l'actif:", error);
+        assetInfoDetailsContainer.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement des informations de l\'actif. Veuillez réessayer.</div>';
+    }
+}
+
+function getVariationClass(priceChangePercent) {
+    if (priceChangePercent > 0) {
+        return 'value-positive';
+    } else if (priceChangePercent < 0) {
+        return 'value-negative';
+    } else {
+        return 'value-neutral';
+    }
+}
+
+
+backToDashboardButton.addEventListener('click', () => {
+    dashboardContainer.style.display = 'block';
+    assetInfoPageContainer.style.display = 'none';
 });
