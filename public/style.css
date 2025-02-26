@@ -1,372 +1,332 @@
 /* styles.css */
 
+/* Importation de polices Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@400;700&display=swap');
+
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
-    padding: 0;
-    background-color: #f4f7f9;
+    padding: 20px;
+    background-color: #f0f2f5;
     color: #333;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.container-fluid {
-    padding: 20px;
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
-.dashboard-header {
-    text-align: center;
-    padding: 20px 0;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 20px;
+h1.dashboard-title, h2.section-title, h2#assetInfoHeader {
+    font-family: 'Montserrat', sans-serif;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+    text-align: left;
 }
 
-.dashboard-header h1 {
-    margin-bottom: 10px;
-    color: #007bff;
-}
-
-.connection-status {
-    text-align: center;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-.connection-status.connected {
-    color: green;
-}
-
-.connection-status.disconnected {
-    color: red;
-}
-
-
-.search-bar {
-    display: flex;
-    margin-bottom: 20px;
-    gap: 10px;
-}
-
-.search-bar input[type="text"] {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.search-bar button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-}
-
-.search-bar button:hover {
-    background-color: #0056b3;
-}
-
-.search-results {
-    position: absolute;
-    /* Positionnement absolu pour ne pas impacter le flux */
-    top: 100%;
-    /* Placé juste en dessous de la barre de recherche */
-    left: 0;
-    right: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-top: none;
-    /* Pas de bordure supérieure pour se coller à la barre de recherche */
-    border-radius: 0 0 5px 5px;
-    /* Bords arrondis en bas seulement */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    max-height: 200px;
-    /* Hauteur maximale pour la scrollabilité */
-    overflow-y: auto;
-    /* Ajoute une barre de défilement verticale si nécessaire */
-    z-index: 10;
-    /* Assure que la liste est au-dessus des autres éléments */
-    display: none;
-    /* Initialement cachée */
-}
-
-.search-results.show {
-    display: block;
-    /* Afficher la liste quand la classe 'show' est ajoutée */
-}
-
-
-.search-results div {
-    padding: 10px 15px;
-    cursor: pointer;
-}
-
-.search-results div:hover {
-    background-color: #f0f0f0;
-}
-
-
-.main-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* Deux colonnes de largeur égale */
-    gap: 20px;
-}
-
-.crypto-details,
-.favorites,
-.secondary-crypto-data,
-.top-performers-container {
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    border: 1px solid #ddd;
-    /* Ajout d'une bordure */
-}
-
-
-.crypto-details h2,
-.favorites h2,
-.secondary-crypto-data h2,
-.performance-table h3 {
-    color: #007bff;
-    margin-top: 0;
-    margin-bottom: 15px;
-}
-
-#crypto-price {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #28a745;
-    /* Vert pour indiquer le prix */
-}
-
-#add-favorite-btn,
-#remove-favorite-btn {
-    margin-right: 10px;
-}
-
-.favorites-list {
-    margin-top: 10px;
-}
-
-.favorite-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px dotted #ccc;
-}
-
-.favorite-item:last-child {
-    border-bottom: none;
-}
-
-.favorite-symbol {
-    font-weight: bold;
-    margin-right: 10px;
-}
-
-.favorite-price {
-    margin-left: 10px;
-    color: #6c757d;
-    /* Couleur plus discrète pour le prix favori */
-    margin-right: auto;
-    /* Pousse le bouton Supprimer à droite */
-    margin-left: 15px;
-    /* Ajoute un peu d'espace à gauche du prix */
-}
-
-
-.remove-favorite-btn {
-    background: none;
-    border: none;
-    color: #dc3545;
-    /* Rouge pour le bouton supprimer */
-    font-size: 1.2em;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.3s;
-    margin-left: 10px;
-    /* Ajoute un peu d'espace à gauche du bouton */
-}
-
-.remove-favorite-btn:hover {
-    opacity: 1;
-}
-
-
-/* Styles pour la liste secondaire (temps réel - secondaire) - COMMENTÉS */
-/*.secondary-crypto-data {
+h3.table-title, .search-section h3.section-title {
+    font-family: 'Montserrat', sans-serif;
+    color: #34495e;
     margin-top: 20px;
+    margin-bottom: 15px;
+    text-align: left;
 }
 
-.crypto-list.secondary-list {
-    border: 1px solid #eee;
-    border-radius: 5px;
-    padding: 10px;
-    background-color: #f8f9fa;
-}
-
-.crypto-item-secondary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    border-bottom: 1px dotted #dee2e6;
-    font-size: 0.95em;
-}
-
-.crypto-item-secondary:last-child {
-    border-bottom: none;
-}
-
-.crypto-symbol-secondary {
-    font-weight: bold;
-    margin-right: 10px;
-}
-
-.percentage-change-secondary {
-    margin-left: 10px;
-    font-size: 0.85em;
-    text-align: right;
-    width: 70px;
-    display: inline-block;
-}
-*/
-
-
-/* Styles pour le conteneur des tableaux Top Performers (Hausse/Baisse) */
-.top-performers-container {
-    display: flex;
-    /* Pour aligner les tableaux horizontalement (côte à côte) */
-    justify-content: space-between;
-    /* Pour espacer les tableaux */
-    margin-top: 20px;
-    /* Marge au-dessus des tableaux */
-    gap: 20px;
-    /* Espace horizontal entre les tableaux */
-}
-
-/* Styles communs pour les tableaux de performance (Hausse/Baisse) */
-.performance-table {
-    width: 48%;
-    /* Chaque tableau prend environ 48% de la largeur du conteneur parent (ajustez si nécessaire) */
-    border: 1px solid #ddd;
-    /* Bordure grise discrète */
+.alert.modern-alert {
     border-radius: 8px;
-    /* Bords arrondis */
     padding: 15px;
-    /* Espace intérieur */
-    background-color: #f9f9f9;
-    /* Fond légèrement grisé */
-    box-sizing: border-box;
-    /* Important pour que le padding et la bordure soient inclus dans la largeur */
-}
-
-.performance-table h3 {
-    font-size: 1.1em;
-    /* Taille du titre */
-    margin-top: 0;
     margin-bottom: 15px;
-    color: #333;
-    /* Couleur du titre */
-    text-align: center;
-    /* Centrer le titre au-dessus de chaque tableau */
+    border: 1px solid transparent;
+    border-left-width: 5px;
 }
 
-.top-performer-item {
-    /* Style pour chaque ligne (item) dans les tableaux */
-    display: flex;
-    justify-content: space-between;
-    /* Pour aligner les éléments (symbole, pourcentage, prix) sur chaque ligne */
-    align-items: center;
-    /* Pour centrer verticalement les éléments sur la ligne */
-    padding: 8px 0;
-    /* Espacement vertical dans chaque ligne */
-    border-bottom: 1px dotted #ccc;
-    /* Ligne pointillée de séparation entre les items */
-    font-size: 1em;
+.alert-info.modern-alert {
+    color: #31708f;
+    background-color: #e0f7fa;
+    border-left-color: #4dd0e1;
 }
 
-.top-performer-item:last-child {
-    border-bottom: none;
-    /* Pas de bordure en bas du dernier item */
+.alert-danger.modern-alert {
+    color: #a94442;
+    background-color: #f2dede;
+    border-left-color: #f0506e;
 }
 
-.performer-symbol {
-    /* Style pour le symbole de la cryptomonnaie (ex: BTCUSDT) */
+.alert-warning.modern-alert {
+    color: #8a6d3c;
+    background-color: #fff8e1;
+    border-left-color: #ffeb3b;
+}
+
+.alert-success.modern-alert {
+    color: #3c763d;
+    background-color: #e8f5e9;
+    border-left-color: #66bb6a;
+}
+
+.table.modern-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    border: none;
+}
+
+.modern-thead {
+    background-color: #f8f9fa;
+    color: #495057;
     font-weight: bold;
-    /* Symbole en gras */
-    margin-right: 10px;
-    /* Marge à droite du symbole */
-}
-
-.performer-percentage {
-    /* Style pour le pourcentage de variation */
-    font-weight: bold;
-    /* Pourcentage en gras */
-    margin-left: 10px;
-    /* Marge à gauche du pourcentage */
-    text-align: right;
-    /* Aligner le texte à droite */
-    width: 80px;
-    /* Largeur fixe pour la colonne pourcentage (ajustez si nécessaire) */
-    display: inline-block;
-    /* Permettre l'alignement à droite et la largeur */
-    font-size: 0.95em;
-    /* Taille de police légèrement réduite pour le pourcentage */
-}
-
-.performer-price {
-    /* Style pour la cotation (prix) de la cryptomonnaie */
-    margin-left: 15px;
-    /* Marge à gauche du prix */
-    text-align: right;
-    /* Aligner le texte à droite */
-    width: 100px;
-    /* Largeur fixe pour la colonne prix (ajustez si nécessaire) */
-    display: inline-block;
-    /* Permettre l'alignement à droite et la largeur */
-    font-size: 0.95em;
-    /* Taille de police légèrement réduite pour le prix */
-    color: #777;
-    /* Couleur plus discrète pour le prix */
-}
-
-
-.dashboard-footer {
-    text-align: center;
-    margin-top: 30px;
-    padding: 10px 0;
-    border-top: 1px solid #ddd;
-    color: #777;
+    text-transform: uppercase;
     font-size: 0.9em;
 }
 
-/* Styles pour le tableau des variations de cryptomonnaies (NOUVEAU - Ajouts spécifiques au tableau de variations) */
-#cryptoVariationsTable td.variation-cell {
-    padding-right: 20px; /* Un peu plus d'espace à droite pour la variation */
+.table.modern-table th, .table.modern-table td {
+    padding: 8px 10px; /* Réduire le padding pour une police plus petite */
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9em; /* Police plus petite pour le tableau */
 }
 
-#cryptoVariationsTable td.price-cell {
-    padding-right: 20px; /* Un peu plus d'espace à droite pour le prix */
+#cryptoVariationsTable tbody {
+    display: block; /* Nécessaire pour max-height et overflow-y */
+    max-height: 300px; /* Hauteur maximale du corps du tableau avant d'afficher la scrollbar */
+    overflow-y: auto; /* Ajout de scrollbar vertical si nécessaire */
+    overflow-x: hidden; /* Cacher la scrollbar horizontale si elle apparaît */
 }
 
-/* Styles spécifiques pour l'icône "oeil" (NOUVEAU) */
+#cryptoVariationsTable tbody tr {
+    display: table-row; /* Pour que les lignes se comportent comme des lignes de tableau */
+    width: 100%; /* Assurer que les lignes prennent toute la largeur du tableau */
+}
+
+
+.table.modern-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.table.modern-table td.variation-cell, .table.modern-table td.price-cell, .table.modern-table td.info-icon-cell {
+    text-align: right;
+}
+
+.form-control.modern-input, .input-group-text.modern-input-group-text {
+    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    font-size: 1rem;
+    color: #495057;
+    box-shadow: none;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control.modern-input:focus, .input-group-text.modern-input-group-text:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: 0;
+}
+
+.input-group-text.modern-input-group-text {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+}
+
+.input-group > .form-control.modern-input:not(:first-child) {
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+}
+
+.btn.modern-button {
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    border: none;
+}
+
+.btn.modern-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.btn-primary.modern-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary.modern-button:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary.modern-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary.modern-button:hover {
+    background-color: #545b62;
+}
+
+.btn-outline-secondary.modern-button.search-button {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.btn-outline-secondary.modern-button.search-button:hover {
+    background-color: #545b62;
+    color: white;
+    border-color: #545b62;
+}
+
+
+.search-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.07);
+    transform: scale(0.8);
+    transform-origin: top left;
+}
+
+.search-input-group {
+    margin-bottom: 15px;
+}
+
+.search-section h3.section-title {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+
+.modern-list-group {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.modern-list-group .list-group-item {
+    border: none;
+    padding: 12px 20px;
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.modern-list-group .list-group-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 8px 8px;
+}
+
+.modern-list-group .list-group-item:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+
+.modern-list-group .list-group-item:hover {
+    background-color: #e9ecef;
+}
+
+.asset-info-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.asset-info-details {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.asset-info-details p {
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.back-dashboard-button {
+    display: block;
+    margin: 20px auto;
+}
+
+
+.icon-header {
+    font-size: 1.8em;
+    margin-right: 10px;
+    vertical-align: -2px;
+    color: #007bff;
+}
+
+.icon-section {
+    font-size: 1.4em;
+    margin-right: 8px;
+    vertical-align: -1px;
+    color: #3498db;
+}
+
+.icon-label {
+    margin-right: 5px;
+    vertical-align: middle;
+    font-size: 0.9em;
+    color: #777;
+}
+
+.icon-button {
+    margin-right: 8px;
+    vertical-align: middle;
+    font-size: 1em;
+}
+
+.icon-table-title {
+    font-size: 1.1em;
+    margin-right: 5px;
+    vertical-align: baseline;
+    color: #555;
+}
+
+.icon-th {
+    margin-right: 3px;
+    font-size: 0.85em;
+    vertical-align: baseline;
+    color: #777;
+}
+
+
+.variation-cell.positive { color: green; }
+.variation-cell.negative { color: red; }
+.value-positive { color: green; }
+.value-negative { color: red; }
+
 #cryptoVariationsTable td.info-icon-cell {
-    text-align: center; /* Centrer l'icône dans la cellule */
-    padding-right: 0; /* Réduire le padding à droite de la cellule de l'icône si nécessaire */
+    text-align: center;
+    padding-right: 0;
 }
 
 .info-icon {
-    font-size: 1.2em; /* Taille de l'icône */
-    color: #007bff; /* Couleur de l'icône (bleu, comme le reste des éléments interactifs) */
-    opacity: 0.7; /* Opacité initiale légèrement réduite */
-    transition: opacity 0.3s; /* Transition douce pour l'effet de survol */
+    font-size: 1em;
+    color: #007bff;
+    opacity: 0.7;
+    transition: opacity 0.3s;
 }
 
 .info-icon:hover {
-    opacity: 1; /* Opacité pleine au survol */
+    opacity: 1;
 }

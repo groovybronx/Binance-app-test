@@ -4,6 +4,7 @@
     <title>Mon Application Binance</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body { font-family: Arial, sans-serif; }
         #apiFormContainer, #dashboard, #assetInfoPage, #searchResults { margin-bottom: 20px; }
@@ -21,72 +22,86 @@
         }
 
         #cryptoVariationsTable {
-            width: 100%; /* Le tableau prend toute la largeur disponible de son conteneur */
-            border-collapse: collapse; /* Fusionner les bordures des cellules pour un aspect plus propre */
+            width: 100%;
+            border-collapse: collapse;
             margin-bottom: 20px;
-            border: 1px solid #ddd; /* Bordure grise autour du tableau */
-            border-radius: 8px; /* Bords arrondis pour le tableau */
-            overflow: hidden; /* Important pour que border-radius fonctionne sur le tableau avec thead et tbody */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         #cryptoVariationsTable thead {
-            background-color: #f8f9fa; /* Couleur de fond légèrement grise pour l'en-tête */
+            background-color: #f8f9fa;
             font-weight: bold;
-            color: #555; /* Couleur de texte un peu plus foncée pour l'en-tête */
+            color: #555;
         }
 
         #cryptoVariationsTable th, #cryptoVariationsTable td {
-            padding: 12px 15px;
+            padding: 8px 10px; /* Réduire le padding pour une police plus petite */
             text-align: left;
-            border-bottom: 1px solid #eee; /* Ligne de séparation entre les lignes */
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em; /* Police plus petite pour le tableau */
         }
 
+        #cryptoVariationsTable tbody {
+            display: block; /* Nécessaire pour max-height et overflow-y */
+            max-height: 300px; /* Hauteur maximale du corps du tableau avant d'afficher la scrollbar */
+            overflow-y: auto; /* Ajout de scrollbar vertical si nécessaire */
+            overflow-x: hidden; /* Cacher la scrollbar horizontale si elle apparaît */
+        }
+
+
+        #cryptoVariationsTable tbody tr {
+            display: table-row; /* Pour que les lignes se comportent comme des lignes de tableau */
+            width: 100%; /* Assurer que les lignes prennent toute la largeur du tableau */
+        }
+
+
         #cryptoVariationsTable tbody tr:last-child td {
-            border-bottom: none; /* Pas de bordure en bas de la dernière ligne */
+            border-bottom: none;
         }
 
         #cryptoVariationsTable tbody tr:hover {
-            background-color: #f5f5f5; /* Couleur de fond légèrement plus foncée au survol des lignes */
+            background-color: #f5f5f5;
         }
 
         #cryptoVariationsTable td.variation-cell {
-            text-align: right; /* Aligner à droite le contenu des cellules de variation */
+            text-align: right;
             font-weight: bold;
-            padding-right: 20px; /* Un peu plus d'espace à droite pour la variation */
+            padding-right: 10px; /* Padding réduit */
         }
 
         #cryptoVariationsTable td.price-cell {
-            text-align: right; /* Aligner à droite les cellules de prix */
-            color: #777; /* Couleur plus discrète pour le prix */
-            padding-right: 20px; /* Un peu plus d'espace à droite pour le prix */
+            text-align: right;
+            color: #777;
+            padding-right: 10px; /* Padding réduit */
         }
 
         #cryptoVariationsTable td.symbol-cell {
-            font-weight: bold; /* Mettre le texte du symbole en gras */
+            font-weight: bold;
         }
 
-        .crypto-variation-item .price { /* Style pour l'élément prix (SPAN INUTILISÉ MAINTENANT, mais gardé au cas où) */
+        .crypto-variation-item .price {
             margin-left: 10px;
             font-size: 0.9em;
             color: #777;
 
         }
 
-        /* Styles spécifiques pour l'icône "oeil" (NOUVEAU) */
         #cryptoVariationsTable td.info-icon-cell {
-            text-align: center; /* Centrer l'icône dans la cellule */
-            padding-right: 0; /* Réduire le padding à droite de la cellule de l'icône si nécessaire */
+            text-align: center;
+            padding-right: 0;
         }
 
         .info-icon {
-            font-size: 1.2em; /* Taille de l'icône */
-            color: #007bff; /* Couleur de l'icône (bleu, comme le reste des éléments interactifs) */
-            opacity: 0.7; /* Opacité initiale légèrement réduite */
-            transition: opacity 0.3s; /* Transition douce pour l'effet de survol */
+            font-size: 1em; /* Taille de l'icône oeil légèrement réduite */
+            color: #007bff;
+            opacity: 0.7;
+            transition: opacity 0.3s;
         }
 
         .info-icon:hover {
-            opacity: 1; /* Opacité pleine au survol */
+            opacity: 1;
         }
 
 
@@ -95,97 +110,108 @@
 </head>
 <body>
     <div class="container">
-        <h1>Tableau de Bord Binance Testnet</h1>
+        <h1 class="dashboard-title"><i class="fas fa-chart-line icon-header"></i> Tableau de Bord Binance Testnet</h1>
 
         <div id="loginFormContainer">
-            <h2>Connexion API</h2>
+            <h2 class="section-title"><i class="fas fa-key icon-section"></i> Connexion API</h2>
             <form id="apiForm">
                 <div class="mb-3">
-                    <label for="apiKey" class="form-label">API Key:</label>
-                    <input type="text" class="form-control" id="apiKey" required>
+                    <label for="apiKey" class="form-label"><i class="fas fa-user-secret icon-label"></i> Clé API:</label>
+                    <input type="text" class="form-control modern-input" id="apiKey" required>
                 </div>
                 <div class="mb-3">
-                    <label for="secretKey" class="form-label">Secret Key:</label>
-                    <input type="text" class="form-control" id="secretKey" required>
+                    <label for="secretKey" class="form-label"><i class="fas fa-lock icon-label"></i> Secret Key:</label>
+                    <input type="text" class="form-control modern-input" id="secretKey" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Se Connecter</button>
+                <button type="submit" class="btn btn-primary modern-button"><i class="fas fa-sign-in-alt icon-button"></i> Se Connecter</button>
             </form>
         </div>
 
-        <div id="connectionStatus" class="alert alert-info">
+        <div id="connectionStatus" class="alert alert-info modern-alert">
             En attente de la connexion API...
         </div>
 
         <div id="dashboard" style="display:none;">
-            <h2>Dashboard</h2>
-            <div id="dashboardConnectionStatus" class="alert alert-info">
+            <h2 class="section-title"><i class="fas fa-tachometer-alt icon-section"></i> Dashboard</h2>
+            <div id="dashboardConnectionStatus" class="alert alert-info modern-alert">
                 Non connecté via WebSocket.
             </div>
 
-            <h3>Soldes du Compte (USDT)</h3>
+            <h3 class="table-title"><i class="fas fa-wallet icon-table-title"></i> Soldes du Compte (USDT)</h3>
             <div id="balances">
-                <div id="balancesErrorMessage" class="alert alert-danger" style="display:none;">
+                <div id="balancesErrorMessage" class="alert alert-danger modern-alert" style="display:none;">
                     Erreur lors du chargement des soldes. Veuillez réessayer plus tard.
                 </div>
-                <div id="noBalancesMessage" class="alert alert-warning" style="display:none;">
+                <div id="noBalancesMessage" class="alert alert-warning modern-alert" style="display:none;">
                     Aucun solde USDT positif trouvé.
                 </div>
-                <table class="table" id="balanceTable" style="width:auto;">
-                    <thead>
-                        <tr>
-                            <th>Actif (USDT)</th>
-                            <th>Solde Libre</th>
-                            <th>Solde Bloqué</th>
-                        </tr>
-                    </thead>
-                    <tbody id="balanceTableBody">
-                        </tbody>
-                </table>
-            </div>
-
-
-            <h3>Variations des Cryptomonnaies (24h)</h3>
-            <div id="cryptoVariationsContainer">
-                <table class="table table-striped table-hover" id="cryptoVariationsTable">
-                    <thead>
-                        <tr>
-                            <th>Symbole</th>
-                            <th>Variation (24h)</th>
-                            <th>Prix actuel (USDT)</th>
-                            <th>Infos</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cryptoVariationsTableBody">
-                        </tbody>
-                </table>
-            </div>
-
-
-            <div id="searchSection">
-                <h3>Recherche de Symbole</h3>
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="searchInput" placeholder="Symbole (ex: BTCUSDT)" aria-label="Symbole" aria-describedby="searchButton">
-                    <button class="btn btn-outline-secondary" type="button" id="searchButton">Rechercher</button>
-                </div>
-                <div id="searchResults" class="list-group">
+                <div class="table-responsive">
+                    <table class="table modern-table" id="balanceTable" style="width:auto;">
+                        <thead class="modern-thead">
+                            <tr>
+                                <th><i class="fas fa-coins icon-th"></i> Actif (USDT)</th>
+                                <th><i class="fas fa-coins icon-th"></i> Solde Libre</th>
+                                <th><i class="fas fa-coins icon-th"></i> Solde Bloqué</th>
+                            </tr>
+                        </thead>
+                        <tbody id="balanceTableBody">
+                            </tbody>
+                        </table>
                     </div>
+                </div>
+
+
+                <h3 class="table-title"><i class="fas fa-chart-bar icon-table-title"></i> Favoris - Variations des Cryptomonnaies (24h)</h3>
+                <div id="cryptoVariationsContainer" class="table-responsive">
+                    <table class="table modern-table table-hover" id="cryptoVariationsTable">
+                        <thead class="modern-thead">
+                            <tr>
+                                <th><i class="fas fa-hashtag icon-th"></i> Symbole</th>
+                                <th><i class="fas fa-chart-line icon-th"></i> Variation (24h)</th>
+                                <th><i class="fas fa-dollar-sign icon-th"></i> Prix actuel (USDT)</th>
+                                <th><i class="fas fa-info-circle icon-th"></i> Infos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cryptoVariationsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <div id="searchSection" class="search-section"  style="display:none;">
+                    <h3 class="section-title"><i class="fas fa-search icon-section"></i> Recherche de Symbole</h3>
+                    <div class="input-group mb-3 search-input-group">
+                        <span class="input-group-text modern-input-group-text" id="searchInputPrepend"><i class="fas fa-coins"></i></span>
+                        <input type="text" class="form-control modern-input" id="searchInput" placeholder="Symbole (ex: BTCUSDT)" aria-label="Symbole" aria-describedby="searchButton">
+                        <button class="btn btn-outline-secondary modern-button search-button" type="button" id="searchButton"><i class="fas fa-arrow-right icon-button"></i> Rechercher</button>
+                    </div>
+                    <div id="searchResults" class="list-group modern-list-group">
+                        </div>
+                </div>
+
+
+            </div>
+
+            <div id="assetInfoPage" style="display:none;">
+                <h2 id="assetInfoHeader" class="asset-info-header"><i class="fas fa-info-circle icon-header"></i> Informations sur l'Actif</h2>
+                <div id="assetInfoDetails" class="asset-info-details">
+                    <p><i class="fas fa-fw fa-signature"></i> <strong>Symbole:</strong> <span id="assetSymbol"></span></p>
+                    <p><i class="fas fa-fw fa-dollar-sign"></i> <strong>Prix actuel:</strong> <span id="assetPrice"></span> USDT</p>
+                    <p><i class="fas fa-fw fa-chart-line"></i> <strong>Variation (24h):</strong> <span id="assetVariation" class=""></span></p>
+                    <p><i class="fas fa-fw fa-arrow-up"></i> <strong>Plus haut (24h):</strong> <span id="assetHigh"></span> USDT</p>
+                    <p><i class="fas fa-fw fa-arrow-down"></i> <strong>Plus bas (24h):</strong> <span id="assetLow"></span> USDT</p>
+                    <p><i class="fas fa-fw fa-chart-area"></i> <strong>Volume (24h):</strong> <span id="assetVolume"></span></p>
+                    <p><i class="fas fa-fw fa-chart-pie"></i> <strong>Volume en USDT (24h):</strong> <span id="assetQuoteVolume"></span> USDT</p>
+                    <button id="favoriteButton" data-symbol="" class="btn btn-primary modern-button"><i class="fas fa-star icon-button"></i> Ajouter aux Favoris</button> </div>
+                <button id="backToDashboardButton" class="btn btn-secondary modern-button back-dashboard-button"><i class="fas fa-arrow-left icon-button"></i> Retour au Tableau de Bord</button>
             </div>
 
 
         </div>
 
-        <div id="assetInfoPage" style="display:none;">
-            <h2 id="assetInfoHeader">Informations sur l'Actif</h2>
-            <div id="assetInfoDetails">
-                </div>
-            <button id="backToDashboardButton" class="btn btn-secondary mt-3">Retour au Tableau de Bord</button>
-        </div>
+        <script src="script.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
-
-    </div>
-
-    <script src="script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-
-</body>
+    </body>
 </html>
