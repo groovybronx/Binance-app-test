@@ -1,0 +1,21 @@
+# Fichiers de modules Node.js
+node_modules/
+
+# Dossier pour les logs (si vous en avez)
+logs/
+*.log
+
+# Fichiers temporaires de l'éditeur de code (ex: Visual Studio Code)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Fichiers temporaires du système d'exploitation
+.DS_Store
+Thumbs.db
+
+# Fichiers d'environnement (attention, à adapter selon votre configuration)
+.env
