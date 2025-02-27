@@ -9,160 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
             integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
             crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-            }
-
-            #apiFormContainer,
-            #dashboard,
-            #assetInfoPage,
-            #searchResults {
-                margin-bottom: 20px;
-            }
-
-            .variation-percent.positive {
-                color: green;
-            }
-
-            .variation-percent.negative {
-                color: red;
-            }
-
-            .value-positive {
-                color: green;
-            }
-
-            .value-negative {
-                color: red;
-            }
-
-            .favorite-star,
-            .favorite-star-search {
-                cursor: pointer;
-                margin-left: 5px;
-                color: gold;
-            }
-
-            .favorite-variation-item,
-            .crypto-variation-item {
-                display: flex;
-                align-items: center;
-                margin-bottom: 5px;
-            }
-
-            .symbol {
-                margin-right: 10px;
-                font-weight: bold;
-            }
-
-            .favorite-variation-item .variation-percent,
-            .crypto-variation-item .variation-percent {
-                margin-left: auto;
-            }
-
-            /* Styles pour le tableau des variations de cryptomonnaies (NOUVEAU) */
-            #cryptoVariationsContainer {
-                overflow-x: auto;
-                /* Pour permettre le défilement horizontal sur les petits écrans si le tableau est trop large */
-            }
-
-            #cryptoVariationsTable {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-
-            #cryptoVariationsTable thead {
-                background-color: #f8f9fa;
-                font-weight: bold;
-                color: #555;
-            }
-
-            #cryptoVariationsTable th,
-            #cryptoVariationsTable td {
-                padding: 8px 10px;
-                /* Réduire le padding pour une police plus petite */
-                text-align: left;
-                border-bottom: 1px solid #eee;
-                font-size: 0.9em;
-                /* Police plus petite pour le tableau */
-            }
-
-            #cryptoVariationsTable tbody {
-                display: block;
-                /* Nécessaire pour max-height et overflow-y */
-                max-height: 300px;
-                /* Hauteur maximale du corps du tableau avant d'afficher la scrollbar */
-                overflow-y: auto;
-                /* Ajout de scrollbar vertical si nécessaire */
-                overflow-x: hidden;
-                /* Cacher la scrollbar horizontale si elle apparaît */
-            }
-
-
-            #cryptoVariationsTable tbody tr {
-                display: table-row;
-                /* Pour que les lignes se comportent comme des lignes de tableau */
-                width: 100%;
-                /* Assurer que les lignes prennent toute la largeur du tableau */
-            }
-
-
-            #cryptoVariationsTable tbody tr:last-child td {
-                border-bottom: none;
-            }
-
-            #cryptoVariationsTable tbody tr:hover {
-                background-color: #f5f5f5;
-            }
-
-            #cryptoVariationsTable td.variation-cell {
-                text-align: right;
-                font-weight: bold;
-                padding-right: 10px;
-                /* Padding réduit */
-            }
-
-            #cryptoVariationsTable td.price-cell {
-                text-align: right;
-                color: #777;
-                padding-right: 10px;
-                /* Padding réduit */
-            }
-
-            #cryptoVariationsTable td.symbol-cell {
-                font-weight: bold;
-            }
-
-            .crypto-variation-item .price {
-                margin-left: 10px;
-                font-size: 0.9em;
-                color: #777;
-
-            }
-
-            #cryptoVariationsTable td.info-icon-cell {
-                text-align: center;
-                padding-right: 0;
-            }
-
-            .info-icon {
-                font-size: 1em;
-                /* Taille de l'icône oeil légèrement réduite */
-                color: #007bff;
-                opacity: 0.7;
-                transition: opacity 0.3s;
-            }
-
-            .info-icon:hover {
-                opacity: 1;
-            }
-        </style>
-
+       
 </head>
 
 <body>
@@ -256,25 +103,36 @@
 
     </div>
 
-    <div id="assetInfoPage" style="display:none;">
+    <div id="assetInfoPage" class="asset-info-page" style="display:none;">
         <h2 id="assetInfoHeader" class="asset-info-header"><i class="fas fa-info-circle icon-header"></i> Informations
             sur l'Actif</h2>
-        <div id="assetInfoDetails" class="asset-info-details">
-            <p><i class="fas fa-fw fa-signature"></i> <strong>Symbole:</strong> <span id="assetSymbol"></span></p>
-            <p><i class="fas fa-fw fa-dollar-sign"></i> <strong>Prix actuel:</strong> <span id="assetPrice"></span> USDT</p>
-            <p><i class="fas fa-fw fa-chart-line"></i> <strong>Variation (24h):</strong> <span id="assetVariation"></span></p>
-            <p><i class="fas fa-fw fa-arrow-up"></i> <strong>Plus haut (24h):</strong> <span id="assetHigh"></span> USDT</p>
-            <p><i class="fas fa-fw fa-arrow-down"></i> <strong>Plus bas (24h):</strong> <span id="assetLow"></span> USDT</p>
-            <p><i class="fas fa-fw fa-chart-area"></i> <strong>Volume (24h):</strong> <span id="assetVolume"></span></p>
-            <p><i class="fas fa-fw fa-chart-pie"></i> <strong>Volume en USDT (24h):</strong> <span id="assetQuoteVolume"></span> USDT</p>
-            <button id="favoriteButton" data-symbol="" class="btn btn-primary modern-button"><i class="fas fa-star icon-button"></i> Ajouter aux Favoris</button>
-        </div>
+            <div id="assetInfoDetailsContainer" class="asset-info-details">
+                <p>
+                    <i class="fas fa-fw fa-signature"></i> <strong>Symbole:</strong> <span id="assetDetailSymbol"></span>
+                </p>
+                <p>
+                    <i class="fas fa-fw fa-dollar-sign"></i> <strong>Prix actuel:</strong> <span id="assetDetailPrice"></span> USDT
+                </p>
+                <p>
+                    <i class="fas fa-fw fa-chart-line"></i> <strong>Variation (24h):</strong> <span id="assetDetailVariation"></span>
+                </p>
+                <p>
+                    <i class="fas fa-fw fa-arrow-up"></i> <strong>Plus haut (24h):</strong> <span id="assetDetailHigh"></span> USDT
+                </p>
+                <p>
+                    <i class="fas fa-fw fa-arrow-down"></i> <strong>Plus bas (24h):</strong> <span id="assetDetailLow"></span> USDT
+                </p>
+                <p>
+                    <i class="fas fa-fw fa-chart-area"></i> <strong>Volume (24h):</strong> <span id="assetDetailVolume"></span>
+                </p>
+                <p>
+                    <i class="fas fa-fw fa-chart-pie"></i> <strong>Volume en USDT (24h):</strong> <span id="assetDetailQuoteVolume"></span> USDT
+                </p>
+            </div>
         <button id="backToDashboardButton" class="btn btn-secondary modern-button back-dashboard-button"><i
                 class="fas fa-arrow-left icon-button"></i> Retour au Tableau de Bord</button>
     </div>
 
-
-    </div>
 
     <script src="js/script.js"></script>
     <script src="js/login/login.js"></script>

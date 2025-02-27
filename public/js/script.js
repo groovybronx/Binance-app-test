@@ -1,9 +1,9 @@
-const dashboardContainer = document.getElementById('dashboard'); // Ajout de la déclaration pour dashboardContainer
-const assetInfoPageContainer = document.getElementById('assetInfoPage'); // Ajout de la déclaration pour assetInfoPageContainer
+const dashboardContainer = document.getElementById('dashboard');
+const assetInfoPageContainer = document.getElementById('assetInfoPage');
 
-document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL YOUR SCRIPT.JS CODE INSIDE THIS
+document.addEventListener('DOMContentLoaded', function () {
 
-    // Dashboard Elements (Ces declarations restent ici car utilisées *dans* script.js pour le tableau de bord, pas pour le login)
+    // Dashboard Elements
     const dashboardConnectionStatusDiv = document.getElementById('dashboardConnectionStatus');
     const balanceTableBody = document.getElementById('balanceTableBody');
     const noBalancesMessage = document.getElementById('noBalancesMessage');
@@ -11,27 +11,26 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
     const cryptoVariationsContainer = document.getElementById('cryptoVariationsContainer');
     const cryptoVariationsTableBody = document.getElementById('cryptoVariationsTableBody');
 
-    // Search Elements (Ces declarations restent ici car utilisées *dans* script.js pour la recherche, pas pour le login)
+    // Search Elements
     const searchInput = document.getElementById('searchInput');
     const searchButton = document.getElementById('searchButton');
     const searchResultsContainer = document.getElementById('searchResults');
 
-    // Asset Info Page Elements (Ces declarations restent ici car utilisées *dans* script.js pour la page d'info actif, pas pour le login)
-    // Suppression de la declaration en double de assetInfoPageContainer et des autres declarations potentiellement en double liées au login
+    // Asset Info Page Elements
     const assetInfoHeaderElement = document.getElementById('assetInfoHeader');
-    const assetInfoDetailsContainer = document.getElementById('assetInfoDetails');
+    const assetInfoDetailsContainer = document.getElementById('assetInfoDetailsContainer'); // ID CORRECT : assetInfoDetailsContainer
     const backToDashboardButton = document.getElementById('backToDashboardButton');
-    const favoriteButton = document.getElementById('favoriteButton'); // Bouton Favoris sur la page d'info actif
+    //const favoriteButton = document.getElementById('favoriteButton'); // Bouton Favoris sur la page d'info actif
 
 
-    const symbolsToTrack = []; // Liste des symboles à suivre initialement VIDE
+    const symbolsToTrack = [];
     let websocketClient;
-    let reconnectionAttempts = 0; // Compteur des tentatives de reconnexions
-    const maxReconnectionAttempts = 5; // Nombre maximal de tentatives de reconnexion
-    const reconnectionDelay = 3000; // Délai en millisecondes avant de retenter la connexion (3 secondes)
+    let reconnectionAttempts = 0;
+    const maxReconnectionAttempts = 5;
+    const reconnectionDelay = 3000;
 
 
-    displayAccountBalances = function (accountInfo) { // MODIFICATION : Suppression du mot-clé 'function' pour rendre globale
+    displayAccountBalances = function (accountInfo) {
         if (accountInfo && accountInfo.balances) {
             balanceTableBody.innerHTML = '';
             noBalancesMessage.style.display = 'none';
@@ -61,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
         }
     }
 
-    // Gestion des favoris dans le localStorage (reste dans script.js car lié aux fonctionnalités principales)
+    // Gestion des favoris dans le localStorage
     function getFavorites() {
         const favorites = localStorage.getItem('favoriteCryptos');
         return favorites ? JSON.parse(favorites) : [];
@@ -89,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
     }
 
 
-    initWebSocket = function () { // MODIFICATION : Suppression du mot-clé 'function' pour rendre globale
+    initWebSocket = function () {
         if (websocketClient && websocketClient.readyState === WebSocket.OPEN) {
             console.log('WebSocket est déjà connecté. Pas besoin de nouvelle connexion.');
             return; // Si déjà connecté, ne rien faire
@@ -99,12 +98,11 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
 
         websocketClient.onopen = () => {
             console.log('Client WebSocket connecté');
-            reconnectionAttempts = 0; // Réinitialiser le compteur de tentatives de reconnexion en cas de succès
+            reconnectionAttempts = 0;
             dashboardConnectionStatusDiv.textContent = 'Connecté via WebSocket - Flux de données temps réel activé.';
             dashboardConnectionStatusDiv.classList.remove('alert-info', 'alert-danger', 'alert-warning');
             dashboardConnectionStatusDiv.classList.add('alert-primary');
-            subscribeToFavorites(); // S'abonner aux flux des favoris (et met à jour le tableau)
-
+            subscribeToFavorites();
 
         };
 
@@ -119,8 +117,8 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
         websocketClient.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.e === '24hrTicker') {
-                const symbol = data.s.toUpperCase(); // Symbol en majuscules pour correspondre aux favoris
-                if (isFavorite(symbol)) { // Vérifier si c'est un favori avant d'afficher
+                const symbol = data.s.toUpperCase();
+                if (isFavorite(symbol)) {
                     const priceChangePercent = parseFloat(data.P).toFixed(2);
                     updateCryptoVariationDisplay(symbol, priceChangePercent, data);
                 }
@@ -142,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
         if (reconnectionAttempts < maxReconnectionAttempts) {
             reconnectionAttempts++;
             dashboardConnectionStatusDiv.textContent = `WebSocket déconnecté. Reconnexion Tentative ${reconnectionAttempts} sur ${maxReconnectionAttempts} dans ${reconnectionDelay / 1000} secondes...`;
-            setTimeout(initWebSocket, reconnectionDelay); // Tenter de se reconnecter après un délai
+            setTimeout(initWebSocket, reconnectionDelay);
         } else {
             dashboardConnectionStatusDiv.textContent = `Échec de la reconnexion WebSocket après ${maxReconnectionAttempts} tentatives. Veuillez rafraîchir la page.`;
             dashboardConnectionStatusDiv.classList.remove('alert-warning', 'alert-primary');
@@ -157,8 +155,8 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
         let variationCell, priceCell, infoIconCell;
 
         if (!rowElement) {
-            if (cryptoVariationsTableBody.rows.length >= 10) { // Limite à 10 lignes
-                return; // Ne pas ajouter de nouvelle ligne si le tableau est plein
+            if (cryptoVariationsTableBody.rows.length >= 10) {
+                return;
             }
             rowElement = cryptoVariationsTableBody.insertRow();
             rowElement.id = `crypto-row-${symbol}`;
@@ -210,9 +208,9 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
     }
 
     function subscribeToFavorites() {
-        cryptoVariationsTableBody.innerHTML = ''; // Vider le tableau avant de le reconstruire
+        cryptoVariationsTableBody.innerHTML = '';
         const favorites = getFavorites();
-        const symbolsToSubscribe = favorites.slice(0, 10); // Limiter à 10 favoris pour l'affichage
+        const symbolsToSubscribe = favorites.slice(0, 10);
 
         if (websocketClient && websocketClient.readyState === WebSocket.OPEN) {
             // Unsubscribe from all first to avoid duplicates, then resubscribe
@@ -223,14 +221,14 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
                 console.log(`Subscribed to ${symbol} ticker stream (favorite)`);
             });
         }
-        // Mettre à jour le tableau même si WebSocket n'est pas encore ouvert (pour affichage initial après favoris)
+        // Mettre à jour le tableau même si WebSocket n'est pas encore ouvert
         symbolsToSubscribe.forEach(symbol => {
-            updateCryptoVariationDisplay(symbol, '0.00', { c: '0.00', P: '0.00' }); // Initialiser l'affichage à 0% en attendant les données WebSocket
+            updateCryptoVariationDisplay(symbol, '0.00', { c: '0.00', P: '0.00' });
         });
     }
 
 
-    // Recherche de symbole et page d'information sur l'actif (Reste dans script.js)
+    // Recherche de symbole et page d'information sur l'actif
     searchButton.addEventListener('click', () => {
         const searchTerm = searchInput.value.trim().toUpperCase();
         if (searchTerm) {
@@ -284,106 +282,90 @@ document.addEventListener('DOMContentLoaded', function () { // ENCAPSULATE ALL Y
         dashboardContainer.style.display = 'none';
         assetInfoPageContainer.style.display = 'block';
         assetInfoHeaderElement.textContent = `Informations sur l'actif ${symbol}USDT`;
-        assetInfoDetailsContainer.innerHTML = '<p>Chargement des données...</p>';
-
-        // Mettre à jour l'état du bouton favori
+        assetInfoDetailsContainer.display = 'block';
+    
+        /* Mettre à jour l'état du bouton favori (reste inchangé)
         const isCurrentlyFavorite = isFavorite(symbol);
         favoriteButton.textContent = isCurrentlyFavorite ? 'Retirer des Favoris' : 'Ajouter aux Favoris';
         favoriteButton.classList.remove(isCurrentlyFavorite ? 'btn-primary' : 'btn-warning');
         favoriteButton.classList.add(isCurrentlyFavorite ? 'btn-warning' : 'btn-primary');
-        favoriteButton.setAttribute('data-symbol', symbol); // Stocker le symbole sur le bouton
-
-
+        favoriteButton.setAttribute('data-symbol', symbol); */
+    
         try {
             const response = await fetch(`/data/24hr-ticker?symbol=${symbol}`);
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }
             const data = await response.json();
-
+    
             if (data.success) {
                 const ticker24hData = data.ticker24hData;
                 console.log("ticker24hData (APRES PARSE JSON):", ticker24hData);
-
-
-                const assetSymbolElement = document.getElementById('assetSymbol');
-                if (assetSymbolElement) {
-                    assetSymbolElement.textContent = ticker24hData.symbol;
-                    console.log("assetSymbolElement:", assetSymbolElement, "textContent:", ticker24hData.symbol);
-                }
-
-                const assetPriceElement = document.getElementById('assetPrice');
-                if (assetPriceElement) {
-                    assetPriceElement.textContent = parseFloat(ticker24hData.lastPrice).toFixed(2) + ' USDT';
-                    console.log("assetPriceElement:", assetPriceElement, "textContent:", parseFloat(ticker24hData.lastPrice).toFixed(2) + ' USDT'); //  <-- CONSOLE.LOG FOR assetPriceElement
-                }
-
-                const assetVariationElement = document.getElementById('assetVariation'); // Get element - Store in variable
-                if (assetVariationElement) {
-                    assetVariationElement.textContent = ticker24hData.priceChangePercent + '%';
-                    console.log("assetVariationElement:", assetVariationElement, "textContent:", ticker24hData.priceChangePercent + '%'); //  <-- CONSOLE.LOG FOR assetVariationElement
-                }
-
-                const assetHighElement = document.getElementById('assetHigh'); // Get element - Store in variable
-                if (assetHighElement) assetHighElement.textContent = ticker24hData.highPrice + ' USDT';
-                console.log("assetHighElement:", assetHighElement, "textContent:", ticker24hData.highPrice + ' USDT'); //  <-- CONSOLE.LOG FOR assetHighElement
-
-                const assetLowElement = document.getElementById('assetLow'); // Get element - Store in variable
-                if (assetLowElement) assetLowElement.textContent = ticker24hData.lowPrice + ' USDT';
-                console.log("assetLowElement:", assetLowElement, "textContent:", ticker24hData.lowPrice + ' USDT'); //  <-- CONSOLE.LOG FOR assetLowElement
-
-                const assetVolumeElement = document.getElementById('assetVolume'); // Get element - Store in variable
-                if (assetVolumeElement) assetVolumeElement.textContent = parseFloat(ticker24hData.volume).toFixed(0);
-                console.log("assetVolumeElement:", assetVolumeElement, "textContent:", parseFloat(ticker24hData.volume).toFixed(0)); //  <-- CONSOLE.LOG FOR assetVolumeElement
-
-
-                assetInfoDetailsContainer.innerHTML = `
-                    <p><i class="fas fa-fw fa-chart-pie"></i> <strong>Volume en USDT (24h):</strong> <span>${parseFloat(ticker24hData.quoteVolume).toFixed(0)} USDT</span></p>
-                `;
+    
+                // -- Mise à jour de TOUTES les informations avec document.getElementById et textContent --
+    
+                const assetDetailSymbolElement = document.getElementById('assetDetailSymbol');
+                if (assetDetailSymbolElement) assetDetailSymbolElement.textContent = ticker24hData.symbol;
+    
+                const assetDetailPriceElement = document.getElementById('assetDetailPrice');
+                if (assetDetailPriceElement) assetDetailPriceElement.textContent = parseFloat(ticker24hData.lastPrice).toFixed(2) + ' USDT';
+    
+                const assetDetailVariationElement = document.getElementById('assetDetailVariation');
+                if (assetDetailVariationElement) assetDetailVariationElement.textContent = ticker24hData.priceChangePercent + '%';
+    
+                const assetDetailHighElement = document.getElementById('assetDetailHigh');
+                if (assetDetailHighElement) assetDetailHighElement.textContent = ticker24hData.highPrice + ' USDT';
+    
+                const assetDetailLowElement = document.getElementById('assetDetailLow');
+                if (assetDetailLowElement) assetDetailLowElement.textContent = ticker24hData.lowPrice + ' USDT';
+    
+                const assetDetailVolumeElement = document.getElementById('assetDetailVolume');
+                if (assetDetailVolumeElement) assetDetailVolumeElement.textContent = parseFloat(ticker24hData.volume).toFixed(0);
+    
+                const assetDetailQuoteVolumeElement = document.getElementById('assetDetailQuoteVolume');
+                if (assetDetailQuoteVolumeElement) assetDetailQuoteVolumeElement.textContent = parseFloat(ticker24hData.quoteVolume).toFixed(0) + ' USDT';
+    
+                assetInfoDetailsContainer.innerHTML = ''; // Vider le message "Chargement des données..."
+    
             } else {
-                // Gérer le cas où la réponse du serveur indique une erreur (data.success: false)
+                // Gestion d'erreur (inchangée)
                 console.error("Erreur lors de la récupération des données du ticker 24h depuis le serveur:", data.message);
-                alert("Erreur lors du chargement des informations de l'actif. Veuillez réessayer."); // Ou une meilleure gestion d'erreur pour l'utilisateur
+                alert("Erreur lors du chargement des informations de l'actif. Veuillez réessayer.");
             }
-
-
+    
         } catch (error) {
-
+            // Gestion des erreurs (inchangée)
             console.error("Erreur lors du chargement des informations de l'actif:", error);
-            console.log("Valeur de assetInfoDetailsContainer DANS LE BLOC CATCH (Error):", assetInfoDetailsContainer); // Console log in CATCH block for error case
-
-            const assetInfoDetailsContainerElement = document.getElementById('assetInfoDetails'); // Get element - Store in variable - FOR ERROR MESSAGE
-            if (assetInfoDetailsContainerElement) { // Check if element exists before setting innerHTML in error case
+            const assetInfoDetailsContainerElement = document.getElementById('assetInfoDetails');
+            if (assetInfoDetailsContainerElement) {
                 assetInfoDetailsContainerElement.innerHTML = '<div class="alert alert-danger modern-alert">Erreur lors du chargement des informations de l actif. Veuillez réessayer.</div>';
             }
         }
     }
-
-
-    // Gestionnaire d'événement pour le bouton "Retour au Tableau de Bord" (Reste dans script.js)
+    // Gestionnaire d'événement pour le bouton "Retour au Tableau de Bord"
     backToDashboardButton.addEventListener('click', () => {
         assetInfoPageContainer.style.display = 'none';
         dashboardContainer.style.display = 'block';
     });
 
-    // Gestionnaire d'événement pour le bouton "Favoris" sur la page d'info actif (Reste dans script.js)
+    /*Gestionnaire d'événement pour le bouton "Favoris" sur la page d'info actif
     favoriteButton.addEventListener('click', () => {
         const symbol = favoriteButton.getAttribute('data-symbol');
         if (isFavorite(symbol)) {
             removeFavorite(symbol);
-            favoriteButton.textContent = 'Retirer des Favoris';
+            favoriteButton.textContent = 'Ajouter aux Favoris'; // Correction du texte ici aussi pour cohérence
             favoriteButton.classList.remove('btn-warning');
             favoriteButton.classList.add('btn-primary');
         } else {
             addFavorite(symbol);
-            favoriteButton.textContent = 'Retirer des Favoris';
+            favoriteButton.textContent = 'Retirer des Favoris'; // Correction du texte ici aussi pour cohérence
             favoriteButton.classList.remove('btn-primary');
             favoriteButton.classList.add('btn-warning');
         }
-        subscribeToFavorites(); // Mise à jour du tableau après ajout/suppression des favoris
-    });
+        subscribeToFavorites();
+    });*/
 
 
-    // Au chargement initial de la page, abonnez-vous aux favoris (s'il y en a déjà en localStorage) (Reste dans script.js)
+    // Au chargement initial de la page, abonnez-vous aux favoris
     document.addEventListener('DOMContentLoaded', subscribeToFavorites);
-}); // END OF DOMContentLoaded EVENT LISTENER.
+}); // END OF DOMContentLoaded EVENT LISTENER
