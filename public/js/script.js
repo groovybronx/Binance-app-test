@@ -42,7 +42,7 @@ const assetInfoDetailsContainer = document.getElementById('assetInfoDetailsConta
 
 const backToDashboardButton = document.getElementById('backToDashboardButton');
 
-//const favoriteButton = document.getElementById('favoriteButton'); // Bouton Favoris sur la page d'info actif
+const favoriteButton = document.getElementById('favoriteButton'); // Bouton Favoris sur la page d'info actif
 
 
 
@@ -569,7 +569,7 @@ assetInfoHeaderElement.textContent = `Informations sur l'actif ${symbol}USDT`;
 assetInfoDetailsContainer.display = 'block';
 
 
-/* Mettre à jour l'état du bouton favori (reste inchangé)
+//Mettre à jour l'état du bouton favori (reste inchangé)
 
 const isCurrentlyFavorite = isFavorite(symbol);
 
@@ -579,7 +579,7 @@ favoriteButton.classList.remove(isCurrentlyFavorite ? 'btn-primary' : 'btn-warni
 
 favoriteButton.classList.add(isCurrentlyFavorite ? 'btn-warning' : 'btn-primary');
 
-favoriteButton.setAttribute('data-symbol', symbol); */
+favoriteButton.setAttribute('data-symbol', symbol); 
 
 
 try {
@@ -632,7 +632,7 @@ if (assetDetailLowElement) assetDetailLowElement.textContent = ticker24hData.low
 
 const assetDetailVolumeElement = document.getElementById('assetDetailVolume');
 
-if (assetDetailVolumeElement) assetDetailVolumeElement.textContent = parseFloat(ticker24hData.volume).toFixed(0);
+if (assetDetailVolumeElement) assetDetailVolumeElement.textContent = parseFloat(ticker24hData.volume).toFixed(0)+ ' USDT';
 
 
 const assetDetailQuoteVolumeElement = document.getElementById('assetDetailQuoteVolume');
@@ -683,37 +683,22 @@ dashboardContainer.style.display = 'block';
 
 
 
-/*Gestionnaire d'événement pour le bouton "Favoris" sur la page d'info actif
-
+//Gestionnaire d'événement pour le bouton "Favoris" sur la page d'info actif
 favoriteButton.addEventListener('click', () => {
-
-const symbol = favoriteButton.getAttribute('data-symbol');
-
-if (isFavorite(symbol)) {
-
-removeFavorite(symbol);
-
-favoriteButton.textContent = 'Ajouter aux Favoris'; // Correction du texte ici aussi pour cohérence
-
-favoriteButton.classList.remove('btn-warning');
-
-favoriteButton.classList.add('btn-primary');
-
-} else {
-
-addFavorite(symbol);
-
-favoriteButton.textContent = 'Retirer des Favoris'; // Correction du texte ici aussi pour cohérence
-
-favoriteButton.classList.remove('btn-primary');
-
-favoriteButton.classList.add('btn-warning');
-
-}
-
-subscribeToFavorites();
-
-});*/
+    const symbol = favoriteButton.getAttribute('data-symbol');
+    if (isFavorite(symbol)) {
+        removeFavorite(symbol);
+        favoriteButton.textContent = 'Ajouter aux Favoris'; // Correction du texte ici aussi pour cohérence
+        favoriteButton.classList.remove('btn-warning');
+        favoriteButton.classList.add('btn-primary');
+    } else {
+        addFavorite(symbol);
+        favoriteButton.textContent = 'Retirer des Favoris'; // Correction du texte ici aussi pour cohérence
+        favoriteButton.classList.remove('btn-primary');
+        favoriteButton.classList.add('btn-warning');
+    }
+    subscribeToFavorites();
+});
 
 
 
