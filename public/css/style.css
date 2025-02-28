@@ -1,6 +1,7 @@
 /* styles.css */
 
 /* Importation de polices Google Fonts */
+
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@400;700&display=swap');
 
 body {
@@ -94,7 +95,7 @@ h3.table-title, .search-section h3.section-title {
     padding: 8px 10px; /* Réduire le padding pour une police plus petite */
     text-align: left;
     border-bottom: 1px solid #f0f0f0;
-    font-size: 0.9em; /* Police plus petite pour le tableau */
+    
 }
 
 #cryptoVariationsTable tbody {
@@ -330,3 +331,23 @@ h3.table-title, .search-section h3.section-title {
 .info-icon:hover {
     opacity: 1;
 }
+
+.profile-button {
+    margin-right: 5px; /* Espacement entre les boutons */
+    margin-bottom: 5px;
+    border-radius: 8px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}
+
+.profile-button.active {
+    background-color: #007bff; /* Couleur de fond pour le bouton sélectionné */
+    color: white; /* Texte blanc pour le bouton sélectionné */
+    border-color: #007bff; /* Bordure bleu pour le bouton sélectionné */
+}
+
+.profile-button:hover {
+    /* Style au survol si vous le souhaitez */
+    background-color: #e0e0e0; /* Gris clair au survol par exemple */
+}
+
