@@ -16,6 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let savedProfiles = [];
     let selectedProfileName = null;
 
+    // --- AJOUTER CE CODE ICI ---
+    const createProfileContainer = document.getElementById('createProfileContainer');
+    const showCreateProfileButton = document.getElementById('showCreateProfileButton');
+
+    showCreateProfileButton.addEventListener('click', function() {
+        createProfileContainer.style.display = 'block'; // Afficher le formulaire de création de profil
+    });
+    // --- FIN DE L'AJOUT ---
+
 
     function loadProfiles() {
         console.log("loadProfiles() appelée");

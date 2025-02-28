@@ -4,6 +4,7 @@
 <head>
     <title>Mon Application Binance</title>
     <link rel="stylesheet" href="css/style.css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -18,8 +19,7 @@
     <div class="container">
         <h1 class="dashboard-title"><i class="fas fa-chart-line icon-header"></i> Tableau de Bord Binance Testnet</h1>
 
-        <div id="loginFormContainer">
-            <h1 class="text-center mb-4">Connexion Binance Testnet</h1>
+        <div id="loginFormContainer"> <h1 class="text-center mb-4">Connexion Binance </h1>
 
             <div id="profileLoginSection">
                 <h2>Se Connecter avec un Profil</h2>
@@ -27,116 +27,116 @@
                     <p id="noProfilesMessage">Aucun profil enregistré. Veuillez créer un profil ci-dessous.</p>
                     <div id="profileButtonsContainer" style="display:none;"> </div>
                 </div>
-                <form id="profileLoginForm" style="display:none;"> <div class="form-group">
+                <form id="profileLoginForm" style="display:none;">
+                    <div class="form-group">
                         <label for="profileCode">Code du Profil (si applicable)</label>
                         <input type="password" class="form-control" id="profileCode" name="profileCode"
                             placeholder="Code du profil">
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block" id="connectProfileButton">Se Connecter</button> <div class="form-check mt-2">
+                    <button type="submit" class="btn btn-primary btn-block" id="connectProfileButton">Se
+                        Connecter</button>
+                    <div class="form-check mt-2">
                         <input type="checkbox" class="form-check-input" id="rememberProfile">
                         <label class="form-check-label" for="rememberProfile">Rester connecté</label>
                     </div>
-                </form> 
-            </div>
-
-            <div id="profileCreationSection" style="margin-top: 30px;">
-                <h2>Créer un Nouveau Profil</h2>
-                <form id="createProfileForm">
-                    <div class="form-group">
-                        <label for="newProfileName">Nom du Profil</label>
-                        <input type="text" class="form-control" id="newProfileName" name="newProfileName"
-                            placeholder="Nom de votre profil (ex: 'Testnet Perso')">
-                    </div>
-                    <div class="form-group">
-                        <label for="newProfileCode">Code du Profil (optionnel)</label>
-                        <input type="password" class="form-control" id="newProfileCode" name="newProfileCode"
-                            placeholder="Code pour ce profil (optionnel)">
-                    </div>
-                    <div class="form-group">
-                        <label for="newApiKey">Clé API</label>
-                        <input type="text" class="form-control" id="newApiKey" name="newApiKey"
-                            placeholder="Votre clé API">
-                    </div>
-                    <div class="form-group">
-                        <label for="newSecretKey">Clé Secrète</label>
-                        <input type="text" class="form-control" id="newSecretKey" name="newSecretKey"
-                            placeholder="Votre clé secrète">
-                    </div>
-                    <button type="submit" class="btn btn-success btn-block">Enregistrer le Profil</button>
                 </form>
             </div>
 
-            <div id="connectionStatus" class="alert alert-info" role="alert"></div>
-        </div>
+            <button id="showCreateProfileButton" class="btn btn-secondary mt-3">Créer un Nouveau Profil</button>
 
-        <div id="dashboard" style="display:none;">
-            <h2 class="section-title"><i class="fas fa-tachometer-alt icon-section"></i> Dashboard</h2>
-            <div id="dashboardConnectionStatus" class="alert alert-info modern-alert">
-                Non connecté via WebSocket.
+            <div id="createProfileContainer" style="display: none;">
+                <h2 class="mt-4">Créer un Nouveau Profil </h2>
+                <form id="createProfileForm">
+                    <div class="mb-3">
+                        <label for="newProfileName" class="form-label">Nom du Profil</label>
+                        <input type="text" class="form-control" id="newProfileName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newProfileCode" class="form-label">Code Profil (optionnel)</label>
+                        <input type="text" class="form-control" id="newProfileCode">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newApiKey" class="form-label">Clé API Testnet</label>
+                        <input type="text" class="form-control" id="newApiKey" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newSecretKey" class="form-label">Clé Secrète Testnet</label>
+                        <input type="text" class="form-control" id="newSecretKey" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Créer Profil</button>
+                </form>
             </div>
 
-            <h3 class="table-title"><i class="fas fa-wallet icon-table-title"></i> Soldes du Compte (USDT)</h3>
-            <div id="balances">
-                <div id="balancesErrorMessage" class="alert alert-danger modern-alert" style="display:none;">
-                    Erreur lors du chargement des soldes. Veuillez réessayer plus tard.
+
+            <div id="dashboard" style="display:none;">
+                <h2 class="section-title"><i class="fas fa-tachometer-alt icon-section"></i> Dashboard</h2>
+                <div id="dashboardConnectionStatus" class="alert alert-info modern-alert">
+                    Non connecté via WebSocket.
                 </div>
-                <div id="noBalancesMessage" class="alert alert-warning modern-alert" style="display:none;">
-                    Aucun solde USDT positif trouvé.
+
+                <h3 class="table-title"><i class="fas fa-wallet icon-table-title"></i> Soldes du Compte (USDT)</h3>
+                <div id="balances">
+                    <div id="balancesErrorMessage" class="alert alert-danger modern-alert" style="display:none;">
+                        Erreur lors du chargement des soldes. Veuillez réessayer plus tard.
+                    </div>
+                    <div id="noBalancesMessage" class="alert alert-warning modern-alert" style="display:none;">
+                        Aucun solde USDT positif trouvé.
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table modern-table" id="balanceTable" style="width:auto;">
+                            <thead class="modern-thead">
+                                <tr>
+                                    <th><i class="fas fa-coins icon-th"></i> Actif (USDT)</th>
+                                    <th><i class="fas fa-coins icon-th"></i> Solde </th>
+                                    <th><i class="fas fa-coins icon-th"></i> Solde Bloqué</th>
+                                </tr>
+                            </thead>
+                            <tbody id="balanceTableBody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table modern-table" id="balanceTable" style="width:auto;">
-                        <thead class="modern-thead">
-                            <tr>
-                                <th><i class="fas fa-coins icon-th"></i> Actif (USDT)</th>
-                                <th><i class="fas fa-coins icon-th"></i> Solde </th>
-                                <th><i class="fas fa-coins icon-th"></i> Solde Bloqué</th>
-                            </tr>
-                        </thead>
-                        <tbody id="balanceTableBody">
-                        </tbody>
-                    </table>
-                </div>
+                <table class="table modern-table table-hover" id="cryptoVariationsTable">
+                    <thead class="modern-thead">
+                        <tr>
+                            <th>
+                                <i class="fas fa-chart-bar icon-table-title"></i> Favoris - Variations des
+                                Cryptomonnaies
+                                (24h)
+                                <br>
+                                <i class="fas fa-hashtag icon-th"></i> Symbole
+                            </th>
+                            <th>
+                                <i class="fas fa-chart-line icon-th"></i> Variation (24h)
+                            </th>
+                            <th>
+                                <i class="fas fa-dollar-sign icon-th"></i> Prix actuel (USDT)
+                            </th>
+                            <th>
+                                <i class="fas fa-info-circle icon-th"></i> Infos
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="cryptoVariationsTableBody">
+                    </tbody>
+                </table>
             </div>
-            <table class="table modern-table table-hover" id="cryptoVariationsTable">
-                <thead class="modern-thead">
-                    <tr>
-                        <th>
-                            <i class="fas fa-chart-bar icon-table-title"></i> Favoris - Variations des Cryptomonnaies
-                            (24h)
-                            <br>
-                            <i class="fas fa-hashtag icon-th"></i> Symbole
-                        </th>
-                        <th>
-                            <i class="fas fa-chart-line icon-th"></i> Variation (24h)
-                        </th>
-                        <th>
-                            <i class="fas fa-dollar-sign icon-th"></i> Prix actuel (USDT)
-                        </th>
-                        <th>
-                            <i class="fas fa-info-circle icon-th"></i> Infos
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="cryptoVariationsTableBody">
-                </tbody>
-            </table>
         </div>
-    </div>
 
 
-    <div id="searchSection" class="search-section" style="display:none;">
-        <h3 class="section-title"><i class="fas fa-search icon-section"></i> Recherche de Symbole</h3>
-        <div class="input-group mb-3 search-input-group">
-            <span class="input-group-text modern-input-group-text" id="searchInputPrepend"><i
-                    class="fas fa-coins"></i></span>
-            <input type="text" class="form-control modern-input" id="searchInput" placeholder="Symbole (ex: BTCUSDT)"
-                aria-label="Symbole" aria-describedby="searchButton">
-            <button class="btn btn-outline-secondary modern-button search-button" type="button" id="searchButton"><i
-                    class="fas fa-arrow-right icon-button"></i> Rechercher</button>
+        <div id="searchSection" class="search-section" style="display:none;">
+            <h3 class="section-title"><i class="fas fa-search icon-section"></i> Recherche de Symbole</h3>
+            <div class="input-group mb-3 search-input-group">
+                <span class="input-group-text modern-input-group-text" id="searchInputPrepend"><i
+                        class="fas fa-coins"></i></span>
+                <input type="text" class="form-control modern-input" id="searchInput"
+                    placeholder="Symbole (ex: BTCUSDT)" aria-label="Symbole" aria-describedby="searchButton">
+                <button class="btn btn-outline-secondary modern-button search-button" type="button" id="searchButton"><i
+                        class="fas fa-arrow-right icon-button"></i> Rechercher</button>
+            </div>
+            <div id="searchResults" class="list-group modern-list-group">
+            </div>
         </div>
-        <div id="searchResults" class="list-group modern-list-group">
-        </div>
-    </div>
 
 
     </div>
