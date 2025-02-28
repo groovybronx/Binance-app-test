@@ -1,682 +1,195 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
+
 <head>
-    <title>Tableau de Bord Binance Testnet</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* Styles CSS améliorés pour la lisibilité et la séparation des sections */
-        html, body {
-            height: 100%;
-            font-family: 'Arial', sans-serif; /* Police de caractères plus lisible */
-            font-size: 16px; /* Taille de police de base augmentée */
-            color: #333; /* Couleur de texte légèrement plus foncée pour un meilleur contraste */
-        }
+    <title>Mon Application Binance</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding-top: 30px; /* Padding supérieur augmenté */
-            padding-bottom: 30px; /* Padding inférieur augmenté */
-            background-color: #f0f2f5; /* Couleur de fond légèrement différente et plus douce */
-        }
-
-        .container {
-            width: 100%;
-            max-width: 960px; /* Augmentation de la largeur maximale du conteneur */
-            padding: 30px; /* Padding intérieur augmenté */
-            background-color: #ffffff;
-            border-radius: 12px; /* Bords un peu plus arrondis */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15); /* Ombre plus prononcée */
-        }
-
-        /* Styles pour les titres de section */
-        h1, h2, h4 {
-            color: #0056b3; /* Couleur des titres - bleu plus foncé */
-            margin-bottom: 20px; /* Espace sous les titres */
-            border-bottom: 2px solid #eee; /* Ligne de séparation sous les titres */
-            padding-bottom: 10px; /* Espace entre le titre et la ligne */
-        }
-
-        h1 { font-size: 2.5em; } /* Taille pour le titre principal (Connexion) */
-        h2 { font-size: 2em; } /* Taille pour les titres de tableau de bord */
-        h4 { font-size: 1.4em; } /* Taille pour les sous-titres (Variations...) */
-
-        /* Styles pour les conteneurs de sections */
-        #loginFormContainer, #dashboard, #assetInfoPage {
-            background-color: #ffffff; /* Fond blanc pour chaque section */
-            padding: 20px; /* Padding intérieur des sections */
-            margin-bottom: 20px; /* Marge entre les sections */
-            border-radius: 8px; /* Bords arrondis pour les sections */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Ombre légère pour les sections */
-            border: 1px solid #eee; /* Fine bordure grise pour les sections */
-        }
-
-        /* Légère modification pour le conteneur des favoris pour le distinguer */
-        #favoriteVariationsContainer {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f9f9f9; /* Gris très clair pour le fond des favoris */
-            border-radius: 8px;
-            border: 1px solid #ddd; /* Bordure légèrement plus foncée pour les favoris */
-        }
-
-
-        .form-control { margin-bottom: 15px; }
-        .btn-primary { margin-top: 10px; }
-        #connectionStatus { margin-top: 20px; text-align: center; font-weight: bold; }
-        .crypto-variation-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .crypto-variation-item:last-child { border-bottom: none; }
-        .variation-percent { font-weight: bold; margin-left: 15px; text-align: right; width: 80px; display: inline-block; }
-        .variation-percent.positive { color: green; }
-        .variation-percent.negative { color: red; }
-
-        /* Styles pour le Dashboard */
-        #dashboard { display: none; }
-        #accountBalances { margin-top: 20px; }
-        #accountBalances .dropdown-menu { /* Style pour le dropdown-menu des soldes (nouveau) */
-            max-height: 200px; /* Hauteur maximale du dropdown menu */
-            overflow-y: auto;   /* Ajoute une barre de défilement verticale si le contenu dépasse */
-        }
-        #accountBalances ul { padding-left: 0; list-style-type: none; }
-        #accountBalances li { padding: 8px 0; border-bottom: 1px dotted #ccc; display: flex; justify-content: space-between; }
-        #accountBalances li:last-child { border-bottom: none; }
-        .asset { font-weight: bold; margin-right: 10px; }
-        .balance { text-align: right; }
-
-        /* Styles pour la page d'information de l'actif */
-        #assetInfoPage { display: none; }
-        #assetInfoContainer { margin-top: 20px; padding: 20px; border: 1px solid #ccc; border-radius: 10px; background-color: #f9f9f9; }
-        #assetInfoHeader { text-align: center; margin-bottom: 20px; }
-        #assetInfoDetails p { margin-bottom: 8px; }
-        #backToDashboard { margin-top: 20px; }
-        .value-positive { color: green; }
-        .value-negative { color: red; }
-        .value-neutral { color: black; } /* Couleur neutre par défaut */
-
-
-        /* Styles pour la barre de recherche */
-        #searchContainer { margin-bottom: 20px; display: flex; }
-        #searchInput { flex-grow: 1; margin-right: 10px; }
-
-        /* Styles pour les étoiles de favoris */
-        .favorite-star, .favorite-star-search {
-            color: gold; /* Couleur dorée pour les étoiles */
-            font-size: 1.2em; /* Taille légèrement plus grande */
-        }
-
-        /* Styles pour le tableau secondaire réduit (variations live) */
-        .secondary-data-table {
-            font-size: 0.9em; /* Police plus petite */
-            margin-top: 15px; /* Marge réduite */
-            opacity: 0.8;     /* Légèrement moins visible */
-        }
-
-        /* Styles pour la section favoris */
-        #favoritesSection {
-            /* Styles pour le conteneur favoris si nécessaire */
-        }
-
-
-        /* Style pour les items favoris - réutilisation du style existant crypto-variation-item */
-        .favorite-variation-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0; /* Padding légèrement réduit */
-            border-bottom: 1px dotted #ccc; /* Style de séparation plus léger */
-        }
-        .favorite-variation-item:last-child {
-            border-bottom: none;
-        }
-
-
-        /* Importation de Font Awesome pour les icônes (à ajouter dans <style>) */
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
-
-
-    </style>
 </head>
+
 <body>
+
     <div class="container">
+        <h1 class="dashboard-title"><i class="fas fa-chart-line icon-header"></i> Tableau de Bord Binance Testnet</h1>
 
         <div id="loginFormContainer">
             <h1 class="text-center mb-4">Connexion Binance Testnet</h1>
-            <form id="apiForm">
-                <div class="form-group">
-                    <label for="apiKey">Clé API</label>
-                    <input type="text" class="form-control" id="apiKey" name="apiKey" placeholder="Votre clé API">
+
+            <div id="profileLoginSection">
+                <h2>Se Connecter avec un Profil</h2>
+                <div id="profileListContainer">
+                    <p id="noProfilesMessage">Aucun profil enregistré. Veuillez créer un profil ci-dessous.</p>
+                    <div id="profileButtonsContainer" style="display:none;"> </div>
                 </div>
-                <div class="form-group">
-                    <label for="secretKey">Clé Secrète</label>
-                    <input type="text" class="form-control" id="secretKey" name="secretKey" placeholder="Votre clé secrète">
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Se Connecter à Binance Testnet</button>
-            </form>
+                <form id="profileLoginForm" style="display:none;"> <div class="form-group">
+                        <label for="profileCode">Code du Profil (si applicable)</label>
+                        <input type="password" class="form-control" id="profileCode" name="profileCode"
+                            placeholder="Code du profil">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="connectProfileButton">Se Connecter</button> <div class="form-check mt-2">
+                        <input type="checkbox" class="form-check-input" id="rememberProfile">
+                        <label class="form-check-label" for="rememberProfile">Rester connecté</label>
+                    </div>
+                </form> 
+            </div>
+
+            <div id="profileCreationSection" style="margin-top: 30px;">
+                <h2>Créer un Nouveau Profil</h2>
+                <form id="createProfileForm">
+                    <div class="form-group">
+                        <label for="newProfileName">Nom du Profil</label>
+                        <input type="text" class="form-control" id="newProfileName" name="newProfileName"
+                            placeholder="Nom de votre profil (ex: 'Testnet Perso')">
+                    </div>
+                    <div class="form-group">
+                        <label for="newProfileCode">Code du Profil (optionnel)</label>
+                        <input type="password" class="form-control" id="newProfileCode" name="newProfileCode"
+                            placeholder="Code pour ce profil (optionnel)">
+                    </div>
+                    <div class="form-group">
+                        <label for="newApiKey">Clé API</label>
+                        <input type="text" class="form-control" id="newApiKey" name="newApiKey"
+                            placeholder="Votre clé API">
+                    </div>
+                    <div class="form-group">
+                        <label for="newSecretKey">Clé Secrète</label>
+                        <input type="text" class="form-control" id="newSecretKey" name="newSecretKey"
+                            placeholder="Votre clé secrète">
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block">Enregistrer le Profil</button>
+                </form>
+            </div>
+
             <div id="connectionStatus" class="alert alert-info" role="alert"></div>
         </div>
 
-
         <div id="dashboard" style="display:none;">
-            <h2 class="text-center mb-4">Tableau de Bord Binance Testnet</h2>
-
-            <div id="dashboardConnectionStatus" class="alert alert-primary" role="alert">Connecté via WebSocket - Flux de données temps réel activé.</div>
-
-            <div id="searchContainer">
-                <input type="text" class="form-control" id="searchInput" placeholder="Rechercher une cryptomonnaie (ex: BTCUSDT)">
-                <button class="btn btn-outline-secondary" id="searchButton">Rechercher</button>
-            </div>
-            <div id="searchResults" class="list-group">
-                </div>
-
-            <div class="d-flex justify-content-between align-items-center mt-3">  <div id="accountBalances" class="mt-3">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="balancesDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-wallet"></i> <span class="ml-1 d-none d-sm-inline">Portefeuille</span>  </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="balancesDropdownButton">
-                            <div class="px-3 py-2">
-                                <table class="table table-sm table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Actif</th>
-                                            <th>Solde Libre</th>
-                                            <th>Solde Bloqué</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="balanceTableBody">
-                                        </tbody>
-                                </table>
-                                <div id="noBalancesMessage" class="alert alert-info mt-2" style="display:none;" role="alert">
-                                    Aucun solde positif trouvé.
-                                </div>
-                                <div id="balancesErrorMessage" class="alert alert-danger mt-2" style="display:none;" role="alert">
-                                    Impossible de charger les soldes du compte.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="favoritesSection" class="mt-3 ml-3"> <button class="btn btn-outline-primary" type="button" id="favoritesButton">
-                        <i class="fas fa-star"></i> <span class="ml-1 d-none d-sm-inline">Favoris</span>
-                    </button>
-                    <div id="favoriteVariationsContainer"> </div>
-                </div>
+            <h2 class="section-title"><i class="fas fa-tachometer-alt icon-section"></i> Dashboard</h2>
+            <div id="dashboardConnectionStatus" class="alert alert-info modern-alert">
+                Non connecté via WebSocket.
             </div>
 
-
-            <h4 class="mt-4">Variations des Cryptomonnaies (24h) - Temps Réel (Secondaire)</h4>  <div id="cryptoVariationsContainer" class="secondary-data-table"> </div>
+            <h3 class="table-title"><i class="fas fa-wallet icon-table-title"></i> Soldes du Compte (USDT)</h3>
+            <div id="balances">
+                <div id="balancesErrorMessage" class="alert alert-danger modern-alert" style="display:none;">
+                    Erreur lors du chargement des soldes. Veuillez réessayer plus tard.
+                </div>
+                <div id="noBalancesMessage" class="alert alert-warning modern-alert" style="display:none;">
+                    Aucun solde USDT positif trouvé.
+                </div>
+                <div class="table-responsive">
+                    <table class="table modern-table" id="balanceTable" style="width:auto;">
+                        <thead class="modern-thead">
+                            <tr>
+                                <th><i class="fas fa-coins icon-th"></i> Actif (USDT)</th>
+                                <th><i class="fas fa-coins icon-th"></i> Solde </th>
+                                <th><i class="fas fa-coins icon-th"></i> Solde Bloqué</th>
+                            </tr>
+                        </thead>
+                        <tbody id="balanceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <table class="table modern-table table-hover" id="cryptoVariationsTable">
+                <thead class="modern-thead">
+                    <tr>
+                        <th>
+                            <i class="fas fa-chart-bar icon-table-title"></i> Favoris - Variations des Cryptomonnaies
+                            (24h)
+                            <br>
+                            <i class="fas fa-hashtag icon-th"></i> Symbole
+                        </th>
+                        <th>
+                            <i class="fas fa-chart-line icon-th"></i> Variation (24h)
+                        </th>
+                        <th>
+                            <i class="fas fa-dollar-sign icon-th"></i> Prix actuel (USDT)
+                        </th>
+                        <th>
+                            <i class="fas fa-info-circle icon-th"></i> Infos
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="cryptoVariationsTableBody">
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <div id="assetInfoPage" style="display:none;">
-            <h2 class="text-center mb-4" id="assetInfoHeader">Informations sur l'actif</h2>
-            <div id="assetInfoContainer">
-                <div id="assetInfoDetails">
-                    </div>
-                <button class="btn btn-secondary btn-block" id="backToDashboard">Retour au Tableau de Bord</button>
-            </div>
+
+    <div id="searchSection" class="search-section" style="display:none;">
+        <h3 class="section-title"><i class="fas fa-search icon-section"></i> Recherche de Symbole</h3>
+        <div class="input-group mb-3 search-input-group">
+            <span class="input-group-text modern-input-group-text" id="searchInputPrepend"><i
+                    class="fas fa-coins"></i></span>
+            <input type="text" class="form-control modern-input" id="searchInput" placeholder="Symbole (ex: BTCUSDT)"
+                aria-label="Symbole" aria-describedby="searchButton">
+            <button class="btn btn-outline-secondary modern-button search-button" type="button" id="searchButton"><i
+                    class="fas fa-arrow-right icon-button"></i> Rechercher</button>
         </div>
+        <div id="searchResults" class="list-group modern-list-group">
+        </div>
+    </div>
 
 
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <div id="assetInfoPage" class="asset-info-page" style="display:none;">
+        <h2 id="assetInfoHeader" class="asset-info-header"><i class="fas fa-info-circle icon-header"></i> Informations
+            sur l'Actif</h2>
+
+        <div id="assetInfoDetailsContainer" class="asset-info-details">
+            <p>
+                <i class="fas fa-fw fa-signature"></i> <strong>Symbole:</strong> <span id="assetDetailSymbol"></span>
+            </p>
+            <p>
+                <i class="fas fa-fw fa-dollar-sign"></i> <strong>Prix actuel:</strong> <span
+                    id="assetDetailPrice"></span>
+            </p>
+            <p>
+                <i class="fas fa-fw fa-chart-line"></i> <strong>Variation (24h):</strong> <span
+                    id="assetDetailVariation"></span>
+            </p>
+            <p>
+                <i class="fas fa-fw fa-arrow-up"></i> <strong>Plus haut (24h):</strong> <span
+                    id="assetDetailHigh"></span>
+            </p>
+            <p>
+                <i class="fas fa-fw fa-arrow-down"></i> <strong>Plus bas (24h):</strong> <span
+                    id="assetDetailLow"></span>
+            </p>
+            <p>
+                <i class="fas fa-fw fa-chart-area"></i> <strong>Volume (24h):</strong> <span
+                    id="assetDetailVolume"></span>
+            </p>
+            <p>
+                <i class="fas fa-fw fa-chart-pie"></i> <strong>Volume en USDT (24h):</strong> <span
+                    id="assetDetailQuoteVolume"></span>
+            </p>
+        </div>
+        <div class="asset-info-actions">
+            <button id="favoriteButton" class="btn btn-primary modern-button favorite-button" data-symbol="">
+                <i class="fas fa-star icon-button"></i> Ajouter aux Favoris
+            </button>
+        </div>
+        <button id="backToDashboardButton" class="btn btn-secondary modern-button back-dashboard-button"><i
+                class="fas fa-arrow-left icon-button"></i> Retour au Tableau de Bord</button>
+    </div>
+
+    <script src="js/login/login.js"></script>
+    <script src="js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
 
-    <script>
-        const apiForm = document.getElementById('apiForm');
-        const connectionStatusDiv = document.getElementById('connectionStatus');
-        const cryptoVariationsContainer = document.getElementById('cryptoVariationsContainer');
-        const symbolsToTrack = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT'];
-        let websocketClient;
-
-        // Dashboard Elements
-        const loginFormContainer = document.getElementById('loginFormContainer');
-        const dashboardContainer = document.getElementById('dashboard');
-        const dashboardConnectionStatusDiv = document.getElementById('dashboardConnectionStatus');
-        const balanceTableBody = document.getElementById('balanceTableBody');
-        const noBalancesMessage = document.getElementById('noBalancesMessage');
-        const balancesErrorMessage = document.getElementById('balancesErrorMessage');
-
-        // Search Elements
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const searchResultsContainer = document.getElementById('searchResults');
-
-        // Asset Info Page Elements
-        const assetInfoPageContainer = document.getElementById('assetInfoPage');
-        const assetInfoHeaderElement = document.getElementById('assetInfoHeader');
-        const assetInfoDetailsContainer = document.getElementById('assetInfoDetails');
-        const backToDashboardButton = document.getElementById('backToDashboard');
-
-        // Favorites Elements
-
-
-        async function displayFavorites() {
-            const favorites = getFavorites(); // Get the array of favorite symbols from localStorage
-            favoriteVariationsContainer.innerHTML = ''; // Clear any existing favorite displays
-
-            if (favorites.length === 0) {
-                favoriteVariationsContainer.innerHTML = '<div class="alert alert-info">Aucun favori sélectionné.</div>';
-                return; // Exit the function early if no favorites
-            }
-
-            // Create and append list items for each favorite symbol
-            favorites.forEach(symbol => {
-                const favoriteItem = document.createElement('div');
-                favoriteItem.classList.add('favorite-variation-item'); // Use the same style as crypto variations
-                favoriteItem.id = `favorite-${symbol}`; // ID for updating variation later
-
-                const symbolElement = document.createElement('span');
-                symbolElement.classList.add('symbol');
-                symbolElement.textContent = symbol;
-
-                const variationElement = document.createElement('span');
-                variationElement.classList.add('variation-percent');
-                variationElement.id = `favorite-variation-${symbol}`; // ID for updating variation in favorites table
-                variationElement.textContent = 'Chargement...'; // Initial loading text
-
-                const starElement = document.createElement('span');
-                starElement.classList.add('favorite-star');
-                starElement.innerHTML = '&#9733;'; // Full star since it's a favorite
-                starElement.style.marginLeft = '5px';
-                starElement.style.cursor = 'pointer';
-                starElement.setAttribute('data-symbol', symbol);
-                starElement.addEventListener('click', toggleFavorite); // Allow removing from favorites in this list too
-                updateStarDisplay(starElement, symbol); // Ensure star display is correct
-
-                favoriteItem.appendChild(symbolElement);
-                favoriteItem.appendChild(starElement);
-                favoriteItem.appendChild(variationElement);
-                favoriteVariationsContainer.appendChild(favoriteItem);
-
-
-                // Immediately request 24hr ticker data for favorites and update display
-                fetch(`/24hr-ticker?symbol=${symbol}`) // Fetch 24hr ticker for each favorite
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                            if (favoriteVariationElementToUpdate) { // Make sure element still exists when data returns
-                                const priceChangePercent = parseFloat(data.priceChangePercent).toFixed(2);
-                                favoriteVariationElementToUpdate.textContent = `${priceChangePercent}%`;
-                                updateVariationStyle(favoriteVariationElementToUpdate, priceChangePercent);
-                            }
-                        } else {
-                            console.error(`Erreur lors de la récupération des données pour ${symbol}:`, data.message);
-                            const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                            if (favoriteVariationElementToUpdate) {
-                                favoriteVariationElementToUpdate.textContent = 'Erreur'; // Display "Error" in case of API failure
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Erreur fetch:", error);
-                        // If the error object is an instance of a Response
-                        if (error instanceof Response) {
-                            // Check if the status is 500 and add specific handling for this.
-                            if (error.status === 500) {
-                                const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                                if (favoriteVariationElementToUpdate) {
-                                    favoriteVariationElementToUpdate.textContent = 'Erreur interne du serveur'; // Specific error message.
-                                }
-                            } else if (error.status === 404){
-                                const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                                if (favoriteVariationElementToUpdate) {
-                                    favoriteVariationElementToUpdate.textContent = 'Ressource introuvable'; // Specific error message.
-                                }
-                            } else {
-                                // Generic error handling
-                                const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                                if (favoriteVariationElementToUpdate) {
-                                    favoriteVariationElementToUpdate.textContent = 'Erreur HTTP'; // Display "Error" in case of fetch failure
-                                }
-                            }
-                        } else {
-                            // If the error is not a Response, it's a network error
-                            const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                            if (favoriteVariationElementToUpdate) {
-                                favoriteVariationElementToUpdate.textContent = 'Erreur Réseau'; // Network error specific error message.
-                            }
-                        }
-                    });
-
-            });
-        }
-
-
-        apiForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const apiKey = document.getElementById('apiKey').value;
-            const secretKey = document.getElementById('secretKey').value;
-
-            const response = await fetch('/connect', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ apiKey, secretKey })
-            });
-
-            const data = await response.json();
-            connectionStatusDiv.textContent = data.message;
-
-            if (data.success) {
-                connectionStatusDiv.classList.remove('alert-info', 'alert-danger');
-                connectionStatusDiv.classList.add('alert-success');
-
-                loginFormContainer.style.display = 'none';
-                dashboardContainer.style.display = 'block';
-                assetInfoPageContainer.style.display = 'none'; // S'assurer que la page d'info est cachée
-
-                displayAccountBalances(data.accountInfo);
-                displayFavorites(); // Afficher les favoris dès la connexion REST réussie
-                initWebSocket();
-
-            } else {
-                connectionStatusDiv.classList.remove('alert-info', 'alert-success');
-                connectionStatusDiv.classList.add('alert-danger');
-            }
-        });
-
-
-        function displayAccountBalances(accountInfo) {
-            if (accountInfo && accountInfo.balances) {
-                balanceTableBody.innerHTML = '';
-                noBalancesMessage.style.display = 'none';
-                balancesErrorMessage.style.display = 'none';
-
-                const nonZeroBalances = accountInfo.balances.filter(balance => parseFloat(balance.free) > 0 || parseFloat(balance.locked) > 0);
-
-                if (nonZeroBalances.length > 0) {
-                    nonZeroBalances.forEach(balance => {
-                        const row = balanceTableBody.insertRow();
-                        const assetCell = row.insertCell();
-                        const freeBalanceCell = row.insertCell();
-                        const lockedBalanceCell = row.insertCell();
-
-                        assetCell.textContent = balance.asset;
-                        freeBalanceCell.textContent = parseFloat(balance.free).toFixed(2);
-                        lockedBalanceCell.textContent = parseFloat(balance.locked).toFixed(2);
-                    });
-                } else {
-                    noBalancesMessage.style.display = 'block';
-                }
-            } else {
-                balancesErrorMessage.style.display = 'block';
-                balanceTableBody.innerHTML = '';
-                noBalancesMessage.style.display = 'none';
-            }
-        }
-
-
-        function initWebSocket() {
-            websocketClient = new WebSocket('wss://stream.testnet.binance.vision/ws');
-
-            websocketClient.onopen = () => {
-                console.log('WebSocket Client Connected');
-                symbolsToTrack.forEach(symbol => {
-                    websocketClient.send(JSON.stringify({ method: 'SUBSCRIBE', params: [`${symbol.toLowerCase()}@ticker`], id: 1 }));
-                    console.log(`Subscribed to ${symbol} ticker stream`);
-                });
-                dashboardConnectionStatusDiv.textContent = 'Connecté via WebSocket - Flux de données temps réel activé.';
-                dashboardConnectionStatusDiv.classList.remove('alert-info', 'alert-danger', 'alert-success');
-                dashboardConnectionStatusDiv.classList.add('alert-primary');
-
-                displayFavorites(); // Afficher les favoris dès la connexion WebSocket ouverte
-            };
-
-            websocketClient.onclose = () => {
-                console.log('WebSocket Client Disconnected');
-                dashboardConnectionStatusDiv.textContent = 'WebSocket déconnecté.';
-                dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success');
-                dashboardConnectionStatusDiv.classList.add('alert-info');
-            };
-
-            websocketClient.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.e === '24hrTicker') { // CONDITION CORRECTE : '24hrTicker'
-                    const symbol = data.s;
-                    const priceChangePercent = parseFloat(data.P).toFixed(2);
-                    updateCryptoVariationDisplay(symbol.toUpperCase(), priceChangePercent);
-                } else {
-                    console.debug('Message WebSocket reçu (non-ticker):', data);
-                }
-            };
-
-            websocketClient.onerror = (error) => {
-                console.error('WebSocket Client Error:', error);
-                dashboardConnectionStatusDiv.textContent = 'Erreur WebSocket. Voir la console pour plus de détails.';
-                dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success', 'alert-info');
-                dashboardConnectionStatusDiv.classList.add('alert-danger');
-            };
-        }
-
-        function updateCryptoVariationDisplay(symbol, priceChangePercent) {
-            // Mise à jour du tableau principal (variations live secondaires)
-            let itemElement = document.getElementById(`crypto-${symbol}`);
-            if (!itemElement) {
-                itemElement = document.createElement('div');
-                itemElement.classList.add('crypto-variation-item');
-                itemElement.id = `crypto-${symbol}`;
-
-                const symbolElement = document.createElement('span');
-                symbolElement.classList.add('symbol');
-                symbolElement.textContent = symbol;
-
-                const starElement = document.createElement('span'); // Ajout de l'étoile
-                starElement.classList.add('favorite-star'); // Classe CSS pour styliser l'étoile (facultatif)
-                starElement.innerHTML = '&#9734;'; // Étoile vide par défaut
-                starElement.style.marginLeft = '5px'; // Espacement
-                starElement.style.cursor = 'pointer'; // Indiquer que c'est cliquable
-                starElement.setAttribute('data-symbol', symbol); // Stocker le symbole dans l'attribut data
-                starElement.addEventListener('click', toggleFavorite); // Ajouter l'écouteur d'événement pour le clic
-                updateStarDisplay(starElement, symbol); // Mise à jour initiale de l'affichage de l'étoile
-
-                const variationElement = document.createElement('span');
-                variationElement.classList.add('variation-percent');
-                variationElement.id = `variation-${symbol}`;
-                itemElement.appendChild(symbolElement);
-                itemElement.appendChild(starElement);
-                itemElement.appendChild(variationElement);
-                cryptoVariationsContainer.appendChild(itemElement);
-            }
-            const variationElementToUpdate = document.getElementById(`variation-${symbol}`);
-            variationElementToUpdate.textContent = `${priceChangePercent}%`;
-            updateVariationStyle(variationElementToUpdate, priceChangePercent);
-
-
-            // Mise à jour du tableau des favoris (NOUVEAU)
-            const favoriteItemElement = document.getElementById(`favorite-${symbol}`);
-            if (favoriteItemElement) { // Vérifier si le symbole est dans les favoris
-                const favoriteVariationElementToUpdate = document.getElementById(`favorite-variation-${symbol}`);
-                favoriteVariationElementToUpdate.textContent = `${priceChangePercent}%`;
-                updateVariationStyle(favoriteVariationElementToUpdate, priceChangePercent);
-            }
-        }
-
-        function updateVariationStyle(variationElement, priceChangePercent) { // Fonction utilitaire pour le style
-            variationElement.classList.remove('positive', 'negative');
-            if (priceChangePercent > 0) {
-                variationElement.classList.add('positive');
-            } else if (priceChangePercent < 0) {
-                variationElement.classList.add('negative');
-            }
-        }
-
-
-        // ======= Recherche de symbole et page d'information =======
-        searchButton.addEventListener('click', () => {
-            const searchTerm = searchInput.value.trim().toUpperCase();
-            if (searchTerm) {
-                searchSymbol(searchTerm);
-            }
-        });
-
-        searchInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                const searchTerm = searchInput.value.trim().toUpperCase();
-                if (searchTerm) {
-                    searchSymbol(searchTerm);
-                }
-            }
-        });
-
-
-        async function searchSymbol(symbol) {
-            searchResultsContainer.innerHTML = ''; // Effacer les résultats précédents
-            try {
-                const response = await fetch(`/price?symbol=${symbol}USDT`); // Recherche de prix via REST API route /price
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
-                }
-                const data = await response.json();
-                if (data.success && data.price) {
-                    const listItem = document.createElement('a');
-                    listItem.href = '#'; // Activer le lien
-                    listItem.classList.add('list-group-item', 'list-group-item-action');
-
-                    const symbolSpan = document.createElement('span'); // Span pour le symbole + prix
-                    symbolSpan.textContent = `${symbol}USDT - Prix actuel: ${parseFloat(data.price).toFixed(2)} USDT`;
-                    listItem.appendChild(symbolSpan); // Ajouter le span au listItem
-
-                    const starElementSearch = document.createElement('span'); // Étoile pour la recherche
-                    starElementSearch.classList.add('favorite-star-search'); // Classe CSS pour styliser l'étoile de recherche (facultatif)
-                    starElementSearch.innerHTML = '&#9734;'; // Étoile vide par défaut
-                    starElementSearch.style.marginLeft = '10px'; // Espacement
-                    starElementSearch.style.cursor = 'pointer'; // Clicable
-                    starElementSearch.setAttribute('data-symbol', symbol); // Stocker le symbole
-                    starElementSearch.addEventListener('click', toggleFavorite); // Écouteur d'événement
-                    updateStarDisplay(starElementSearch, symbol); // Mise à jour initiale de l'affichage de l'étoile dans la recherche
-                    listItem.appendChild(starElementSearch); // Ajouter l'étoile après le texte
-
-
-                    listItem.addEventListener('click', () => { // Gestionnaire d'événement pour afficher la page d'info (reste inchangé)
-                        displayAssetInfoPage(symbol);
-                    });
-                    searchResultsContainer.appendChild(listItem);
-                } else {
-                    searchResultsContainer.innerHTML = '<div class="alert alert-warning">Aucun résultat trouvé.</div>';
-                }
-            } catch (error) {
-                console.error("Erreur lors de la recherche de symbole:", error);
-                searchResultsContainer.innerHTML = '<div class="alert alert-danger">Erreur lors de la recherche.</div>';
-            }
-        }
-
-
-        async function displayAssetInfoPage(symbol) {
-            dashboardContainer.style.display = 'none'; // Cacher le dashboard
-            assetInfoPageContainer.style.display = 'block'; // Afficher la page d'info
-            assetInfoHeaderElement.textContent = `Informations sur l'actif ${symbol}USDT`;
-            assetInfoDetailsContainer.innerHTML = '<p>Chargement des données...</p>'; // Message de chargement initial
-
-            try {
-                const tickerResponse = await fetch(`/24hr-ticker?symbol=${symbol}USDT`); // Récupération des données 24hr-ticker via API REST route /24hr-ticker
-                if (!tickerResponse.ok) {
-                    throw new Error(`Erreur HTTP: ${tickerResponse.status}`);
-                }
-                const tickerData = await tickerResponse.json();
-
-                if (tickerData.success) { // Vérifier la propriété success dans la réponse JSON
-                    assetInfoDetailsContainer.innerHTML = `
-                        <p><strong>Symbole:</strong> ${tickerData.symbol}</p>
-                        <p><strong>Prix actuel:</strong> ${parseFloat(tickerData.lastPrice).toFixed(2)} USDT</p>
-                        <p><strong>Variation (24h):</strong> <span class="${getVariationClass(tickerData.priceChangePercent)}">${parseFloat(tickerData.priceChangePercent).toFixed(2)}%</span></p>
-                        <p><strong>Plus haut (24h):</strong> ${parseFloat(tickerData.highPrice).toFixed(2)} USDT</p>
-                        <p><strong>Plus bas (24h):</strong> ${parseFloat(tickerData.lowPrice).toFixed(2)} USDT</p>
-                        <p><strong>Volume (24h):</strong> ${parseFloat(tickerData.volume).toFixed(2)} ${symbol.substring(0, symbol.indexOf('USDT'))}</p>
-                        <p><strong>Volume en USDT (24h):</strong> ${parseFloat(tickerData.quoteVolume).toFixed(2)} USDT</p>
-                    `;
-                } else {
-                    // Afficher un message d'erreur plus précis si data.success est false (erreur côté serveur API)
-                    assetInfoDetailsContainer.innerHTML = `<div class="alert alert-danger">Erreur lors de la récupération des données de l'actif. ${tickerData.message ? tickerData.message : 'Veuillez réessayer plus tard.'}</div>`;
-                }
-
-
-            } catch (error) {
-                console.error("Erreur lors du chargement des informations de l'actif:", error);
-                assetInfoDetailsContainer.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement des informations de l\'actif. Veuillez réessayer.</div>';
-            }
-        }
-
-        function getVariationClass(priceChangePercent) {
-            if (priceChangePercent > 0) {
-                return 'value-positive';
-            } else if (priceChangePercent < 0) {
-                return 'value-negative';
-            } else {
-                return 'value-neutral';
-            }
-        }
-
-
-        backToDashboardButton.addEventListener('click', () => {
-            dashboardContainer.style.display = 'block';
-            assetInfoPageContainer.style.display = 'none';
-        });
-
-
-        function toggleFavorite(event) {
-            const symbol = event.target.getAttribute('data-symbol');
-            let favorites = getFavorites(); // Récupérer la liste actuelle des favoris
-
-            const isFavorite = favorites.includes(symbol);
-
-            if (isFavorite) {
-                // Retirer des favoris
-                favorites = favorites.filter(favSymbol => favSymbol !== symbol);
-                event.target.innerHTML = '&#9734;'; // Afficher étoile vide
-            } else {
-                // Ajouter aux favoris
-                favorites.push(symbol);
-                event.target.innerHTML = '&#9733;'; // Afficher étoile pleine
-            }
-
-            saveFavorites(favorites); // Sauvegarder la liste mise à jour
-            displayFavorites(); // **Re-afficher les favoris pour mettre à jour l'affichage**
-            console.log(`Symbole ${symbol} favoris mis à jour. Liste actuelle :`, favorites); // Log pour débogage
-        }
-
-        function getFavorites() {
-            const favoritesString = localStorage.getItem('favoriteCryptos');
-            return favoritesString ? JSON.parse(favoritesString) : []; // Retourner un tableau vide si rien n'est enregistré
-        }
-
-        function saveFavorites(favorites) {
-            localStorage.setItem('favoriteCryptos', JSON.stringify(favorites));
-        }
-
-        function updateStarDisplay(starElement, symbol) {
-            const favorites = getFavorites();
-            if (favorites.includes(symbol)) {
-                starElement.innerHTML = '&#9733;'; // Étoile pleine si favori
-            } else {
-                starElement.innerHTML = '&#9734;'; // Étoile vide sinon
-            }
-        }
-
-        const favoritesButton = document.getElementById('favoritesButton');
-        const favoriteVariationsContainer = document.getElementById('favoriteVariationsContainer');
-
-
-        favoritesButton.addEventListener('click', () => {
-            if (favoriteVariationsContainer.style.display === 'none') {
-                favoriteVariationsContainer.style.display = 'block'; // Afficher si caché
-                displayFavorites(); // Re-afficher les favoris quand on ouvre (au cas où la liste a changé)
-            } else {
-                favoriteVariationsContainer.style.display = 'none'; // Cacher si affiché
-            }
-        });
-
-        // Cacher initialement le conteneur des favoris au démarrage
-        favoriteVariationsContainer.style.display = 'none';
-    </script>
 </body>
+
 </html>
