@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const connectProfileButton = document.getElementById('connectProfileButton'); // Bouton "Se Connecter"
     const createProfileForm = document.getElementById('createProfileForm');
     const logoutButton = document.getElementById('logoutButton'); // Bouton "Déconnexion"
+    const showCreateProfileButton = document.getElementById('showCreateProfileButton'); // Bouton "Créer un Nouveau Profil"
+    const createProfileContainer = document.getElementById('createProfileContainer'); // Container du formulaire "Créer un Profil"
 
 
     let savedProfiles = [];
@@ -32,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // profileLoginForm.style.display = 'block'; // SUPPRIMER CETTE LIGNE : Ne pas afficher le formulaire de code profil lors de la connexion automatique
         loginFormContainer.style.display = 'none'; // Cacher le formulaire de login principal en attendant la connexion auto
 
-        const selectedProfile = savedProfiles.find(p => p.profileName === selectedProfileName);
+        const selectedProfile = savedProfiles.find(p => p.profileName === rememberedProfileName);
         if (selectedProfile) {
             // Tentative de connexion automatique avec le profil mémorisé
             connectAutomatically(selectedProfile);
@@ -85,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // --- AJOUT DEBUT - Gestion du formulaire createProfileForm (Créer un Nouveau Profil) ---
     createProfileForm.addEventListener('submit', function (event) {
         event.preventDefault();
         const profileName = document.getElementById('newProfileName').value.trim();
@@ -110,7 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loadProfiles();
         alert(`Profil "${profileName}" enregistré avec succès.`);
         createProfileForm.reset();
+        createProfileContainer.style.display = 'none'; // Cacher le formulaire après la création du profil
     });
+    // --- FIN AJOUT - Gestion du formulaire createProfileForm (Créer un Nouveau Profil) ---
 
 
     connectProfileButton.addEventListener('click', async function (event) {
@@ -230,6 +235,18 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Bouton 'logoutButton' non trouvé dans le DOM. Vérifiez l'ID dans index.html.");
     }
     // --- FIN AJOUT - Fonctionnalité "Rester déconnecté" - Gestion du bouton Déconnexion ---
+
+
+    // --- Gestion du bouton "Créer un nouveau profil" (afficher/masquer le formulaire) ---
+    if (showCreateProfileButton && createProfileContainer) {
+        showCreateProfileButton.addEventListener('click', function() {
+            console.log("Bouton 'Créer un Nouveau Profil' cliqué.");
+            createProfileContainer.style.display = (createProfileContainer.style.display === 'none' || createProfileContainer.style.display === '') ? 'block' : 'none';
+        });
+    } else {
+        console.error("Bouton 'showCreateProfileButton' ou 'createProfileContainer' non trouvé dans le DOM. Vérifiez les IDs dans index.html.");
+    }
+    // --- Fin gestion du bouton "Créer un nouveau profil" ---
 
 
     // --- AJOUT FIN - Fonctionnalité "Rester connecté" - Fonction connectAutomatically ---
