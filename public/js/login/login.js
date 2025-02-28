@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileLoginForm = document.getElementById('profileLoginForm');
     const connectProfileButton = document.getElementById('connectProfileButton'); // Bouton "Se Connecter"
     const createProfileForm = document.getElementById('createProfileForm');
+    const logoutButton = document.getElementById('logoutButton'); // Bouton "Déconnexion"
+
 
     let savedProfiles = [];
     loadProfiles(); // APPELLER loadProfiles() ICI, APRES avoir déclaré savedProfiles et les éléments HTML
@@ -188,6 +190,46 @@ document.addEventListener('DOMContentLoaded', () => {
             accountBalanceDiv.innerHTML = '';
         }
     });
+
+
+    // --- AJOUT FIN - Fonctionnalité "Rester déconnecté" - Gestion du bouton Déconnexion ---
+    if (logoutButton) { // Vérifier si le bouton existe bien dans le DOM
+        logoutButton.addEventListener('click', function() {
+            console.log("Bouton Déconnexion cliqué."); // Pour vérification dans la console
+
+            // 1. Supprimer le profil mémorisé du localStorage (désactiver "Rester connecté")
+            localStorage.removeItem('rememberedProfileName');
+            console.log("Profil mémorisé supprimé de localStorage (Déconnexion).");
+
+            // 2. Réinitialiser l'affichage : Cacher le tableau de bord, afficher le formulaire de login et les boutons de profil
+            const dashboardContainer = document.getElementById('dashboard');
+            const loginFormContainer = document.getElementById('loginFormContainer');
+            const profileButtonsContainer = document.getElementById('profileButtonsContainer');
+
+            if (dashboardContainer && loginFormContainer && profileButtonsContainer) { // Vérifier que les éléments existent avant de les manipuler
+                dashboardContainer.style.display = 'none'; // Cacher le tableau de bord
+                loginFormContainer.style.display = 'block'; // Afficher le formulaire de login principal
+                profileButtonsContainer.style.display = 'block'; // Afficher les boutons de profil
+                console.log("Tableau de bord caché, formulaire de login et boutons de profil affichés.");
+
+                // Optionnel : Réinitialiser d'autres éléments ou variables si nécessaire (ex: vider le contenu du tableau de bord)
+                const accountInfoDiv = document.getElementById('account-info');
+                const accountBalanceDiv = document.getElementById('account-balance');
+                if (accountInfoDiv && accountBalanceDiv) {
+                    accountInfoDiv.textContent = ''; // Vider les infos du compte
+                    accountBalanceDiv.innerHTML = ''; // Vider le solde
+                    console.log("Infos du compte et solde réinitialisés.");
+                }
+
+                alert("Déconnexion réussie."); // Message de confirmation (optionnel)
+            } else {
+                console.error("Éléments HTML (dashboard, loginFormContainer, profileButtonsContainer) non trouvés. Vérifiez les IDs dans index.html.");
+            }
+        });
+    } else {
+        console.error("Bouton 'logoutButton' non trouvé dans le DOM. Vérifiez l'ID dans index.html.");
+    }
+    // --- FIN AJOUT - Fonctionnalité "Rester déconnecté" - Gestion du bouton Déconnexion ---
 
 
     // --- AJOUT FIN - Fonctionnalité "Rester connecté" - Fonction connectAutomatically ---
