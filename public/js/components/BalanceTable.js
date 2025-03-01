@@ -7,10 +7,11 @@ function BalanceTable(containerElementId) {
      */
     this.containerId = containerElementId;
     this.container = document.getElementById(containerElementId); // Référence au conteneur HTML
-    this.tableBody = null; // On initialisera le tbody plus tard
+    this.table = null; // On initialisera le table element
+    this.tableBody = null; // On initialisera le tbody element
 }
 
-BalanceTable.prototype.render = function() {
+BalanceTable.prototype.render = function () {
     /**
      * Méthode pour initialiser et afficher le tableau des balances dans le conteneur.
      */
@@ -19,18 +20,30 @@ BalanceTable.prototype.render = function() {
         return;
     }
 
-    // --- Structure HTML du tableau (pour l'instant, on suppose qu'elle existe déjà dans index.html) ---
-    // --- On va juste récupérer la référence au tbody ---
-    this.tableBody = this.container.querySelector('tbody');
-    if (!this.tableBody) {
-        console.error(`BalanceTable: Element <tbody> non trouvé dans le conteneur avec l'ID "${this.containerId}".`);
-        return;
-    }
+    // --- Création de la structure HTML du tableau dynamiquement ---
+    this.table = document.createElement('table');
+    this.table.className = 'table table-bordered table-responsive'; // Classes Bootstrap pour le style (adaptez selon vos besoins)
+    let thead = document.createElement('thead');
+    thead.innerHTML = `
+        <tr>
+            <th>Actif</th>
+            <th>Solde Disponible</th>
+            <th>Solde Bloqué</th>
+        </tr>
+    `;
+    this.table.appendChild(thead);
+
+
+    this.tableBody = document.createElement('tbody');
+    this.table.appendChild(this.tableBody);
+
+    this.container.appendChild(this.table); // Ajouter le tableau créé au conteneur HTML
+
 
     console.log("BalanceTable component rendu dans le conteneur:", this.containerId);
 };
 
-BalanceTable.prototype.updateBalances = function(balancesData) {
+BalanceTable.prototype.updateBalances = function (balancesData) {
     /**
      * Méthode pour mettre à jour le tableau des balances avec de nouvelles données.
      * @param {Array<Object>} balancesData - Un tableau d'objets représentant les données de balance (ex: [{asset: 'BTC', free: '...', locked: '...'}, ...]).
@@ -58,3 +71,5 @@ BalanceTable.prototype.updateBalances = function(balancesData) {
         lockedBalanceCell.textContent = parseFloat(balance.locked).toFixed(2);
     });
 };
+
+export { BalanceTable };

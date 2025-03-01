@@ -1,6 +1,8 @@
+import { displayAccountBalances } from '../dashboard/dashboard.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     // login.js - Gestion des profils de connexion (VERSION LISTES A PUCES + ICONES EDIT/DELETE)
-
+   
     // --- DEPLACER TOUTES LES DECLARATIONS AVEC document.getElementById ICI, AVANT loadProfiles() ---
     const loginFormContainer = document.getElementById('loginFormContainer');
     const dashboardContainer = document.getElementById('dashboard');
