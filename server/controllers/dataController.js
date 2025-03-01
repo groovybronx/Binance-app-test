@@ -15,10 +15,12 @@ exports.getPrice = async (req, res, next) => {
 
         if (priceData.success) { // Vérifier si l'appel au service a réussi
             // Envoi de la réponse JSON avec le prix réel récupéré du service Binance
-            res.json({ success: true, price: priceData.price, symbol: symbol }); // **NOUVEAU : Utilisation de priceData.price et priceData.symbol**
+            res.status(200).json({ success: true, price: priceData.price, symbol: symbol }); // **NOUVEAU : Utilisation de priceData.price et priceData.symbol**
         } else {
             // Si le service n'a pas réussi à récupérer le prix, renvoyer une erreur
-            res.status(500).json({ success: false, message: 'Impossible de récupérer le prix depuis Binance API.', details: priceData.message });
+            // Amélioration: Renvoyer le status code du service si disponible, sinon 500 par défaut
+            const statusCode = priceData.statusCode || 500;
+            res.status(statusCode).json({ success: false, message: 'Impossible de récupérer le prix depuis Binance API.', details: priceData.message });
         }
 
     } catch (error) {
@@ -41,10 +43,12 @@ exports.get24hrTicker = async (req, res, next) => {
 
         if (ticker24hData.success) { // Vérifier si l'appel au service a réussi
             // Envoi de la réponse JSON avec les données du ticker 24h réel récupérées du service Binance
-            res.json({ success: true, ticker24hData: ticker24hData.data }); // **NOUVEAU : Utilisation de ticker24hData.data** (car les données utiles sont dans .data dans ce cas)
+            res.status(200).json({ success: true, ticker24hData: ticker24hData.data }); // **NOUVEAU : Utilisation de ticker24hData.data** (car les données utiles sont dans .data dans ce cas)
         } else {
             // Si le service n'a pas réussi à récupérer le ticker 24h, renvoyer une erreur
-            res.status(500).json({ success: false, message: 'Impossible de récupérer le ticker 24h depuis Binance API.', details: ticker24hData.message });
+            // Amélioration: Renvoyer le status code du service si disponible, sinon 500 par défaut
+            const statusCode = ticker24hData.statusCode || 500;
+            res.status(statusCode).json({ success: false, message: 'Impossible de récupérer le ticker 24h depuis Binance API.', details: ticker24hData.message });
         }
 
     } catch (error) {
@@ -58,14 +62,56 @@ exports.get24hrTickers = async (req, res) => {
     try {
         // --- MODIFICATION DE L'URL ICI POUR UTILISER L'API SPOT TESTNET ---
         const response = await axios.get('https://testnet.binance.vision/api/v3/ticker/24hr'); // Endpoint API SPOT Testnet pour TOUS les tickers 24h
-        if (response.status === 200) {
+
+        // Vérifier si la réponse est OK (statut 2xx)
+        if (response.status >= 200 && response.status < 300) {
             const tickers24hData = response.data;
-            res.json({ success: true, tickers24hData: tickers24hData });
+            res.status(200).json({ success: true, tickers24hData: tickers24hData });
         } else {
+            // Utiliser le status code de la réponse pour informer le client de l'erreur
             res.status(response.status).json({ success: false, message: `Erreur API Binance (tickers 24h - SPOT): ${response.status} ${response.statusText}` });
         }
     } catch (error) {
         console.error("Erreur lors de la requête des tickers 24h à l'API Binance SPOT:", error);
-        res.status(500).json({ success: false, message: "Erreur serveur lors de la récupération des tickers 24h SPOT." });
+        // Amélioration: uniformiser la réponse d'erreur et utiliser un statut 500 pour les erreurs serveur
+        res.status(500).json({ success: false, message: "Erreur serveur lors de la récupération des tickers 24h SPOT.", details: error.message });
+    }
+};
+
+// Contrôleur pour la route /top-gainers (GET /api/top-gainers) - Récupérer les Top 5 "Hausse"
+exports.getTopGainers = async (req, res, next) => {
+    try {
+        // **Appel à binanceService pour récupérer les Top 5 "Hausse"**
+        const topGainersData = await binanceService.getTopGainers(); // <-- Fonction à implémenter dans binanceService
+
+        if (topGainersData.success) {
+            res.status(200).json({ success: true, topGainers: topGainersData.data }); // <-- Renommer potentiellement 'data' en 'topGainers' pour plus de clarté
+        } else {
+            const statusCode = topGainersData.statusCode || 500;
+            res.status(statusCode).json({ success: false, message: 'Impossible de récupérer les Top Gainers depuis Binance API.', details: topGainersData.message });
+        }
+
+    } catch (error) {
+        console.error('Erreur dans dataController.getTopGainers:', error);
+        next(error);
+    }
+};
+
+// Contrôleur pour la route /top-losers (GET /api/top-losers) - Récupérer les Top 5 "Baisse"
+exports.getTopLosers = async (req, res, next) => {
+    try {
+        // **Appel à binanceService pour récupérer les Top 5 "Baisse"**
+        const topLosersData = await binanceService.getTopLosers(); // <-- Fonction à implémenter dans binanceService
+
+        if (topLosersData.success) {
+            res.status(200).json({ success: true, topLosers: topLosersData.data }); // <-- Renommer potentiellement 'data' en 'topLosers' pour plus de clarté
+        } else {
+            const statusCode = topLosersData.statusCode || 500;
+            res.status(statusCode).json({ success: false, message: 'Impossible de récupérer les Top Losers depuis Binance API.', details: topLosersData.message });
+        }
+
+    } catch (error) {
+        console.error('Erreur dans dataController.getTopLosers:', error);
+        next(error);
     }
 };

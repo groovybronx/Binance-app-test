@@ -1,4 +1,5 @@
 const { Spot } = require('@binance/connector');
+const axios = require('axios');
 
 // Service pour interagir avec l'API Binance
 const binanceService = {
@@ -47,6 +48,67 @@ const binanceService = {
 
 
     // -- Vous pourrez ajouter d'autres fonctions de service ici (ex: historique des prix, etc.) --
+};
+
+// Fonction pour récupérer les Top 5 des cryptomonnaies en hausse (Gainers)
+exports.getTopGainers = async () => {
+    try {
+        // --- URL de l'API BINANCE TESTNET pour les Top Gainers 24h (à vérifier et adapter !) ---
+        const response = await axios.get('https://testnet.binance.vision/api/v3/ticker/24hr'); // Utiliser l'endpoint tickers 24h
+
+        if (response.status !== 200) {
+            return { success: false, message: `Erreur API Binance (Top Gainers): ${response.status} ${response.statusText}`, statusCode: response.status };
+        }
+
+        let tickers24hData = response.data;
+
+        // --- Filtrer et trier pour obtenir les Top 5 Gainers ---
+        const gainers = tickers24hData
+            .filter(ticker => parseFloat(ticker.priceChangePercent) > 0 && ticker.symbol.endsWith('USDT')) // Filtrer: variation positive et paires USDT
+            .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent)) // Trier par variation descendante
+            .slice(0, 5) // Prendre les 5 premiers (Top 5)
+            .map(ticker => ({ // Formater les données retournées
+                symbol: ticker.symbol,
+                percentageChange: parseFloat(ticker.priceChangePercent).toFixed(2) // Pourcentage de variation (arrondi à 2 décimales)
+            }));
+
+        return { success: true, data: gainers }; // Renvoyer les Top 5 Gainers formatés
+
+    } catch (error) {
+        console.error("Erreur lors de la récupération des Top Gainers depuis Binance API:", error);
+        return { success: false, message: "Erreur lors de la récupération des Top Gainers depuis Binance API.", details: error.message };
+    }
+};
+
+
+// Fonction pour récupérer les Top 5 des cryptomonnaies en baisse (Losers)
+exports.getTopLosers = async () => {
+    try {
+        // --- URL de l'API BINANCE TESTNET pour les Tickers 24h (la même que pour les gainers) ---
+        const response = await axios.get('https://testnet.binance.vision/api/v3/ticker/24hr'); // Réutiliser l'endpoint tickers 24h
+
+        if (response.status !== 200) {
+            return { success: false, message: `Erreur API Binance (Top Losers): ${response.status} ${response.statusText}`, statusCode: response.status };
+        }
+
+        let tickers24hData = response.data;
+
+        // --- Filtrer et trier pour obtenir les Top 5 Losers ---
+        const losers = tickers24hData
+            .filter(ticker => parseFloat(ticker.priceChangePercent) < 0 && ticker.symbol.endsWith('USDT')) // Filtrer: variation négative et paires USDT
+            .sort((a, b) => parseFloat(a.priceChangePercent) - parseFloat(b.priceChangePercent)) // Trier par variation ASCENDANTE (du plus négatif au moins négatif)
+            .slice(0, 5) // Prendre les 5 premiers (Top 5)
+            .map(ticker => ({ // Formater les données retournées
+                symbol: ticker.symbol,
+                percentageChange: parseFloat(ticker.priceChangePercent).toFixed(2) // Pourcentage de variation (arrondi à 2 décimales)
+            }));
+
+        return { success: true, data: losers }; // Renvoyer les Top 5 Losers formatés
+
+    } catch (error) {
+        console.error("Erreur lors de la récupération des Top Losers depuis Binance API:", error);
+        return { success: false, message: "Erreur lors de la récupération des Top Losers depuis Binance API.", details: error.message };
+    }
 };
 
 module.exports = binanceService;

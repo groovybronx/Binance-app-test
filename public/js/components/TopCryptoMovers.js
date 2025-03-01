@@ -1,127 +1,90 @@
 // js/components/TopCryptoMovers.js
-
 function TopCryptoMovers(containerElementId) {
-    /**
-     * Composant TopCryptoMovers pour afficher les 5 plus grandes hausses et baisses de crypto.
-     * @param {string} containerElementId - L'ID de l'élément HTML qui contiendra le composant.
-     */
     this.containerId = containerElementId;
     this.container = document.getElementById(containerElementId);
-    this.gainersList = null;  // Pour la liste des plus fortes hausses
-    this.losersList = null;   // Pour la liste des plus fortes baisses
+    this.listContainer = null; // Conteneur pour la liste (ul)
+    this.componentType = null; // 'gainers' ou 'losers' - sera défini lors de render()
 }
 
-TopCryptoMovers.prototype.render = async function() {
+
+TopCryptoMovers.prototype.render = function (componentType) { // <-- ACCEPTER 'componentType' comme argument
     if (!this.container) {
         console.error(`TopCryptoMovers: Conteneur HTML avec l'ID "${this.containerId}" non trouvé.`);
         return;
     }
 
-    // Structure HTML de base du composant
-    this.container.innerHTML = `
-        <div class="top-movers-container">
-            <div class="gainers-section">
-                <h5>Top 5 Hausse</h5>
-                <ul class="list-group gainers-list">
-                    <li class="list-group-item">Chargement...</li>  </ul>
-            </div>
-            <div class="losers-section">
-                <h5>Top 5 Baisse</h5>
-                <ul class="list-group losers-list">
-                    <li class="list-group-item">Chargement...</li>  </ul>
-            </div>
-        </div>
-    `;
+    this.componentType = componentType; // Enregistrer le type de composant ('gainers' ou 'losers')
 
-    this.gainersList = this.container.querySelector('.gainers-list');
-    this.losersList = this.container.querySelector('.losers-list');
-
-    try {
-        const moversData = await this.fetchTopMovers();
-        this.updateDisplay(moversData);
-    } catch (error) {
-        console.error("Erreur lors de la récupération des Top Crypto Movers:", error);
-        this.gainersList.innerHTML = '<li class="list-group-item list-group-item-danger">Erreur de chargement</li>';
-        this.losersList.innerHTML = '<li class="list-group-item list-group-item-danger">Erreur de chargement</li>';
+    // --- Création de la structure HTML de la liste ---
+    this.listContainer = document.createElement('ul');
+    if (componentType === 'gainers') {
+        this.listContainer.className = 'list-group gainers-list'; // Classe spécifique pour les "gainers" si besoin
+    } else if (componentType === 'losers') {
+        this.listContainer.className = 'list-group losers-list';  // Classe spécifique pour les "losers" si besoin
+    } else {
+        this.listContainer.className = 'list-group top-movers-list'; // Classe par défaut
     }
+
+
+    const loadingItem = document.createElement('li');
+    loadingItem.className = 'list-group-item';
+    loadingItem.textContent = 'Chargement...'; // Message de chargement initial
+    this.listContainer.appendChild(loadingItem);
+    this.container.appendChild(this.listContainer);
+
+    // Mise à jour du titre (optionnel - si vous voulez un titre différent pour Gainers/Losers dans TopCryptoMovers.js)
+    // this.updateTitle(); // Déplacez ou adaptez updateTitle si vous voulez le gérer ici
+
+    console.log(`TopCryptoMovers component (${componentType}) rendu dans le conteneur:`, this.containerId);
 };
 
 
-TopCryptoMovers.prototype.fetchTopMovers = async function() {
-    try {
-        const response = await fetch('/data/24hr-tickers'); // Endpoint pour récupérer les tickers 24h de TOUS les symboles
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.success && data.tickers24hData) {
-            return data.tickers24hData;
-        } else {
-            throw new Error("Données tickers 24h non reçues du serveur.");
-        }
-    } catch (error) {
-        console.error("Erreur lors de la récupération des données 24hr-tickers:", error);
-        throw error; // Relancer l'erreur pour la gestion dans render()
-    }
-};
-
-
-TopCryptoMovers.prototype.updateDisplay = function(tickersData) {
-    if (!this.gainersList || !this.losersList) {
-        console.error("TopCryptoMovers: listes gainersList ou losersList non initialisées.");
+TopCryptoMovers.prototype.updateMovers = function (moversData) {
+    if (!this.listContainer) {
+        console.error("TopCryptoMovers: listContainer non initialisé. Assurez-vous d'appeler render() en premier.");
         return;
     }
 
-    // Filtrer pour les paires USDT et convertir priceChangePercent en nombre
-    const usdtTickers = tickersData
-        .filter(ticker => ticker.symbol.endsWith('USDT'))
-        .map(ticker => ({
-            symbol: ticker.symbol,
-            priceChangePercent: parseFloat(ticker.priceChangePercent)
-        }));
+    this.listContainer.innerHTML = ''; // Effacer le message "Chargement..."
 
-    // Trier par variation de prix (décroissant pour les hausses, croissant pour les baisses)
-    const sortedByChange = [...usdtTickers].sort((a, b) => b.priceChangePercent - a.priceChangePercent);
-
-    // Séparer les 5 plus fortes hausses et les 5 plus fortes baisses
-    const topGainers = sortedByChange.filter(ticker => ticker.priceChangePercent >= 0).slice(0, 5);
-    const topLosers = sortedByChange.filter(ticker => ticker.priceChangePercent < 0).slice(-5).reverse(); // .reverse() pour avoir du plus négatif au moins négatif
-
-
-    this.gainersList.innerHTML = ''; // Vider la liste des hausses
-    topGainers.forEach(mover => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start'); // Classes Bootstrap pour style
-        listItem.innerHTML = `
-            <div class="ms-2 me-auto">
-                <div class="fw-bold">${mover.symbol}</div>
-            </div>
-            <span class="badge bg-success rounded-pill">${mover.priceChangePercent.toFixed(2)}%</span>
-        `;
-        this.gainersList.appendChild(listItem);
-    });
-
-
-    this.losersList.innerHTML = ''; // Vider la liste des baisses
-    topLosers.forEach(mover => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start'); // Classes Bootstrap pour style
-        listItem.innerHTML = `
-            <div class="ms-2 me-auto">
-                <div class="fw-bold">${mover.symbol}</div>
-            </div>
-            <span class="badge bg-danger rounded-pill">${mover.priceChangePercent.toFixed(2)}%</span>
-        `;
-        this.losersList.appendChild(listItem);
-    });
-
-    if (topGainers.length === 0) {
-        this.gainersList.innerHTML = '<li class="list-group-item">Pas de hausses significatives</li>';
+    if (!moversData || moversData.length === 0) {
+        const noDataItem = document.createElement('li');
+        noDataItem.className = 'list-group-item';
+        noDataItem.textContent = 'Aucune donnée disponible.'; // Message si pas de données
+        this.listContainer.appendChild(noDataItem);
+        return;
     }
-    if (topLosers.length === 0) {
-        this.losersList.innerHTML = '<li class="list-group-item">Pas de baisses significatives</li>';
+
+    moversData.forEach(mover => {
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item';
+        listItem.textContent = `${mover.symbol}  ${mover.percentageChange}%`; // Adaptez l'affichage selon la structure de vos données
+        // Vous pourriez ajouter des classes CSS spécifiques ici en fonction de mover.percentageChange (positif/négatif)
+        if (parseFloat(mover.percentageChange) > 0 && this.componentType === 'gainers') {
+            listItem.classList.add('gainers'); // Classe CSS pour les "gainers" (si vous voulez styliser différemment)
+        } else if (parseFloat(mover.percentageChange) < 0 && this.componentType === 'losers') {
+            listItem.classList.add('losers');  // Classe CSS pour les "losers"
+        }
+        this.listContainer.appendChild(listItem);
+    });
+};
+
+
+// Fonction pour mettre à jour le titre du composant (optionnel - si vous voulez un titre dynamique géré par TopCryptoMovers.js)
+
+TopCryptoMovers.prototype.updateTitle = function () {
+    let titleElement = this.container.querySelector('h3'); // Exemple: chercher un <h3> comme titre dans le conteneur
+    if (titleElement) {
+        if (this.componentType === 'gainers') {
+            titleElement.textContent = 'Top 5 Hausse Cryptos (USDT)';
+        } else if (this.componentType === 'losers') {
+            titleElement.textContent = 'Top 5 Baisse Cryptos (USDT)';
+        } else {
+            titleElement.textContent = 'Top Crypto Movers (USDT)'; // Titre par défaut
+        }
     }
 };
+
 
 
 export { TopCryptoMovers };

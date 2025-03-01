@@ -1,17 +1,16 @@
 // js/dashboard/dashboard.js
 // --- FONCTIONS DU TABLEAU DE BORD ---
-import '../script.js'; 
+import '../script.js';
 import { TopCryptoMovers } from '../components/TopCryptoMovers.js';
 
-// Fonction pour afficher les soldes du compte dans le tableau (exemple - à adapter/déplacer vers un composant BalanceTable ?)
+// Fonction pour afficher les soldes du compte dans le tableau
 export function displayAccountBalances(accountInfo) {
-    console.log("Fonction displayAccountBalances() appelée dans dashboard.js avec :", accountInfo); // Log pour vérifier l'appel 
+    console.log("Fonction displayAccountBalances() appelée dans dashboard.js avec :", accountInfo);
     if (accountInfo && accountInfo.balances) {
         balanceTableBody.innerHTML = '';
         noBalancesMessage.style.display = 'none';
         balancesErrorMessage.style.display = 'none';
 
-        // Filtrer les soldes pour ne garder que ceux en USDT
         const usdtBalances = accountInfo.balances.filter(balance => balance.asset.endsWith('USDT') && (parseFloat(balance.free) > 0 || parseFloat(balance.locked) > 0));
 
         if (usdtBalances.length > 0) {
@@ -36,20 +35,20 @@ export function displayAccountBalances(accountInfo) {
 };
 
 
-// --- Import des Composants et Services (si nécessaire plus tard) ---
-//import { BalanceTable } from '../components/BalanceTable.js'; // Importez BalanceTable ici quand il sera prêt
-// import { accountService } from '../services/accountService.js'; // Importez accountService ici quand il sera prêt
-
 document.addEventListener('DOMContentLoaded', () => {
     console.log("dashboard.js chargé et DOMContentLoaded écouté.");
 
-    // --- DECLARATIONS DES ELEMENTS HTML DU DASHBOARD (ADAPTEZ LES SELECTEURS SI NECESSAIRE) ---
+    // --- DECLARATIONS DES ELEMENTS HTML DU DASHBOARD
     const dashboardConnectionStatusDiv = document.getElementById('dashboardConnectionStatus');
-    const balanceTableBody = document.getElementById('balanceTableBody'); // Ref vers le tbody du tableau des balances (dans index.html)
+    const balanceTableBody = document.getElementById('balanceTableBody');
     const noBalancesMessage = document.getElementById('noBalancesMessage');
     const balancesErrorMessage = document.getElementById('balancesErrorMessage');
     const cryptoVariationsContainer = document.getElementById('cryptoVariationsContainer');
     const cryptoVariationsTableBody = document.getElementById('cryptoVariationsTableBody');
+
+    // Récupérer les conteneurs pour TopCryptoMovers Gainers et Losers
+    const topMoversGainersContainer = document.getElementById('topCryptoMoversContainerGainers');
+    const topMoversLosersContainer = document.getElementById('topCryptoMoversContainerLosers');
 
 
     // --- VARIABLES ET ETATS INTERNES AU DASHBOARD ---
@@ -57,27 +56,62 @@ document.addEventListener('DOMContentLoaded', () => {
     let reconnectionAttempts = 0;
     const maxReconnectionAttempts = 5;
     const reconnectionDelay = 3000;
-    const symbolsToTrack = []; // Pourrait être géré par un service plus tard
+    const symbolsToTrack = [];
 
 
-    // --- Création et rendu du composant TopCryptoMovers ---
-    const topMoversContainer = document.getElementById('topCryptoMoversContainer'); // ID du conteneur dans index.html
-    if (topMoversContainer) {
-        const topCryptoMoversComponent = new TopCryptoMovers('topCryptoMoversContainer');
-        topCryptoMoversComponent.render();
+    // --- Création et rendu des composants TopCryptoMovers Gainers et Losers ---
+    let topCryptoMoversGainersComponent, topCryptoMoversLosersComponent; // Déclarer ici pour portée globale dans dashboard.js
+
+    // Rendre le composant TopCryptoMovers pour les Gainers (Hausse)
+    if (topMoversGainersContainer) {
+        topCryptoMoversGainersComponent = new TopCryptoMovers('topCryptoMoversContainerGainers'); // Instance pour les Gainers
+        topCryptoMoversGainersComponent.render('gainers'); // Passer 'gainers' comme type
     } else {
-        console.error("Conteneur HTML pour TopCryptoMovers avec l'ID 'topCryptoMoversContainer' non trouvé dans index.html.");
+        console.error("Conteneur HTML pour TopCryptoMovers (Gainers) avec l'ID 'topCryptoMoversContainerGainers' non trouvé dans index.html.");
+    }
+
+    // Rendre le composant TopCryptoMovers pour les Losers (Baisse)
+    if (topMoversLosersContainer) {
+        topCryptoMoversLosersComponent = new TopCryptoMovers('topCryptoMoversContainerLosers'); // Instance pour les Losers
+        topCryptoMoversLosersComponent.render('losers'); // Passer 'losers' comme type
+    } else {
+        console.error("Conteneur HTML pour TopCryptoMovers (Losers) avec l'ID 'topCryptoMoversContainerLosers' non trouvé dans index.html.");
     }
 
 
-    // Fonction pour initialiser la connexion WebSocket (à déplacer potentiellement dans un service accountService.js)
+    // Fonction pour récupérer les données des Top Crypto Movers (Gainers et Losers) et mettre à jour les composants
+    window.fetchTopCryptoMoversData = async function() {
+        try {
+            // Récupérer les Top 5 Gainers
+            const gainersResponse = await axios.get('/api/top-gainers'); // <-- API pour les "Hausse" (VERIFIEZ L'URL EXACTE !)
+            const gainersData = gainersResponse.data;
+            if (topCryptoMoversGainersComponent && gainersData) {
+                topCryptoMoversGainersComponent.updateMovers(gainersData); // Mettre à jour les Gainers
+            }
+
+            // Récupérer les Top 5 Losers
+            const losersResponse = await axios.get('/api/top-losers');   // <-- API pour les "Baisse" (VERIFIEZ L'URL EXACTE !)
+            const losersData = losersResponse.data;
+            if (topCryptoMoversLosersComponent && losersData) {
+                topCryptoMoversLosersComponent.updateMovers(losersData);   // Mettre à jour les Losers
+            }
+
+
+        } catch (error) {
+            console.error("Erreur lors de la récupération des Top Crypto Movers (Gainers et Losers):", error);
+            // Gérer l'erreur (afficher un message à l'utilisateur, etc.)
+        }
+    };
+
+
+    // Fonction pour initialiser la connexion WebSocket
     window.initWebSocket = function () {
         if (websocketClient && websocketClient.readyState === WebSocket.OPEN) {
             console.log('WebSocket est déjà connecté. Pas besoin de nouvelle connexion.');
             return;
         }
 
-        websocketClient = new WebSocket('wss://stream.testnet.binance.vision/ws'); // URL WebSocket - pourrait être configurable
+        websocketClient = new WebSocket('wss://stream.testnet.binance.vision/ws');
 
         websocketClient.onopen = () => {
             console.log('Client WebSocket connecté (dashboard.js)');
@@ -93,19 +127,19 @@ document.addEventListener('DOMContentLoaded', () => {
             dashboardConnectionStatusDiv.textContent = 'WebSocket déconnecté. Tentative de reconnexion...';
             dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success');
             dashboardConnectionStatusDiv.classList.add('alert-warning');
-            reconnectWebSocket(); // Tentative de reconnexion en cas de fermeture
+            reconnectWebSocket();
         };
 
         websocketClient.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.e === '24hrTicker') {
                 const symbol = data.s.toUpperCase();
-                if (isFavorite(symbol)) { // Utilisation de la fonction de gestion des favoris (définie dans script.js pour l'instant)
+                if (isFavorite(symbol)) {
                     const priceChangePercent = parseFloat(data.P).toFixed(2);
-                    updateCryptoVariationDisplay(symbol, priceChangePercent, data); // Mise à jour de l'affichage des variations
+                    updateCryptoVariationDisplay(symbol, priceChangePercent, data);
                 }
             } else {
-                console.debug('Message WebSocket reçu (non-ticker) dans dashboard.js:', data); // Debug pour autres types de messages WS
+                console.debug('Message WebSocket reçu (non-ticker) dans dashboard.js:', data);
             }
         };
 
@@ -114,17 +148,17 @@ document.addEventListener('DOMContentLoaded', () => {
             dashboardConnectionStatusDiv.textContent = `Erreur WebSocket: ${error.message}. Tentative de reconnexion...`;
             dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success', 'alert-info');
             dashboardConnectionStatusDiv.classList.add('alert-danger');
-            reconnectWebSocket(); // Tentative de reconnexion en cas d'erreur
+            reconnectWebSocket();
         };
     };
 
 
-    // Fonction de reconnexion WebSocket (à déplacer potentiellement dans un service accountService.js)
+    // Fonction de reconnexion WebSocket
     function reconnectWebSocket() {
         if (reconnectionAttempts < maxReconnectionAttempts) {
             reconnectionAttempts++;
             dashboardConnectionStatusDiv.textContent = `WebSocket déconnecté. Reconnexion Tentative ${reconnectionAttempts} sur ${maxReconnectionAttempts} dans ${reconnectionDelay / 1000} secondes...`;
-            setTimeout(initWebSocket, reconnectionDelay); // Nouvelle tentative de connexion après un délai
+            setTimeout(initWebSocket, reconnectionDelay);
         } else {
             dashboardConnectionStatusDiv.textContent = `Échec de la reconnexion WebSocket après ${maxReconnectionAttempts} tentatives. Veuillez rafraîchir la page.`;
             dashboardConnectionStatusDiv.classList.remove('alert-warning', 'alert-primary');
@@ -141,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!rowElement) {
             if (cryptoVariationsTableBody.rows.length >= 10) {
-                return; // Limiter le nombre de lignes dans le tableau (optionnel)
+                return;
             }
             rowElement = cryptoVariationsTableBody.insertRow();
             rowElement.id = `crypto-row-${symbol}`;
@@ -162,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
             infoIcon.style.cursor = 'pointer';
             infoIcon.title = 'Voir les informations détaillées';
             infoIcon.addEventListener('click', () => {
-                window.displayAssetInfoPage(symbol); // Appel à displayAssetInfoPage (définie dans script.js pour l'instant)
+                window.displayAssetInfoPage(symbol);
             });
             infoIconCell.appendChild(infoIcon);
 
@@ -188,14 +222,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // Fonction pour s'abonner aux flux WebSocket des cryptos favorites (à déplacer potentiellement dans un service accountService.js)
+    // Fonction pour s'abonner aux flux WebSocket des cryptos favorites
     function subscribeToFavorites() {
-        cryptoVariationsTableBody.innerHTML = ''; // Vider le tableau avant de le remplir
-        const favorites = window.getFavorites(); // Récupérer les favoris (fonction définie dans script.js pour l'instant)
-        const symbolsToSubscribe = favorites.slice(0, 10); // Limiter à 10 favoris pour l'exemple
+        cryptoVariationsTableBody.innerHTML = '';
+        const favorites = window.getFavorites();
+        const symbolsToSubscribe = favorites.slice(0, 10);
 
         if (websocketClient && websocketClient.readyState === WebSocket.OPEN) {
-            // Se désabonner de tous les flux d'abord pour éviter les doublons, puis se réabonner
             websocketClient.send(JSON.stringify({ method: 'UNSUBSCRIBE', params: symbolsToSubscribe.map(symbol => `${symbol.toLowerCase()}@ticker`), id: 2 }));
 
             symbolsToSubscribe.forEach(symbol => {
@@ -203,18 +236,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`Subscribed to ${symbol} ticker stream (favorite) (dashboard.js): ${symbol}`);
             });
         }
-        // Mettre à jour le tableau même si WebSocket n'est pas encore ouvert (affichage initial avec 0.00%)
         symbolsToSubscribe.forEach(symbol => {
             updateCryptoVariationDisplay(symbol, '0.00', { c: '0.00', P: '1.00' });
         });
     }
 
 
-    // --- INITIALISATION DU DASHBOARD (SI NECESSAIRE) ---
+    // --- INITIALISATION DU DASHBOARD
     console.log("dashboard.js initialisation terminée.");
-    // ---  Par exemple :  Appel initial à une fonction pour récupérer les données de balances au chargement du dashboard (si applicable) ---
-    // ---  Exemple :  fetchInitialDashboardData();
-    initWebSocket(); // Initialiser la connexion WebSocket au chargement du dashboard
-
+    fetchTopCryptoMoversData(); // Récupérer les données des Top Movers AU CHARGEMENT du dashboard (important !)
+    initWebSocket();
 
 });
