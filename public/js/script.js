@@ -194,7 +194,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         variationCell.textContent = `${priceChangePercent}%`;
-        updateVariationStyle(variationCell, variationCell.textContent);
+        // --- AJOUT DEBUT - Logique de colorisation des variations en pourcentage ---
+        if (parseFloat(priceChangePercent) > 0) {
+            variationCell.classList.add('positive');
+            variationCell.classList.remove('negative');
+        } else if (parseFloat(priceChangePercent) < 0) {
+            variationCell.classList.add('negative');
+            variationCell.classList.remove('positive');
+        } else {
+            variationCell.classList.remove('positive', 'negative');
+        }
+        // --- AJOUT FIN - Logique de colorisation des variations en pourcentage ---
+
 
         const lastPrice = parseFloat(data.c).toFixed(2);
         priceCell.textContent = `${lastPrice} USDT`;
