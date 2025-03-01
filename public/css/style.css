@@ -426,3 +426,12 @@ h2.section-title, h3.table-title {
     color: #007bff;
     margin-left: 0.5em;
 }
+.top-movers-container {
+    display: flex;
+    justify-content: space-around; /* ou space-between, etc. */
+}
+
+.top-movers-table {
+    flex: 1; /* Permet aux tableaux de prendre une part égale de l'espace */
+    margin: 10px; /* Ajoute un peu d'espace autour des tableaux */
+}

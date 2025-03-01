@@ -19,19 +19,21 @@ TopCryptoMovers.prototype.render = async function() {
 
     // Structure HTML de base du composant
     this.container.innerHTML = `
-        <div class="top-movers-container">
-            <div class="gainers-section">
-                <h5>Top 5 Hausse</h5>
-                <ul class="list-group gainers-list">
-                    <li class="list-group-item">Chargement...</li>  </ul>
-            </div>
-            <div class="losers-section">
-                <h5>Top 5 Baisse</h5>
-                <ul class="list-group losers-list">
-                    <li class="list-group-item">Chargement...</li>  </ul>
-            </div>
+    <div class="top-movers-container">
+        <div class="gainers-section top-movers-table">
+            <h5>Top 5 Hausse</h5>
+            <ul class="list-group gainers-list">
+                <li class="list-group-item">Chargement...</li>
+            </ul>
         </div>
-    `;
+        <div class="losers-section top-movers-table">
+            <h5>Top 5 Baisse</h5>
+            <ul class="list-group losers-list">
+                <li class="list-group-item">Chargement...</li>
+            </ul>
+        </div>
+    </div>
+`;
 
     this.gainersList = this.container.querySelector('.gainers-list');
     this.losersList = this.container.querySelector('.losers-list');
