@@ -1,169 +1,281 @@
-/* styles.css */
-
-/* Importation de polices Google Fonts */
-
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@400;700&display=swap');
+/* style.css */
 
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
     margin: 0;
     padding: 20px;
-    background-color: #f0f2f5;
-    color: #333;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 30px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-}
-
-h1.dashboard-title, h2.section-title, h2#assetInfoHeader {
-    font-family: 'Montserrat', sans-serif;
-    color: #2c3e50;
-    margin-bottom: 25px;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
-    text-align: left;
-}
-
-h3.table-title, .search-section h3.section-title {
-    font-family: 'Montserrat', sans-serif;
-    color: #34495e;
-    margin-top: 20px;
-    margin-bottom: 15px;
-    text-align: left;
-}
-
-.alert.modern-alert {
+    max-width: 960px;
+    margin: auto;
+    padding: 20px;
+    background-color: white;
     border-radius: 8px;
-    padding: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1.dashboard-title {
+    color: #343a40;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.icon-header {
+    margin-right: 0.5em;
+}
+
+/* Styles pour la section de connexion */
+#loginFormContainer {
+    margin-bottom: 30px;
+}
+
+#loginFormContainer .card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+#loginFormContainer .card-body {
+    padding: 25px;
+}
+
+#loginFormContainer h2.text-center {
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+#profileLoginSection h4.text-center {
+    margin-top: 15px;
     margin-bottom: 15px;
-    border: 1px solid transparent;
-    border-left-width: 5px;
+    color: #6c757d;
 }
 
-.alert-info.modern-alert {
-    color: #31708f;
-    background-color: #e0f7fa;
-    border-left-color: #4dd0e1;
+#profileListContainer {
+    margin-bottom: 15px;
 }
 
-.alert-danger.modern-alert {
-    color: #a94442;
-    background-color: #f2dede;
-    border-left-color: #f0506e;
+#profileButtonsContainer {
+    display: flex;
+    flex-direction: column; /* Pour afficher les boutons en colonne */
+    align-items: center; /* Centrer les boutons horizontalement dans le container */
+    gap: 0.5rem; /* Espacement entre les boutons */
 }
 
-.alert-warning.modern-alert {
-    color: #8a6d3c;
-    background-color: #fff8e1;
-    border-left-color: #ffeb3b;
+
+/* Styles pour les listes de profils (puces) */
+#profileListContainer {
+    /* Styles pour le conteneur de la liste de profils si nécessaire */
+    /* par exemple, pour centrer la liste, ajouter une marge, etc. */
 }
 
-.alert-success.modern-alert {
-    color: #3c763d;
-    background-color: #e8f5e9;
-    border-left-color: #66bb6a;
+.profile-list {
+    /* Styles pour la liste <ul> elle-même (si besoin, mais list-unstyled de Bootstrap retire déjà les puces) */
+    padding-left: 0; /* S'assurer qu'il n'y a pas de padding à gauche qui pourrait décaler la liste */
+    margin-bottom: 1rem; /* Ajouter un peu d'espace en bas de la liste */
+}
+
+.profile-list-item {
+    /* Styles pour chaque élément <li> (puce) */
+    margin-bottom: 0.5rem; /* Espacement vertical entre les puces */
+    border-radius: 0.25rem; /* Bords arrondis pour un aspect plus doux */
+    background-color: #f8f9fa; /* Couleur de fond claire pour chaque puce */
+    border: 1px solid #dee2e6; /* Bordure légère */
+    display: flex;                  /* AJOUT : Utiliser Flexbox pour aligner le lien et les boutons */
+    justify-content: space-between; /* AJOUT : Espacer le lien et les boutons (texte à gauche, boutons à droite) */
+    align-items: center;         /* AJOUT : Centrer verticalement le texte et les boutons */
+    padding-right: 0.5rem;       /* AJOUT : Un peu de padding à droite pour l'espacement des boutons */
+}
+
+.profile-list-item.active {
+    /* Style pour l'élément <li> actif (sélectionné) */
+    background-color: #e9ecef; /* Couleur de fond légèrement plus foncée pour l'élément actif */
+    border-color: #ced4da; /* Bordure légèrement plus foncée pour l'élément actif */
+}
+
+.profile-list-link {
+    /* Styles pour le lien <a> à l'intérieur de chaque <li> (texte du profil) */
+    display: block; /* Important : pour que le lien occupe toute la surface du <li> et soit cliquable sur toute la surface */
+    padding: 0.75rem 1.25rem; /* Padding intérieur pour l'espacement du texte dans la puce */
+    color: #495057; /* Couleur du texte (gris foncé par défaut, adaptez selon votre thème) */
+    text-decoration: none; /* Enlever le soulignement par défaut des liens */
+    /* Autres styles de texte (police, taille, etc.) si vous le souhaitez */
+}
+
+.profile-list-link:hover,
+.profile-list-link:focus {
+    /* Styles au survol et au focus (accessibilité) */
+    background-color: #e2e6ea; /* Couleur de fond au survol/focus, légèrement plus foncée */
+    color: #212529; /* Couleur du texte au survol/focus, plus foncée */
+    text-decoration: none; /* S'assurer qu'il n'y a toujours pas de soulignement au survol */
+}
+
+
+.profile-actions {
+    display: flex; /* Pour aligner les boutons horizontalement */
+    gap: 0.5rem; /* Espacement entre les boutons */
+    margin-left: 1rem; /* Pousser les boutons à droite (après le texte du profil) */
+}
+
+.profile-actions button {
+    /* Styles pour les boutons "Éditer" et "Supprimer" en général */
+    padding: 0; /* SUPPRIMER le padding par défaut pour les boutons d'icônes, on utilisera padding sur l'icône */
+    font-size: 0.875rem; /* Garder la même taille de police */
+    border-radius: 0.25rem; /* Bords arrondis */
+    width: 2.2rem;           /* AJOUT : Largeur fixe pour les boutons d'icônes (adaptez si besoin) */
+    height: 2.2rem;          /* AJOUT : Hauteur fixe pour les boutons d'icônes (adaptez si besoin) */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-actions button:hover {
+    opacity: 0.8; /* Légère transparence au survol */
+}
+
+
+.icon-button {
+    /* Styles spécifiques pour les boutons contenant des icônes */
+    padding: 0;       /* SUPPRIMER le padding ici aussi, on le gère déjà sur .profile-actions button */
+    font-size: 0.875rem; /* Garder la même taille de police */
+    line-height: 1;     /* Ajuster la hauteur de ligne pour centrer verticalement l'icône */
+    display: inline-flex; /* Pour un meilleur contrôle de l'alignement vertical de l'icône */
+    align-items: center; /* Centrer verticalement l'icône dans le bouton */
+    justify-content: center; /* Centrer horizontalement */
+    width: auto;         /* Ajuster la largeur automatiquement au contenu (l'icône) */
+    height: auto;        /* Ajuster la hauteur automatiquement au contenu */
+    border: none;        /* Enlever la bordure, car on utilise déjà .profile-actions button pour la bordure */
+    background: transparent; /* Fond transparent pour que la couleur de fond vienne de .profile-actions button */
+}
+
+
+.icon-button i {
+    /* Styles pour les icônes <i> à l'intérieur des boutons d'icônes */
+    font-size: 1.1rem; /* TAILLE des icônes (un peu plus grand que le texte) - ajustez selon besoin */
+    margin: 0;         /* Retirer les marges par défaut des icônes */
+}
+
+
+.edit-profile-button.icon-button {
+    /* Styles spécifiques pour le bouton "Éditer" (icône stylo) si besoin */
+    /* Vous pourriez vouloir des styles différents pour "Éditer" et "Supprimer" icônes */
+}
+
+.delete-profile-button.icon-button {
+    /* Styles spécifiques pour le bouton "Supprimer" (icône corbeille) si besoin */
+    /* Par exemple, une couleur de fond légèrement différente pour "Supprimer" */
+}
+
+
+#profileLoginForm {
+    margin-top: 20px;
+}
+
+#profileLoginForm .form-group {
+    margin-bottom: 15px;
+}
+
+#createProfileContainer {
+    margin-top: 20px;
+    border-top: 1px solid #dee2e6;
+    padding-top: 20px;
+}
+
+#createProfileContainer h4.text-center {
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* Styles généraux pour le dashboard */
+#dashboard {
+    display: none; /* Initialement caché */
+    padding: 20px 0;
+}
+
+h2.section-title, h3.table-title {
+    color: #343a40;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.icon-section, .icon-table-title {
+    margin-right: 0.3em;
+}
+
+#dashboardConnectionStatus {
+    margin-bottom: 20px;
+}
+
+#balances, #cryptoVariationsContainer {
+    margin-bottom: 30px;
+}
+
+#balances .alert, #cryptoVariationsContainer .alert {
+    margin-top: 15px;
+}
+
+.table-responsive {
+    overflow-x: auto;
 }
 
 .table.modern-table {
+    margin-bottom: 1rem;
+    color: #212529;
     border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
+    border-radius: 0.5rem;
     overflow: hidden;
-    border: none;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+}
+
+.table.modern-table th, .table.modern-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: left;
+}
+
+.table.modern-table th {
+    background-color: #f8f9fa;
+    color: #343a40;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}
+
+.table.modern-table tbody tr:hover {
+    background-color: #f9f9f9;
 }
 
 .modern-thead {
     background-color: #f8f9fa;
-    color: #495057;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.9em;
 }
 
-.table.modern-table th, .table.modern-table td {
-    padding: 8px 10px; /* Réduire le padding pour une police plus petite */
-    text-align: left;
-    border-bottom: 1px solid #f0f0f0;
-    
-}
-
-#cryptoVariationsTable tbody {
-    display: block; /* Nécessaire pour max-height et overflow-y */
-    max-height: 300px; /* Hauteur maximale du corps du tableau avant d'afficher la scrollbar */
-    overflow-y: auto; /* Ajout de scrollbar vertical si nécessaire */
-    overflow-x: hidden; /* Cacher la scrollbar horizontale si elle apparaît */
-}
-
-#cryptoVariationsTable tbody tr {
-    display: table-row; /* Pour que les lignes se comportent comme des lignes de tableau */
-    width: 100%; /* Assurer que les lignes prennent toute la largeur du tableau */
+.modern-thead th {
+    border-bottom: 2px solid #dee2e6;
 }
 
 
-.table.modern-table tbody tr:hover {
-    background-color: #f5f5f5;
+.asset-actions {
+    margin-top: 20px;
+    text-align: center;
 }
 
-.table.modern-table td.variation-cell, .table.modern-table td.price-cell, .table.modern-table td.info-icon-cell {
-    text-align: right;
-}
-
-.form-control.modern-input, .input-group-text.modern-input-group-text {
-    border-radius: 8px;
-    padding: 12px 15px;
-    border: 1px solid #ced4da;
-    font-size: 1rem;
-    color: #495057;
-    box-shadow: none;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.form-control.modern-input:focus, .input-group-text.modern-input-group-text:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    outline: 0;
-}
-
-.input-group-text.modern-input-group-text {
-    background-color: #e9ecef;
-    border: 1px solid #ced4da;
-    border-right: none;
-    border-radius: 8px 0 0 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 15px;
-}
-
-.input-group > .form-control.modern-input:not(:first-child) {
-    border-left: none;
-    border-radius: 0 8px 8px 0;
-}
-
-.btn.modern-button {
-    border-radius: 8px;
-    padding: 12px 25px;
-    font-weight: 500;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+.modern-button {
+    padding: 10px 20px;
     border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center; /* Pour centrer l'icône et le texte horizontalement */
 }
 
-.btn.modern-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+.modern-button .icon-button {
+    margin-right: 0.5em; /* Espacement entre l'icône et le texte */
 }
+
 
 .btn-primary.modern-button {
     background-color: #007bff;
@@ -183,154 +295,134 @@ h3.table-title, .search-section h3.section-title {
     background-color: #545b62;
 }
 
-.btn-outline-secondary.modern-button.search-button {
+.btn-outline-secondary.profile-button {
     border-color: #6c757d;
     color: #6c757d;
+    margin: 5px; /* Espacement autour des boutons de profil */
 }
 
-.btn-outline-secondary.modern-button.search-button:hover {
-    background-color: #545b62;
+.btn-outline-secondary.profile-button:hover, .btn-outline-secondary.profile-button.active {
+    background-color: #6c757d;
     color: white;
-    border-color: #545b62;
+}
+
+.search-button {
+    margin-top: 15px;
+}
+
+.logout-button {
+    margin-left: 10px;
 }
 
 
 .search-section {
+    display: none; /* Initialement caché */
     margin-top: 20px;
-    margin-bottom: 20px;
     padding: 15px;
     background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.07);
-    transform: scale(0.8);
-    transform-origin: top left;
-}
-
-.search-input-group {
-    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
 }
 
 .search-section h3.section-title {
-    font-size: 1.2em;
-    margin-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
 }
 
+.search-input-group .modern-input-group-text {
+    background-color: #e9ecef;
+    color: #495057;
+    border: 1px solid #ced4da;
+}
+
+.search-input-group .modern-input {
+    border: 1px solid #ced4da;
+}
+
+.modern-input {
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ced4da;
+}
 
 .modern-list-group {
-    border-radius: 8px;
+    border-radius: 0.5rem;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    border: 1px solid #ced4da;
 }
 
-.modern-list-group .list-group-item {
+.modern-list-group-item {
     border: none;
-    padding: 12px 20px;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem 1.25rem;
     background-color: white;
-    border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s ease-in-out;
+    color: #495057;
 }
 
-.modern-list-group .list-group-item:last-child {
+.modern-list-group-item:last-child {
     border-bottom: none;
-    border-radius: 0 0 8px 8px;
 }
 
-.modern-list-group .list-group-item:first-child {
-    border-radius: 8px 8px 0 0;
+.modern-list-group-item:hover, .modern-list-group-item:focus {
+    background-color: #f8f9fa;
+    color: #343a40;
+    cursor: pointer;
 }
 
 
-.modern-list-group .list-group-item:hover {
-    background-color: #e9ecef;
+.asset-info-page {
+    display: none; /* Initialement cachée */
+    padding: 20px 0;
 }
 
 .asset-info-header {
+    color: #007bff;
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .asset-info-details {
-    padding: 20px;
     background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     margin-bottom: 20px;
 }
 
 .asset-info-details p {
-    line-height: 1.8;
-    color: #555;
     margin-bottom: 10px;
-}
-
-.back-dashboard-button {
-    display: block;
-    margin: 20px auto;
-}
-
-
-.icon-header {
-    font-size: 1.8em;
-    margin-right: 10px;
-    vertical-align: -2px;
-    color: #007bff;
-}
-
-.icon-section {
-    font-size: 1.4em;
-    margin-right: 8px;
-    vertical-align: -1px;
-    color: #3498db;
-}
-
-.icon-label {
-    margin-right: 5px;
-    vertical-align: middle;
-    font-size: 0.9em;
-    color: #777;
-}
-
-.icon-button {
-    margin-right: 8px;
-    vertical-align: middle;
-    font-size: 1em;
-}
-
-.icon-table-title {
-    font-size: 1.1em;
-    margin-right: 5px;
-    vertical-align: baseline;
+    line-height: 1.6;
     color: #555;
 }
 
-.icon-th {
-    margin-right: 3px;
-    font-size: 0.85em;
-    vertical-align: baseline;
-    color: #777;
+.asset-info-details strong {
+    font-weight: 600;
+    color: #343a40;
+    margin-right: 0.5em;
 }
 
-
-.variation-cell.positive { color: green; }
-.variation-cell.negative { color: red; }
-.value-positive { color: green; }
-.value-negative { color: red; }
-
-#cryptoVariationsTable td.info-icon-cell {
+.asset-info-actions {
     text-align: center;
-    padding-right: 0;
+    margin-bottom: 20px;
+}
+
+.favorite-button, .back-dashboard-button {
+    margin: 0 10px;
+}
+
+.positive {
+    color: green;
+}
+
+.negative {
+    color: red;
+}
+
+.variation-cell {
+    font-weight: bold;
 }
 
 .info-icon {
-    font-size: 1em;
     color: #007bff;
-    opacity: 0.7;
-    transition: opacity 0.3s;
+    margin-left: 0.5em;
 }
-
-.info-icon:hover {
-    opacity: 1;
-}
-
-
-

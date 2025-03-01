@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         // Mettre à jour le tableau même si WebSocket n'est pas encore ouvert
         symbolsToSubscribe.forEach(symbol => {
-            updateCryptoVariationDisplay(symbol, '0.00', { c: '0.00', P: '0.00' });
+            updateCryptoVariationDisplay(symbol, '0.00', { c: '0.00', P: '1.00' });
         });
     }
 
