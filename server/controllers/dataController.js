@@ -1,3 +1,4 @@
+const axios = require('axios'); // Importer le module axios pour les appels API REST
 const binanceService = require('../services/binanceService'); // Import du service Binance
 
 // Contrôleur pour la route /price (GET /data/price) - Récupérer le prix actuel d'un symbole
@@ -52,3 +53,19 @@ exports.get24hrTicker = async (req, res, next) => {
     }
 };
 
+//recuperer tout les symboles
+exports.get24hrTickers = async (req, res) => {
+    try {
+        // --- MODIFICATION DE L'URL ICI POUR UTILISER L'API SPOT TESTNET ---
+        const response = await axios.get('https://testnet.binance.vision/api/v3/ticker/24hr'); // Endpoint API SPOT Testnet pour TOUS les tickers 24h
+        if (response.status === 200) {
+            const tickers24hData = response.data;
+            res.json({ success: true, tickers24hData: tickers24hData });
+        } else {
+            res.status(response.status).json({ success: false, message: `Erreur API Binance (tickers 24h - SPOT): ${response.status} ${response.statusText}` });
+        }
+    } catch (error) {
+        console.error("Erreur lors de la requête des tickers 24h à l'API Binance SPOT:", error);
+        res.status(500).json({ success: false, message: "Erreur serveur lors de la récupération des tickers 24h SPOT." });
+    }
+};

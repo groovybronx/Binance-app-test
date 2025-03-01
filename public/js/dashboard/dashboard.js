@@ -1,6 +1,8 @@
 // js/dashboard/dashboard.js
 // --- FONCTIONS DU TABLEAU DE BORD ---
 import '../script.js'; 
+import { TopCryptoMovers } from '../components/TopCryptoMovers.js';
+
 // Fonction pour afficher les soldes du compte dans le tableau (exemple - à adapter/déplacer vers un composant BalanceTable ?)
 export function displayAccountBalances(accountInfo) {
     console.log("Fonction displayAccountBalances() appelée dans dashboard.js avec :", accountInfo); // Log pour vérifier l'appel 
@@ -58,7 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const symbolsToTrack = []; // Pourrait être géré par un service plus tard
 
 
-
+    // --- Création et rendu du composant TopCryptoMovers ---
+    const topMoversContainer = document.getElementById('topCryptoMoversContainer'); // ID du conteneur dans index.html
+    if (topMoversContainer) {
+        const topCryptoMoversComponent = new TopCryptoMovers('topCryptoMoversContainer');
+        topCryptoMoversComponent.render();
+    } else {
+        console.error("Conteneur HTML pour TopCryptoMovers avec l'ID 'topCryptoMoversContainer' non trouvé dans index.html.");
+    }
 
 
     // Fonction pour initialiser la connexion WebSocket (à déplacer potentiellement dans un service accountService.js)

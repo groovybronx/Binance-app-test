@@ -8,6 +8,8 @@ router.get('/price', dataController.getPrice);
 // Route pour obtenir le ticker 24h d'un symbole - via REST API
 router.get('/24hr-ticker', dataController.get24hrTicker);
 
+// Route pour obtenir les tickers 24h de TOUS les symboles - via REST API
+router.get('/24hr-tickers', dataController.get24hrTickers);
 // -- Ici, vous pourrez ajouter d'autres routes liées aux données --
 
 module.exports = router;
