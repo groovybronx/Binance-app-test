@@ -332,22 +332,5 @@ h3.table-title, .search-section h3.section-title {
     opacity: 1;
 }
 
-.profile-button {
-    margin-right: 5px; /* Espacement entre les boutons */
-    margin-bottom: 5px;
-    border-radius: 8px;
-    padding: 8px 15px;
-    font-size: 0.9rem;
-}
 
-.profile-button.active {
-    background-color: #007bff; /* Couleur de fond pour le bouton sélectionné */
-    color: white; /* Texte blanc pour le bouton sélectionné */
-    border-color: #007bff; /* Bordure bleu pour le bouton sélectionné */
-}
-
-.profile-button:hover {
-    /* Style au survol si vous le souhaitez */
-    background-color: #e0e0e0; /* Gris clair au survol par exemple */
-}
 
