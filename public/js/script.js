@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // ---  DECLARATION DU COMPOSANT BalanceTable ---
-    const balanceTable = new BalanceTable('balances'); // 'balances' doit être l'ID du conteneur div dans index.html
+    const balanceTable = new BalanceTable('dashboard-header-container'); // 'balances' doit être l'ID du conteneur div dans index.html
     balanceTable.render(); // Initialiser le composant BalanceTable
 
 

@@ -6,7 +6,7 @@
     --secondary-color: #6c757d;
     --background-color: #f4f7f9;
     --white: #fff;
-    --text-color: #333;
+    --text-color: #000000;
     --light-gray: #f8f9fa;
     --border-color: #dee2e6;
     --dark-gray: #343a40;
@@ -291,11 +291,13 @@ h2.section-title, h3.table-title {
 }
 
 .search-button {
-    margin-top: 15px;
+    scale: 0.8;
+    margin-left: 10px;
 }
 
 .logout-button {
     margin-left: 10px;
+    scale: 0.8;
 }
 
 .search-section {
@@ -422,27 +424,84 @@ h2.section-title, h3.table-title {
 }
 
 .main-container {
-    display: grid;
-    grid: auto-flow dense / 40px 40px 1fr;
-    justify-content: space-around;
-}
-
-.table-responsive {
-    display: grid;
-    grid: auto-flow dense / 1fr;
-    
+    /* Utiliser flexbox pour aligner les éléments horizontalement */
+    display: flex;
+    flex-direction: row; /* Aligner les éléments en ligne (horizontalement) */
+    flex-wrap: wrap; /* Permettre aux éléments de passer à la ligne si l'espace est insuffisant */
+    justify-content: space-between; /* Distribuer l'espace entre les éléments */
+    align-items: flex-start; /* Aligner les éléments au début de la ligne (en haut) */
+    gap: 20px; /* Espacement entre les éléments */
 }
 
 
 #topCryptoMoversContainer {
-    display: grid;
-    grid: auto-flow dense / 1fr 1fr;
-    gap: 20px;
+    /* Utiliser flex: 1 pour que ce conteneur occupe l'espace disponible */
+    flex: 1;
+    margin-top: 20px; /* Ajuster la marge supérieure à 0 pour l'alignement côte à côte */
+}
+#balances{
+    flex: 1;
+    margin-top: 20px; /* Ajuster la marge supérieure à 0 pour l'alignement côte à côte */
+}
+
+#cryptoVariationsTable{
+     flex: 1;
+    margin-top: 20px; /* Ajuster la marge supérieure à 0 pour l'alignement côte à côte */
+}
+
+
+#balance {
+    display: inline-block;
     margin-top: 20px;
 }
-#balanceContainer {
-    display: grid;
-    grid: auto-flow dense / 1fr 1fr;
-    gap: 20px;
-    margin-top: 20px;
-} 
+.table-responsive {
+    overflow-x: auto; /* Ajouter un défilement horizontal si nécessaire */
+    /* margin-top: 20px;  Supprimé ici car géré par dashboard-header-container */
+    flex: 1; /* Permettre à la table de prendre de l'espace dans le conteneur flex */
+}
+
+#dashboard-header-container { /* Styles pour le nouveau conteneur */
+    display: flex;
+    flex-direction: row; /* Alignement horizontal */
+    justify-content: flex-start; /* Aligner à gauche, ou space-between, space-around selon le besoin */
+    align-items: flex-start; /* Aligner les éléments en haut */
+    gap: 20px; /* Espacement entre les éléments */
+    margin-bottom: 20px; /* Ajouter de l'espace en dessous si nécessaire */
+}
+
+#dashboardConnectionStatus {
+    flex: none; /* Ne pas laisser le status alert s'étirer */
+    margin-bottom: 0; /* Supprimer la marge bottom car le conteneur gère l'espacement */
+    scale: 0.8; /* Ajuster l'échelle si nécessaire pour l'alignement */
+}
+
+
+/* Media query pour les écrans plus petits (par exemple, les mobiles) */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column; /* Empiler verticalement sur les petits écrans */
+        align-items: stretch; /* Étirer les éléments pour qu'ils occupent toute la largeur */
+    }
+
+    #topCryptoMoversContainer,
+    #balances,
+    #cryptoVariationsTable {
+        flex: none; /* Empêcher les éléments de s'étirer excessivement sur les petits écrans */
+        width: 100%; /* Occuper toute la largeur disponible sur les petits écrans */
+        margin-top: 20px; /* Ajouter de la marge entre les sections empilées */
+    }
+
+    .top-movers-container {
+        flex-direction: column; /* Empiler les tables top-movers verticalement sur les petits écrans si nécessaire */
+    }
+    .table-responsive {
+        margin-top: 20px; /* Conserver la marge même en mode mobile si nécessaire */
+    }
+    #dashboard-header-container {
+        flex-direction: column; /* Empiler verticalement sur petit écran */
+        align-items: stretch; /* Étirer les éléments enfants */
+    }
+    #dashboardConnectionStatus {
+        scale: 0.6; /* Réduire l'échelle sur petit écran si nécessaire */
+    }
+}

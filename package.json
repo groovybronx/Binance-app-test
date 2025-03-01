@@ -15,7 +15,7 @@
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
-    "test": "start"
+     "start": "nodemon server/server.js"
   },
   "dependencies": {
     "@binance/connector": "^3.6.1",
@@ -23,6 +23,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "nodemon": "^3.1.9",
     "ws": "^8.18.1"
   }
 }
