@@ -435,3 +435,12 @@ h2.section-title, h3.table-title {
     flex: 1; /* Permet aux tableaux de prendre une part égale de l'espace */
     margin: 10px; /* Ajoute un peu d'espace autour des tableaux */
 }
+.main-container {
+    display: flex;
+    justify-content: space-around; /* ou space-between, etc. */
+}
+
+#topCryptoMoversContainer, #balances {
+    flex: 1; /* Permet aux conteneurs de prendre une part égale de l'espace */
+    margin: 10px; /* Ajoute un peu d'espace autour des conteneurs */
+}

@@ -24,13 +24,7 @@ BalanceTable.prototype.render = function () {
     this.table = document.createElement('table');
     this.table.className = 'table table-bordered table-responsive'; // Classes Bootstrap pour le style (adaptez selon vos besoins)
     let thead = document.createElement('thead');
-    thead.innerHTML = `
-        <tr>
-            <th>Actif</th>
-            <th>Solde Disponible</th>
-            <th>Solde Bloqué</th>
-        </tr>
-    `;
+    thead.innerHTML = ``;
     this.table.appendChild(thead);
 
 
