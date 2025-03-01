@@ -1,3 +1,4 @@
+import { BalanceTable } from './components/BalanceTable.js';
 const dashboardContainer = document.getElementById('dashboard');
 const assetInfoPageContainer = document.getElementById('assetInfoPage');
 
@@ -25,6 +26,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const backToDashboardButton = document.getElementById('backToDashboardButton');
     const favoriteButton = document.getElementById('favoriteButton'); // Bouton Favoris sur la page d'info actif
 
+    // --- Création des instances de composants ---
+    const balanceTable = new BalanceTable('balances'); // 'balances' doit être l'ID du conteneur div de votre tableau des balances dans index.html
+    balanceTable.render(); // Appeler la méthode render pour initialiser le composant
+
+
 
     const symbolsToTrack = [];
     let websocketClient;
@@ -33,35 +39,42 @@ document.addEventListener('DOMContentLoaded', function () {
     const reconnectionDelay = 3000;
 
 
-    displayAccountBalances = function (accountInfo) {
+    window.displayAccountBalances = function (accountInfo) {
         if (accountInfo && accountInfo.balances) {
-            balanceTableBody.innerHTML = '';
-            noBalancesMessage.style.display = 'none';
-            balancesErrorMessage.style.display = 'none';
-
-            // Filtrer les soldes pour ne garder que ceux en USDT
+            // --- SUPPRIMER ces lignes (car la logique de mise à jour du tableau est maintenant dans BalanceTable.js) ---
+            // balanceTableBody.innerHTML = '';
+            // noBalancesMessage.style.display = 'none';
+            // balancesErrorMessage.style.display = 'none';
+    
+            // --- Filtrer les soldes (reste inchangé) ---
             const usdtBalances = accountInfo.balances.filter(balance => balance.asset.endsWith('USDT') && (parseFloat(balance.free) > 0 || parseFloat(balance.locked) > 0));
-
+    
             if (usdtBalances.length > 0) {
-                usdtBalances.forEach(balance => {
-                    const row = balanceTableBody.insertRow();
-                    const assetCell = row.insertCell();
-                    const freeBalanceCell = row.insertCell();
-                    const lockedBalanceCell = row.insertCell();
-
-                    assetCell.textContent = balance.asset;
-                    freeBalanceCell.textContent = parseFloat(balance.free).toFixed(2);
-                    lockedBalanceCell.textContent = parseFloat(balance.locked).toFixed(2);
-                });
+                // --- APPELER LA METHODE updateBalances DU COMPOSANT BalanceTable ---
+                balanceTable.updateBalances(usdtBalances); // <--- MODIFICATION : Utiliser le composant BalanceTable pour mettre à jour le tableau
+    
+                // --- SUPPRIMER cette partie (car la gestion de l'affichage du message "pas de balances" est maintenant dans le composant, si nécessaire) ---
+                // usdtBalances.forEach(balance => { ... });
+                // } else {
+                //    noBalancesMessage.style.display = 'block';
             } else {
-                noBalancesMessage.style.display = 'block';
+                // ---  SI vous voulez afficher un message "pas de balances" via le composant, vous pouvez ajouter une méthode dans BalanceTable pour ça ---
+                // ---  Pour l'instant, on laisse vide, ou vous pouvez afficher un message par défaut dans le composant si besoin ---
+                // noBalancesMessage.style.display = 'block'; // <--- SUPPRIMER ou ADAPTER si vous gérez ce message via le composant
             }
+            // --- SUPPRIMER ces lignes (car la gestion des erreurs est maintenant potentiellement gérée ailleurs ou dans le composant si vous le souhaitez) ---
+            // } else {
+            //    balancesErrorMessage.style.display = 'block';
+            //    balanceTableBody.innerHTML = '';
+            //    noBalancesMessage.style.display = 'none';
         } else {
+            // ... (gestion des erreurs, à adapter selon votre besoin, peut-être laisser un message d'erreur général hors du composant pour l'instant) ...
             balancesErrorMessage.style.display = 'block';
-            balanceTableBody.innerHTML = '';
-            noBalancesMessage.style.display = 'none';
+            // balanceTableBody.innerHTML = ''; // <--- SUPPRIMER ou ADAPTER (le composant gère maintenant la mise à jour du tableau)
+            // noBalancesMessage.style.display = 'none'; // <--- SUPPRIMER ou ADAPTER
         }
-    }
+        console.log("displayAccountBalances function is being called (from script.js)"); // Add this console.log for testing
+    };
 
     // Gestion des favoris dans le localStorage
     function getFavorites() {
