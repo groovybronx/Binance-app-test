@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));// Pour servir les
 app.use('/auth', authRoutes); // Préfixe '/auth' pour les routes d'authentification (ex: /auth/connect)
 app.use('/data', dataRoutes); // Préfixe '/data' pour les routes de données (ex: /data/price)
 // app.use('/trading', tradingRoutes); // (Futur - si vous ajoutez des routes de trading, avec préfixe '/trading')
-
+app.use('/api', dataRoutes);
 
 // Middleware de gestion des erreurs (doit être défini *après* les routes)
 app.use(errorMiddleware);
