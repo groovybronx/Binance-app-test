@@ -1,313 +1,189 @@
-// public/js/login/login.js
-// login.js - Gestion des profils de connexion (VERSION LISTES A PUCES + ICONES EDIT/DELETE)
-
-import { initCreateProfileComponent } from '../components/createProfile/createProfile.js'; // IMPORT DU COMPOSANT createProfileComponent
-
-// --- Déclaration des éléments DOM (UNE SEULE FOIS en haut du fichier) ---
-const loginFormContainer = document.getElementById('loginFormContainer');
-const profileListContainer = document.getElementById('profileListContainer');
-const profileButtonsContainer = document.getElementById('profileButtonsContainer'); // Container pour les listes de profil
-const noProfilesMessage = document.getElementById('noProfilesMessage');
-const profileLoginForm = document.getElementById('profileLoginForm');
-const connectProfileButton = document.getElementById('connectProfileButton'); // Bouton "Se Connecter"
-const createProfileForm = document.getElementById('createProfileForm'); // Déclaration, même si le composant s'en occupe maintenant
-const showCreateProfileButton = document.getElementById('showCreateProfileButton'); // Bouton "Créer un Nouveau Profil"
-const createProfileContainer = document.getElementById('createProfileContainer'); // Déclaration, même si le composant s'en occupe maintenant
-
-
-let savedProfiles; // Déclaration de savedProfiles en portée globale (script)
-
 document.addEventListener('DOMContentLoaded', () => {
-    savedProfiles = loadProfiles(); // CHARGER les profils UNE SEULE FOIS au démarrage, DANS le DOMContentLoaded
-    populateProfileDropdown(); // Peupler la liste des profils après le chargement
+    console.log("login.js initialisation commencée.");
 
-    // --- INITIALISER le composant createProfileComponent et LUI PASSER les fonctions saveProfile et populateProfileDropdown EN PARAMÈTRES ---
-    initCreateProfileComponent(saveProfile, populateProfileDropdown); // INITIALISATION DU COMPOSANT createProfileComponent et PASSAGE DES FONCTIONS EN PARAMÈTRES
+    // Initialisation des éléments du DOM
+    const profileListContainer = document.getElementById('profileListContainer');
+    const profileLoginForm = document.getElementById('profileLoginForm');
+    const profileLoginFormInner = document.getElementById('profileLoginFormInner');
+    const profileCode = document.getElementById('profileCode');
+    const profileApiKey = document.getElementById('profileApiKey');
+    const profileSecretKey = document.getElementById('profileSecretKey');
+    const rememberProfile = document.getElementById('rememberProfile');
+    const connectProfileButton = document.getElementById('connectProfileButton');
+    const showCreateProfileButton = document.getElementById('showCreateProfileButton');
+    const createProfileContainer = document.getElementById('createProfileContainer');
 
-    let selectedProfileName = null;
-    let currentProfileName = null;
+    // Chargement initial des profils
+    loadProfiles();
 
-
-    console.log("login.js initialisation terminée."); // MODIFICATION : message plus précis (login.js)
-
-
-
-    // --- Fonctionnalité "Rester connecté" ---
-    const rememberedProfileName = localStorage.getItem('rememberedProfileName');
-    console.log("Au chargement de la page, profil mémorisé trouvé dans localStorage :", rememberedProfileName);
-    if (rememberedProfileName) {
-        selectedProfileName = rememberedProfileName; // Définir le profil mémorisé comme profil sélectionné
-        loginFormContainer.style.display = 'none'; // Cacher le formulaire de login principal en attendant la connexion auto
-
-        const selectedProfile = getProfile(rememberedProfileName);
-        if (selectedProfile) {
-            // Tentative de connexion automatique avec le profil mémorisé
-            connectAutomatically(selectedProfile.profileName);
-        } else {
-            // Profil mémorisé non trouvé (supprimé ?), revenir à l'affichage normal de login
-            loginFormContainer.style.display = 'block';
-            profileButtonsContainer.style.display = 'block';
-            populateProfileDropdown();
-        }
-    }
-    // --- Fin Fonctionnalité "Rester connecté" ---
-
-
-    function loadProfiles() {
-        console.log("login.js: loadProfiles() appelée"); // MODIFICATION : message plus précis (login.js)
-        const profilesJSON = localStorage.getItem('binanceProfiles');
-        const loadedProfiles = profilesJSON ? JSON.parse(profilesJSON) : [];
-        console.log("login.js: Profils chargés depuis localStorage :", loadedProfiles); // MODIFICATION : message plus précis (login.js)
-        return loadedProfiles;
+    // Vérification du profil mémorisé
+    const rememberedProfile = localStorage.getItem('rememberedProfile');
+    if (rememberedProfile) {
+        console.log("Au chargement de la page, profil mémorisé trouvé dans localStorage :", rememberedProfile);
+        connectAutomatically(rememberedProfile);
     }
 
+    // Event listeners
+    if (profileLoginFormInner) {
+        profileLoginFormInner.addEventListener('submit', handleLogin);
+    }
 
-    function populateProfileDropdown() {
-        console.log("login.js: populateProfileDropdown() appelée (pour listes avec icônes Edit/Delete)"); // MODIFICATION : message plus précis (login.js)
+    if (showCreateProfileButton) {
+        showCreateProfileButton.addEventListener('click', toggleCreateProfileForm);
+    }
+
+    console.log("login.js initialisation terminée.");
+});
+
+function loadProfiles() {
+    console.log("login.js: loadProfiles() appelée");
+    const profiles = JSON.parse(localStorage.getItem('profiles')) || [];
+    console.log("login.js: Profils chargés depuis localStorage :", profiles);
+    populateProfileDropdown(profiles);
+}
+
+function populateProfileDropdown(profiles) {
+    console.log("login.js: populateProfileDropdown() appelée");
+    const profileButtonsContainer = document.getElementById('profileButtonsContainer');
+    const noProfilesMessage = document.getElementById('noProfilesMessage');
+
+    if (profileButtonsContainer) {
         profileButtonsContainer.innerHTML = '';
 
-        const profileList = document.createElement('ul');
-        profileList.classList.add('list-unstyled', 'profile-list');
-
-
-        if (savedProfiles.length === 0) { // Utiliser savedProfiles chargée au démarrage
-            noProfilesMessage.style.display = 'block';
-            profileButtonsContainer.style.display = 'none';
-            return;
+        if (profiles.length === 0) {
+            if (noProfilesMessage) noProfilesMessage.style.display = 'block';
         } else {
-            noProfilesMessage.style.display = 'none';
-            profileButtonsContainer.style.display = 'block';
+            if (noProfilesMessage) noProfilesMessage.style.display = 'none';
+            profiles.forEach(profile => {
+                console.log("login.js: Traitement du profil:", profile.name);
+                const profileButton = document.createElement('button');
+                profileButton.textContent = profile.name;
+                profileButton.classList.add('btn', 'btn-outline-primary', 'me-2', 'mb-2');
+                profileButton.addEventListener('click', () => selectProfile(profile.name));
+
+                const editButton = createIconButton('✏️', () => editProfile(profile.name));
+                const deleteButton = createIconButton('🗑️', () => deleteProfile(profile.name));
+
+                const buttonGroup = document.createElement('div');
+                buttonGroup.classList.add('btn-group', 'me-2', 'mb-2');
+                buttonGroup.appendChild(profileButton);
+                buttonGroup.appendChild(editButton);
+                buttonGroup.appendChild(deleteButton);
+
+                profileButtonsContainer.appendChild(buttonGroup);
+            });
         }
-
-
-        savedProfiles.forEach(profile => {
-            console.log("login.js: Traitement du profil (liste Icones Edit/Delete):", profile.profileName); // MODIFICATION : message plus précis (login.js)
-
-            const profileListItem = document.createElement('li');
-            profileListItem.classList.add('profile-list-item');
-
-            const profileLink = document.createElement('a');
-            profileLink.href = '#';
-            profileLink.textContent = profile.profileName;
-            profileLink.classList.add('profile-list-link');
-
-            profileLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                selectedProfileName = profile.profileName;
-                document.querySelectorAll('.profile-list-item').forEach(item => item.classList.remove('active'));
-                profileListItem.classList.add('active');
-                profileLoginForm.style.display = 'block';
-            });
-            profileListItem.appendChild(profileLink);
-
-            const actionsContainer = document.createElement('div');
-            actionsContainer.classList.add('profile-actions');
-
-            const editButton = document.createElement('button');
-            editButton.classList.add('btn', 'btn-sm', 'btn-outline-primary', 'edit-profile-button', 'icon-button');
-            editButton.innerHTML = '<i class="fas fa-pen"></i>';
-            editButton.title = 'Éditer le profil';
-            editButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-                event.preventDefault();
-                handleEditProfile(profile.profileName);
-            });
-            actionsContainer.appendChild(editButton);
-
-            const deleteButton = document.createElement('button');
-            deleteButton.classList.add('btn', 'btn-sm', 'btn-outline-danger', 'delete-profile-button', 'icon-button');
-            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-            deleteButton.title = 'Supprimer le profil';
-            deleteButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-                event.preventDefault();
-                handleDeleteProfile(profile.profileName);
-            });
-            actionsContainer.appendChild(deleteButton);
-
-            profileListItem.appendChild(actionsContainer);
-            profileList.appendChild(profileListItem);
-        });
-
-        profileButtonsContainer.appendChild(profileList);
-        profileButtonsContainer.style.display = 'block';
-        console.log("login.js: Fin de populateProfileDropdown() (pour listes avec icônes Edit/Delete)"); // MODIFICATION : message plus précis (login.js)
     }
+    console.log("login.js: Fin de populateProfileDropdown()");
+}
 
+function createIconButton(icon, onClick) {
+    const button = document.createElement('button');
+    button.innerHTML = icon;
+    button.classList.add('btn', 'btn-outline-secondary');
+    button.addEventListener('click', onClick);
+    return button;
+}
 
-    connectProfileButton.addEventListener('click', async function (event) {
-        event.preventDefault();
-        const profileCodeInput = document.getElementById('profileCode').value.trim();
-        const rememberProfileCheckbox = document.getElementById('rememberProfile').checked;
+function selectProfile(profileName) {
+    console.log("login.js: selectProfile appelée pour", profileName);
+    const profiles = JSON.parse(localStorage.getItem('profiles')) || [];
+    const selectedProfile = profiles.find(p => p.name === profileName);
 
-        if (!selectedProfileName) {
-            alert('Veuillez sélectionner un profil en cliquant sur un profil dans la liste.');
-            return;
+    if (selectedProfile) {
+        document.getElementById('profileApiKey').value = selectedProfile.apiKey || '';
+        document.getElementById('profileSecretKey').value = selectedProfile.secretKey || '';
+        if (selectedProfile.code) {
+            document.getElementById('profileCode').value = selectedProfile.code;
         }
-
-        const selectedProfile = getProfile(selectedProfileName);
-        if (!selectedProfile) {
-            alert('Profil sélectionné non trouvé. Veuillez recharger la page.');
-            return;
-        }
-
-        if (selectedProfile.profileCode && profileCodeInput !== selectedProfile.profileCode) {
-            alert('Code de profil incorrect.');
-            return;
-        }
-
-        const apiKey = selectedProfile.apiKey;
-        const secretKey = selectedProfile.secretKey;
-
-        if (!apiKey || !secretKey) {
-            alert('Clés API ou secrète manquantes dans le profil sélectionné.');
-            return;
-        }
-
-        try {
-            const response = await axios.post('/auth/connect', { apiKey: apiKey, secretKey: secretKey }); // URL API REST CORRECTE : /auth/connect
-            if (response.data.success) {
-                   
-
-
-                if (rememberProfileCheckbox) {
-                    localStorage.setItem('rememberedProfileName', selectedProfileName);
-                    console.log("Rester connecté coché. Profil enregistré dans localStorage :", selectedProfileName);
-                } else {
-                    localStorage.removeItem('rememberedProfileName');
-                    console.log("Rester connecté non coché. Profil supprimé de localStorage.");
-                }
-
-
-            } else {
-                alert(`Échec de la connexion API REST avec le profil "${selectedProfile.profileName}": ${response.data.message}`);
-                console.error('login.js: Erreur de connexion API REST (profil):', response.data); // MODIFICATION : message plus précis (login.js)
-                // accountInfoDiv.textContent = 'Erreur de connexion API (profil). Voir la console pour les détails.'; // COMMENTED OUT - REMOVED
-                // accountBalanceDiv.innerHTML = ''; // COMMENTED OUT - REMOVED
-            }
-        } catch (error) {
-            console.error('login.js: Erreur lors de la requête de connexion API REST (profil):', error); // MODIFICATION : message plus précis (login.js)
-            alert('Erreur de connexion API REST (profil). Vérifiez la console pour plus de détails.');
-            // accountInfoDiv.textContent = 'Erreur de connexion API (profil). Voir la console pour les détails.'; // COMMENTED OUT - REMOVED
-            // accountBalanceDiv.innerHTML = ''; // COMMENTED OUT - REMOVED
-        }
-    });
-
-
-
-    if (showCreateProfileButton && createProfileContainer) {
-        showCreateProfileButton.addEventListener('click', function () {
-            console.log("Bouton 'Créer un Nouveau Profil' cliqué.");
-            createProfileContainer.style.display = (createProfileContainer.style.display === 'none' || createProfileContainer.style.display === '') ? 'block' : 'none';
-        });
-    } else {
-        console.error("Bouton 'showCreateProfileButton' ou 'createProfileContainer' non trouvé dans le DOM. Vérifiez les IDs dans index.html.");
     }
+}
 
+async function handleLogin(event) {
+    event.preventDefault();
+    console.log("login.js: handleLogin appelée");
 
-    async function connectAutomatically(profileName) {
-        console.log("login.js: Fonction connectAutomatically appelée pour le profil :", profileName); // MODIFICATION : message plus précis (login.js)
-        const storedProfile = getProfile(profileName);
-        if (storedProfile) {
+    const apiKey = document.getElementById('profileApiKey').value;
+    const secretKey = document.getElementById('profileSecretKey').value;
+    const code = document.getElementById('profileCode').value;
+    const rememberProfile = document.getElementById('rememberProfile').checked;
 
-            currentProfileName = profileName;
+    try {
+        const response = await axios.post('/auth/connect', { apiKey, secretKey });
+        console.log("login.js: Réponse de la requête de connexion:", response);
 
-            console.log("login.js: Debugging - getElementById results:"); // MODIFICATION : message plus précis (login.js)
-            console.log("login.js: profileApiKey element:", document.getElementById('profileApiKey')); // MODIFICATION : message plus précis (login.js)
-            console.log("login.js: profileSecretKey element:", document.getElementById('profileSecretKey')); // MODIFICATION : message plus précis (login.js)
-            console.log("login.js: profileCode element:", document.getElementById('profileCode')); // MODIFICATION : message plus précis (login.js)
-
-
-            document.getElementById('profileApiKey').value = storedProfile.apiKey;
-            document.getElementById('profileSecretKey').value = storedProfile.secretKey;
-            document.getElementById('profileCode').value = storedProfile.profileCode;
-
-
-            try {
-                const response = await axios.post('/auth/connect', { // URL API REST CORRECTE : /auth/connect
-                    apiKey: storedProfile.apiKey,
-                    secretKey: storedProfile.secretKey,
-                    profileCode: storedProfile.profileCode,
-                    profileName: profileName
-                });
-
-                console.log("login.js: Réponse de la requête axios.post('auth/connect') dans connectAutomatically :", response); // MODIFICATION : message plus précis (login.js)
-
-                if (response.data && response.data.success) {
-                    // updateConnectionStatus(true, 'Connexion automatique réussie (REST API).', 'alert-success'); // COMMENTÉ - ON GÉRERA updateConnectionStatus PLUS TARD
-                    memorizeCurrentProfile(profileName);
-                    //window.location.replace('html/dashboard.html'); // MODIFICATION IMPORTANTE : REDIRECTION AVEC replace()
-
-
-                    // initWebSocket(); // INITIALISATION DE WEBSOCKET - ON GÉRERA WEBSOCKET PLUS TARD
-                    // loadFavorites(); // CHARGER LES FAVORIS - ON GÉRERA FAVORIS PLUS TARD
-
-
-                } else {
-                    // updateConnectionStatus(false, `Erreur de connexion automatique (API REST): ${response.data ? response.data.message : 'erreur inconnue'}`, 'alert-danger'); // COMMENTÉ - ON GÉRERA updateConnectionStatus PLUS TARD
-                    console.error("login.js: Erreur de connexion automatique (API REST):", response.data); // MODIFICATION : message plus précis (login.js)
-                }
-
-
-            } catch (error) {
-                // updateConnectionStatus(false, `Erreur lors de la requête de connexion API REST automatique (profil): ${error.message}`, 'alert-danger'); // COMMENTÉ - ON GÉRERA updateConnectionStatus PLUS TARD
-                console.error("login.js: Erreur lors de la requête de connexion API REST automatique (profil):", error); // MODIFICATION : message plus précis (login.js)
+        if (response.data.success) {
+            if (rememberProfile) {
+                localStorage.setItem('rememberedProfile', JSON.stringify({ apiKey, secretKey, code }));
             }
-
-
+            window.location.href = '/html/dashboard.html';
         } else {
-            console.warn("login.js: Profil mémorisé introuvable, connexion automatique impossible."); // MODIFICATION : message plus précis (login.js)
+            console.error('Échec de la connexion:', response.data.message);
+            // Afficher un message d'erreur à l'utilisateur
         }
+    } catch (error) {
+        console.error('Erreur lors de la connexion:', error);
+        // Afficher un message d'erreur à l'utilisateur
+    }
+}
+
+async function connectAutomatically(profileName) {
+    console.log("login.js: Fonction connectAutomatically appelée pour le profil :", profileName);
+
+    const profiles = JSON.parse(localStorage.getItem('profiles')) || [];
+    const profile = profiles.find(p => p.name === profileName);
+
+    if (!profile) {
+        console.error("Profil non trouvé pour la connexion automatique");
+        return;
     }
 
+    console.log("login.js: Debugging - getElementById results:");
+    console.log("login.js: profileApiKey element:", document.getElementById('profileApiKey'));
+    console.log("login.js: profileSecretKey element:", document.getElementById('profileSecretKey'));
+    console.log("login.js: profileCode element:", document.getElementById('profileCode'));
 
-    function handleEditProfile(profileName) {
-        console.log("login.js: handleEditProfile appelée pour le profil :", profileName); // MODIFICATION : message plus précis (login.js)
-        alert(`Fonctionnalité d'édition du profil "${profileName}" à implémenter.`);
+    document.getElementById('profileApiKey').value = profile.apiKey;
+    document.getElementById('profileSecretKey').value = profile.secretKey;
+    if (profile.code) {
+        document.getElementById('profileCode').value = profile.code;
     }
 
+    try {
+        const response = await axios.post('/auth/connect', { 
+            apiKey: profile.apiKey, 
+            secretKey: profile.secretKey 
+        });
+        console.log("login.js: Réponse de la requête axios.post('auth/connect') dans connectAutomatically :", response);
 
-    function handleDeleteProfile(profileName) {
-        console.log("login.js: handleDeleteProfile appelée pour le profil :", profileName); // MODIFICATION : message plus précis (login.js)
-
-        if (confirm(`Êtes-vous sûr de vouloir supprimer le profil "${profileName}" ? Cette action est irréversible.`)) {
-            savedProfiles = savedProfiles.filter(profile => profile.profileName !== profileName); // Utiliser savedProfiles en mémoire
-            localStorage.setItem('binanceProfiles', JSON.stringify(savedProfiles));
-            populateProfileDropdown();
-            alert(`Profil "${profileName}" supprimé avec succès.`);
-
-
-            if (selectedProfileName === profileName) {
-                selectedProfileName = null;
-                profileLoginForm.style.display = 'block';
-                document.querySelectorAll('.profile-list-item').forEach(item => item.classList.remove('active'));
-            }
+        if (response.data.success) {
+            window.location.href = '/html/dashboard.html';
+        } else {
+            console.error('Échec de la connexion automatique:', response.data.message);
+            // Afficher un message d'erreur à l'utilisateur
         }
+    } catch (error) {
+        console.error('Erreur lors de la connexion automatique:', error);
+        // Afficher un message d'erreur à l'utilisateur
     }
+}
 
-
-    function getProfile(profileName) {
-        return savedProfiles.find(profile => profile.profileName === profileName); // Utiliser savedProfiles en mémoire
+function toggleCreateProfileForm() {
+    const createProfileContainer = document.getElementById('createProfileContainer');
+    if (createProfileContainer) {
+        createProfileContainer.style.display = createProfileContainer.style.display === 'none' ? 'block' : 'none';
     }
+}
 
+function editProfile(profileName) {
+    console.log("Édition du profil:", profileName);
+    // Implémentez la logique d'édition ici
+}
 
-    function saveProfile(profileData) {
-        savedProfiles.push(profileData);    // Ajouter au tableau en mémoire
-        localStorage.setItem('binanceProfiles', JSON.stringify(savedProfiles));
-    }
-
-
-    function deleteProfile(profileName) {
-        savedProfiles = savedProfiles.filter(profile => profile.profileName !== profileName); // Utiliser savedProfiles en mémoire
-        localStorage.setItem('binanceProfiles', JSON.stringify(savedProfiles));
-    }
-
-
-    function memorizeCurrentProfile(profileName) {
-        localStorage.setItem('rememberedProfileName', profileName);
-    }
-
-
-
-
-});
+function deleteProfile(profileName) {
+    console.log("Suppression du profil:", profileName);
+    const profiles = JSON.parse(localStorage.getItem('profiles')) || [];
+    const updatedProfiles = profiles.filter(p => p.name !== profileName);
+    localStorage.setItem('profiles', JSON.stringify(updatedProfiles));
+    loadProfiles();
+}
