@@ -1,5 +1,7 @@
-// js/login/login.js
+// public/js/login/login.js
 // login.js - Gestion des profils de connexion (VERSION LISTES A PUCES + ICONES EDIT/DELETE)
+
+import { initCreateProfileComponent } from '../components/createProfile/createProfile.js'; // IMPORT DU COMPOSANT createProfileComponent
 
 // --- Déclaration des éléments DOM (UNE SEULE FOIS en haut du fichier) ---
 const loginFormContainer = document.getElementById('loginFormContainer');
@@ -12,26 +14,25 @@ const profileButtonsContainer = document.getElementById('profileButtonsContainer
 const noProfilesMessage = document.getElementById('noProfilesMessage');
 const profileLoginForm = document.getElementById('profileLoginForm');
 const connectProfileButton = document.getElementById('connectProfileButton'); // Bouton "Se Connecter"
-const createProfileForm = document.getElementById('createProfileForm');
+const createProfileForm = document.getElementById('createProfileForm'); // Déclaration, même si le composant s'en occupe maintenant
 const logoutButton = document.getElementById('logoutButton'); // Bouton "Déconnexion"
 const showCreateProfileButton = document.getElementById('showCreateProfileButton'); // Bouton "Créer un Nouveau Profil"
-const createProfileContainer = document.getElementById('createProfileContainer'); // Container du formulaire "Créer un Profil"
+const createProfileContainer = document.getElementById('createProfileContainer'); // Déclaration, même si le composant s'en occupe maintenant
 const profileNameDropdown = document.getElementById('profileNameDropdown');
 
 
-
+let savedProfiles; // Déclaration de savedProfiles en portée globale (script)
 
 document.addEventListener('DOMContentLoaded', () => {
-    
-   
-    
-    let savedProfiles = loadProfiles(); // CHARGER les profils UNE SEULE FOIS au démarrage
+    savedProfiles = loadProfiles(); // CHARGER les profils UNE SEULE FOIS au démarrage, DANS le DOMContentLoaded
+    populateProfileDropdown(); // Peupler la liste des profils après le chargement
+
+    // --- INITIALISER le composant createProfileComponent et LUI PASSER les fonctions saveProfile et populateProfileDropdown EN PARAMÈTRES ---
+    initCreateProfileComponent(saveProfile, populateProfileDropdown); // INITIALISATION DU COMPOSANT createProfileComponent et PASSAGE DES FONCTIONS EN PARAMÈTRES
 
     let selectedProfileName = null;
-    savedProfiles = loadProfiles(); // Initialize savedProfiles immediately after declaration
+    let currentProfileName = null;
 
-    
-    
 
     // --- Fonctionnalité "Rester connecté" ---
     const rememberedProfileName = localStorage.getItem('rememberedProfileName');
@@ -134,43 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
         profileButtonsContainer.style.display = 'block';
         console.log("Fin de populateProfileDropdown() (pour listes avec icônes Edit/Delete)");
     }
-
-
-    // --- Gestion du formulaire createProfileForm (Créer un Nouveau Profil) ---
-    createProfileForm.addEventListener('submit', function (event) {
-        console.log("DEBUG - createProfileForm submit event listener ENTERED!"); // AJOUTER CE LOG
-        event.preventDefault();
-        const profileName = document.getElementById('profileName');
-        const profileCode = document.getElementById('profileCode');
-        const apiKey = document.getElementById('profileApiKey');
-        const secretKey = document.getElementById('profileSecretKey');
-
-        console.log("DEBUG - Valeurs des champs du formulaire de création AVANT validation:");
-        console.log("Nom du Profil:", profileName);
-        console.log("Clé API Testnet:", apiKey);
-        console.log("Clé Secrète Testnet:", secretKey);
-
-        if (!profileName || !apiKey || !secretKey) {
-            alert('Veuillez remplir tous les champs obligatoires (Nom du Profil, Clé API et Clé Secrète).');
-            return;
-        }
-
-        const newProfile = {
-            profileName: profileName,
-            profileCode: profileCode,
-            apiKey: apiKey,
-            secretKey: secretKey,
-            connectionType: 'Testnet'
-        };
-
-        saveProfile(newProfile);
-        populateProfileDropdown();
-
-        alert(`Profil "${profileName}" enregistré avec succès.`);
-        createProfileForm.reset();
-        createProfileContainer.style.display = 'none';
-    });
-    // --- Fin Gestion du formulaire createProfileForm (Créer un Nouveau Profil) ---
 
 
     connectProfileButton.addEventListener('click', async function (event) {
