@@ -1,9 +1,14 @@
 // js/script.js
-import { BalanceTable } from './components/BalanceTable.js';
+//import { BalanceTable } from './components/BalanceTable.js';
+//const BalanceTable = new BalanceTable('dashboard-header-container');
+
 document.addEventListener('DOMContentLoaded', function () {
     console.log("script.js chargé et DOMContentLoaded écouté.");
 
     // --- DECLARATIONS DES ELEMENTS HTML PRINCIPAUX (GARDER CEUX QUI NE SONT PAS SPECIFIQUES AU DASHBOARD) ---
+    //const BalanceTable = new BalanceTable('   '); 
+    // Initialiser le composant BalanceTable avec l'ID du conteneur
+    
     const dashboardContainer = document.getElementById('dashboard');
     const assetInfoPageContainer = document.getElementById('assetInfoPage');
     const searchInput = document.getElementById('searchInput');
@@ -15,11 +20,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const backToDashboardButton = document.getElementById('backToDashboardButton');
     const favoriteButton = document.getElementById('favoriteButton');
     const searchButtonDashboard = document.getElementById('searchButtonDashboard'); // Bouton "Rechercher un Symbole" du Dashboard
+    
+       
+   
+    
 
 
     // ---  DECLARATION DU COMPOSANT BalanceTable ---
-    const balanceTable = new BalanceTable('dashboard-header-container'); // 'balances' doit être l'ID du conteneur div dans index.html
-    balanceTable.render(); // Initialiser le composant BalanceTable
+   // 'balances' doit être l'ID du conteneur div dans index.html
+    //BalanceTable.render(); // Initialiser le composant BalanceTable
 
 
     // --- FONCTIONS GLOBALES (OU DEPLACER DANS DES SERVICES SI POSSIBLE) ---
@@ -161,12 +170,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // ---  GESTIONNAIRES D'EVENEMENTS (RESTE DANS SCRIPT.JS POUR L'INITIALISATION DES INTERACTIONS GLOBALES) ---
 
     // Gestionnaire d'événement pour le bouton "Retour au Tableau de Bord"
-    backToDashboardButton.addEventListener('click', () => {
-        assetInfoPageContainer.style.display = 'none';
-        dashboardContainer.style.display = 'block';
-    });
+    //backToDashboardButton.addEventListener('click', () => {
+    //    assetInfoPageContainer.style.display = 'none';
+    //    dashboardContainer.style.display = 'block';
+    //});
 
-    // Gestionnaire d'événement pour le bouton "Favoris" sur la page d'info actif
+    /* Gestionnaire d'événement pour le bouton "Favoris" sur la page d'info actif
     favoriteButton.addEventListener('click', () => {
         const symbol = favoriteButton.getAttribute('data-symbol');
         if (isFavorite(symbol)) {
@@ -185,18 +194,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Gestionnaire d'événement pour le bouton "Rechercher un Symbole" du Dashboard
-    if (searchButtonDashboard) {
-        searchButtonDashboard.addEventListener('click', () => {
-            console.log("Bouton 'Rechercher un Symbole' (Dashboard) cliqué.");
-            if (searchSection) {
-                searchSection.style.display = (searchSection.style.display === 'none' || searchSection.style.display === '') ? 'block' : 'none';
-            } else {
-                console.error("Section 'searchSection' non trouvée dans le DOM.");
-            }
-        });
-    } else {
-        console.error("Bouton 'searchButtonDashboard' non trouvé dans le DOM.");
-    }
+    document.addEventListener('DOMContentLoaded', () => { // <-- ADD THIS INNER DOMContentLoaded WRAPPER
+        // Gestionnaire d'événement pour le bouton "Rechercher un Symbole" du Dashboard
+        const searchButtonDashboard = document.getElementById('searchButtonDashboard'); // GET ELEMENT INSIDE INNER DOMContentLoaded
+        if (searchButtonDashboard) {
+            searchButtonDashboard.addEventListener('click', () => {
+                console.log("Bouton 'Rechercher un Symbole' (Dashboard) cliqué.");
+                if (searchSection) {
+                    searchSection.style.display = (searchSection.style.display === 'none' || searchSection.style.display === '') ? 'block' : 'none';
+                } else {
+                    console.error("Section 'searchSection' non trouvée dans le DOM.");
+                }
+            });
+        } else {
+            console.error("Bouton 'searchButtonDashboard' non trouvé dans le DOM.");
+        }
+    }); // <-- CLOSE INNER DOMContentLoaded WRAPPER
 
     // Gestionnaire d'événement pour le bouton de recherche (formulaire de recherche)
     searchButton.addEventListener('click', () => {
@@ -219,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- INITIALISATION GENERALE AU CHARGEMENT DE LA PAGE ---
     console.log("script.js initialisation terminée.");
+    */
 
-    
-});
+
+}); 

@@ -32,6 +32,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const reconnectionDelay = 3000;
     const symbolsToTrack = []; // Pourrait être géré par un service plus tard
 
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function () {
+            console.log("Bouton Déconnexion cliqué.");
+
+            localStorage.removeItem('rememberedProfileName');
+            console.log("Profil mémorisé supprimé de localStorage (Déconnexion).");
+
+
+            dashboardContainer.style.display = 'none';
+            loginFormContainer.style.display = 'block';
+            profileButtonsContainer.style.display = 'block';
+            console.log("Tableau de bord caché, formulaire de login et listes de profil affichés.");
+
+
+            if (accountInfoDiv && accountBalanceDiv) {
+                accountInfoDiv.textContent = '';
+                accountBalanceDiv.innerHTML = '';
+                console.log("Infos du compte et solde réinitialisés.");
+            }
+
+            alert("Déconnexion réussie.");
+        });
+    } else {
+        console.error("Bouton 'logoutButton' non trouvé dans le DOM. Vérifiez l'ID dans index.html.");
+    }
+
 
 
     // --- Composants ---

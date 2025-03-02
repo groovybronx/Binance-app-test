@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Binance App Test</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-...vXsP1vsj" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+
+    <header>
+        <h1>Binance Login</h1>        
+    </header>
+
+    <main>
+        <section id="loginFormContainer" style="display: block;">
+            <div id="profileListContainer" style="display: block;">
+                <h2>Profils Binance</h2>
+                <div id="noProfilesMessage" style="display: block;">Aucun profil enregistré. Veuillez en créer un.</div>
+                <div id="profileButtonsContainer">
+                    </div>
+            </div>
+
+            <div id="profileLoginForm" style="display:block">
+                <h3>Se connecter avec le profil sélectionné</h3>
+                <form id="profileLoginFormInner">
+                    <div class="mb-3">
+                        <label for="profileCode" class="form-label">Code de profil (optionnel)</label>
+                        <input type="password" class="form-control" id="profileCode" placeholder="Code de profil" autocomplete="current-password">
+                    </div>
+                    <div class="mb-3">
+                        <label for="profileApiKey" class="form-label">Clé API</label>
+                        <input type="text" class="form-control" id="profileApiKey" placeholder="Clé API">
+                    </div>
+                    <div class="mb-3">
+                        <label for="profileSecretKey" class="form-label">Clé Secrète</label>
+                        <input type="text" class="form-control" id="profileSecretKey" placeholder="Clé Secrète">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberProfile">
+                        <label class="form-check-label" for="rememberProfile">Se souvenir de ce profil</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="connectProfileButton">Se Connecter</button>
+                </form>
+            </div>
+
+            <button id="showCreateProfileButton" class="btn btn-secondary">Créer un Nouveau Profil</button>
+
+            <div id="createProfileContainer" style="display:none;">
+                <h3>Créer un Nouveau Profil</h3>
+                <form id="createProfileForm">
+                    <div class="mb-3">
+                        <label for="profileName" class="form-label">Nom du Profil *</label>
+                        <input type="text" class="form-control" id="profileName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createProfileCode" class="form-label">Code de Profil (optionnel)</label>
+                        <input type="password" class="form-control" id="createProfileCode" autocomplete="current-password">
+                    </div>
+                    <div class="mb-3">
+                        <label for="createProfileApiKey" class="form-label">Clé API Testnet *</label>
+                        <input type="text" class="form-control" id="createProfileApiKey" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createProfileSecretKey" class="form-label">Clé Secrète Testnet *</label>
+                        <input type="text" class="form-control" id="createProfileSecretKey" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Créer Profil</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2024 Binance App Test</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="../js/login/login.js"></script> 
+    <script type="module" src="../js/components/createProfile/createProfile.js"></script> 
+    <script type="module" src="../js/script.js"></script> 
+
+
+</body>
+</html>

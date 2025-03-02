@@ -3,7 +3,7 @@ export class BalanceTable {
     constructor(containerId) {
         this.tableContainer = document.getElementById(containerId);
         if (!this.tableContainer) {
-            console.error(`Conteneur BalanceTable avec l'ID '${containerId}' non trouvé.`);
+            console.error(`Conteneur CBalanceTable avec l'ID '${containerId}' non trouvé.`);
             return;
         }
         this.tableBody = this.tableContainer.querySelector('tbody'); // Sélectionner le tbody
