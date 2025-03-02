@@ -1,14 +1,14 @@
+console.log("script.js : Script script.js EXÉCUTÉ (rechargement complet ?)"); // AJOUTER CE LOG AU DÉBUT DE SCRIPT.JS
 // js/script.js
-//import { BalanceTable } from './components/BalanceTable.js';
-//const BalanceTable = new BalanceTable('dashboard-header-container');
+/*import { BalanceTable } from './components/BalanceTable.js'; // IMPORT BalanceTable COMPONENT
+const BalanceTable = document.getElementById('balances');
+    new BalanceTable('balances');
+    BalanceTable.render(); // Container pour BalanceTable */
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log("script.js chargé et DOMContentLoaded écouté.");
 
     // --- DECLARATIONS DES ELEMENTS HTML PRINCIPAUX (GARDER CEUX QUI NE SONT PAS SPECIFIQUES AU DASHBOARD) ---
-    //const BalanceTable = new BalanceTable('   '); 
-    // Initialiser le composant BalanceTable avec l'ID du conteneur
-    
     const dashboardContainer = document.getElementById('dashboard');
     const assetInfoPageContainer = document.getElementById('assetInfoPage');
     const searchInput = document.getElementById('searchInput');
@@ -17,18 +17,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchSection = document.getElementById('searchSection');
     const assetInfoHeaderElement = document.getElementById('assetInfoHeader');
     const assetInfoDetailsContainer = document.getElementById('assetInfoDetailsContainer');
-    const backToDashboardButton = document.getElementById('backToDashboardButton');
+    const backToDashboardButton = document.getElementById('backToDashboardButton'); // Make sure this button exists in dashboard.html
     const favoriteButton = document.getElementById('favoriteButton');
     const searchButtonDashboard = document.getElementById('searchButtonDashboard'); // Bouton "Rechercher un Symbole" du Dashboard
     
-       
-   
     
 
 
-    // ---  DECLARATION DU COMPOSANT BalanceTable ---
-   // 'balances' doit être l'ID du conteneur div dans index.html
-    //BalanceTable.render(); // Initialiser le composant BalanceTable
+    // ---  DECLARATION DU COMPOSANT BalanceTable ET INITIALISATION  ---
+    // 'balances' doit être l'ID du conteneur div dans dashboard.html
+    //const BalanceTable = new BalanceTable('balances'); // Initialiser le composant BalanceTable AVEC l'ID DU CONTAINER
+     // RENDER la table (l'affichage initial se fera après la connexion WebSocket et la réception des données)
 
 
     // --- FONCTIONS GLOBALES (OU DEPLACER DANS DES SERVICES SI POSSIBLE) ---
@@ -40,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     window.addFavorite = function (symbol) {
-        let favorites = getFavorites();
+        let favorites = favorites();
         if (!favorites.includes(symbol)) {
             favorites.push(symbol);
             localStorage.setItem('favoriteCryptos', JSON.stringify(favorites));
@@ -48,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     window.removeFavorite = function (symbol) {
-        let favorites = getFavorites();
+        let favorites = favorites();
         const index = favorites.indexOf(symbol);
         if (index > -1) {
             favorites.splice(index, 1);
@@ -95,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (data.success) {
                 const ticker24hData = data.ticker24hData;
-                console.log("ticker24hData (APRES PARSE JSON):", ticker24hData);
+                console.log("script.js: ticker24hData (APRES PARSE JSON):", ticker24hData); // MODIFICATION : message plus précis (script.js)
 
                 const assetDetailSymbolElement = document.getElementById('assetDetailSymbol');
                 if (assetDetailSymbolElement) assetDetailSymbolElement.textContent = ticker24hData.symbol;
@@ -105,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const assetDetailVariationElement = document.getElementById('assetDetailVariation');
                 if (assetDetailVariationElement) assetDetailVariationElement.textContent = ticker24hData.priceChangePercent + '%';
+                updateVariationStyle(assetDetailVariationElement, ticker24hData.priceChangePercent); // APPLIQUER LE STYLE DE VARIATION
 
                 const assetDetailHighElement = document.getElementById('assetDetailHigh');
                 if (assetDetailHighElement) assetDetailHighElement.textContent = ticker24hData.highPrice + ' USDT';
@@ -120,12 +120,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             } else {
-                console.error("Erreur lors de la récupération des données du ticker 24h depuis le serveur:", data.message);
+                console.error("script.js: Erreur lors de la récupération des données du ticker 24h depuis le serveur:", data.message); // MODIFICATION : message plus précis (script.js)
                 alert("Erreur lors du chargement des informations de l'actif. Veuillez réessayer.");
             }
 
         } catch (error) {
-            console.error("Erreur lors du chargement des informations de l'actif:", error);
+            console.error("script.js: Erreur lors du chargement des informations de l'actif:", error); // MODIFICATION : message plus précis (script.js)
             const assetInfoDetailsContainerElement = document.getElementById('assetInfoDetails');
             if (assetInfoDetailsContainerElement) {
                 assetInfoDetailsContainerElement.innerHTML = '<div class="alert alert-danger modern-alert">Erreur lors du chargement des informations de l actif. Veuillez réessayer.</div>';
@@ -161,78 +161,92 @@ document.addEventListener('DOMContentLoaded', function () {
                 searchResultsContainer.innerHTML = '<div class="alert alert-warning modern-alert">Aucun résultat trouvé.</div>';
             }
         } catch (error) {
-            console.error("Erreur lors de la recherche de symbole:", error);
+            console.error("script.js: Erreur lors de la recherche de symbole:", error); // MODIFICATION : message plus précis (script.js)
             searchResultsContainer.innerHTML = '<div class="alert alert-danger modern-alert">Erreur lors de la recherche.</div>';
         }
     }
 
 
-    // ---  GESTIONNAIRES D'EVENEMENTS (RESTE DANS SCRIPT.JS POUR L'INITIALISATION DES INTERACTIONS GLOBALES) ---
+    // ---  GESTIONNAIRES D'EVENEMENTS  ---
 
     // Gestionnaire d'événement pour le bouton "Retour au Tableau de Bord"
-    //backToDashboardButton.addEventListener('click', () => {
-    //    assetInfoPageContainer.style.display = 'none';
-    //    dashboardContainer.style.display = 'block';
-    //});
+    if (backToDashboardButton) { // Vérifier si l'élément existe avant d'ajouter l'écouteur
+        backToDashboardButton.addEventListener('click', () => {
+            assetInfoPageContainer.style.display = 'none';
+            dashboardContainer.style.display = 'block';
+        });
+    } else {
+        console.error("script.js: backToDashboardButton non trouvé dans le DOM. Vérifiez dashboard.html."); // MODIFICATION : message plus précis (script.js)
+    }
 
-    /* Gestionnaire d'événement pour le bouton "Favoris" sur la page d'info actif
-    favoriteButton.addEventListener('click', () => {
-        const symbol = favoriteButton.getAttribute('data-symbol');
-        if (isFavorite(symbol)) {
-            removeFavorite(symbol);
-            favoriteButton.textContent = 'Ajouter aux Favoris';
-            favoriteButton.classList.remove('btn-warning');
-            favoriteButton.classList.add('btn-primary');
-        } else {
-            addFavorite(symbol);
-            favoriteButton.textContent = 'Retirer des Favoris';
-            favoriteButton.classList.remove('btn-primary');
-            favoriteButton.classList.add('btn-warning');
-        }
-        // subscribeToFavorites(); // DEPLACER L'APPEL DE subscribeToFavorites VERS dashboard.js (ou autre endroit plus logique si on modularise davantage)
-    });
+
+    // Gestionnaire d'événement pour le bouton "Favoris" sur la page d'info actif
+    if (favoriteButton) { // Vérifier si l'élément existe avant d'ajouter l'écouteur
+        favoriteButton.addEventListener('click', () => {
+            const symbol = favoriteButton.getAttribute('data-symbol');
+            if (isFavorite(symbol)) {
+                removeFavorite(symbol);
+                favoriteButton.textContent = 'Ajouter aux Favoris';
+                favoriteButton.classList.remove('btn-warning');
+                favoriteButton.classList.add('btn-primary');
+            } else {
+                addFavorite(symbol);
+                favoriteButton.textContent = 'Retirer des Favoris';
+                favoriteButton.classList.remove('btn-primary');
+                favoriteButton.classList.add('btn-warning');
+            }
+            // subscribeToFavorites(); // DEPLACER L'APPEL DE subscribeToFavorites VERS dashboard.js
+        });
+    } else {
+        console.error("script.js: favoriteButton non trouvé dans le DOM. Vérifiez assetInfoPage.html."); // MODIFICATION : message plus précis (script.js)
+    }
 
 
     // Gestionnaire d'événement pour le bouton "Rechercher un Symbole" du Dashboard
-    document.addEventListener('DOMContentLoaded', () => { // <-- ADD THIS INNER DOMContentLoaded WRAPPER
-        // Gestionnaire d'événement pour le bouton "Rechercher un Symbole" du Dashboard
-        const searchButtonDashboard = document.getElementById('searchButtonDashboard'); // GET ELEMENT INSIDE INNER DOMContentLoaded
-        if (searchButtonDashboard) {
-            searchButtonDashboard.addEventListener('click', () => {
-                console.log("Bouton 'Rechercher un Symbole' (Dashboard) cliqué.");
-                if (searchSection) {
-                    searchSection.style.display = (searchSection.style.display === 'none' || searchSection.style.display === '') ? 'block' : 'none';
-                } else {
-                    console.error("Section 'searchSection' non trouvée dans le DOM.");
-                }
-            });
-        } else {
-            console.error("Bouton 'searchButtonDashboard' non trouvé dans le DOM.");
-        }
-    }); // <-- CLOSE INNER DOMContentLoaded WRAPPER
+    if (searchButtonDashboard) { // Vérifier si l'élément existe avant d'ajouter l'écouteur
+        searchButtonDashboard.addEventListener('click', () => {
+            console.log("script.js: Bouton 'Rechercher un Symbole' (Dashboard) cliqué."); // MODIFICATION : message plus précis (script.js)
+            if (searchSection) {
+                searchSection.style.display = (searchSection.style.display === 'none' || searchSection.style.display === '') ? 'block' : 'none';
+            } else {
+                console.error("script.js: Section 'searchSection' non trouvée dans le DOM."); // MODIFICATION : message plus précis (script.js)
+            }
+        });
+    } else {
+        console.error("script.js: Bouton 'searchButtonDashboard' non trouvé dans le DOM. Vérifiez dashboard.html."); // MODIFICATION : message plus précis (script.js)
+    }
+
 
     // Gestionnaire d'événement pour le bouton de recherche (formulaire de recherche)
-    searchButton.addEventListener('click', () => {
-        const searchTerm = searchInput.value.trim().toUpperCase();
-        if (searchTerm) {
-            searchSymbol(searchTerm);
-        }
-    });
-
-    // Gestionnaire d'événement pour la touche "Enter" dans le champ de recherche
-    searchInput.addEventListener('keyup', (event) => {
-        if (event.key === 'Enter') {
+    if (searchButton) { // Vérifier si l'élément existe avant d'ajouter l'écouteur
+        searchButton.addEventListener('click', () => {
             const searchTerm = searchInput.value.trim().toUpperCase();
             if (searchTerm) {
                 searchSymbol(searchTerm);
             }
-        }
-    });
+        });
+    } else {
+        console.error("script.js: searchButton non trouvé dans le DOM. Vérifiez dashboard.html."); // MODIFICATION : message plus précis (script.js)
+    }
+
+
+    // Gestionnaire d'événement pour la touche "Enter" dans le champ de recherche
+    if (searchInput) { // Vérifier si l'élément existe avant d'ajouter l'écouteur
+        searchInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                const searchTerm = searchInput.value.trim().toUpperCase();
+                if (searchTerm) {
+                    searchSymbol(searchTerm);
+                }
+            }
+        });
+    } else {
+        console.error("script.js: searchInput non trouvé dans le DOM. Vérifiez dashboard.html."); // MODIFICATION : message plus précis (script.js)
+    }
 
 
     // --- INITIALISATION GENERALE AU CHARGEMENT DE LA PAGE ---
-    console.log("script.js initialisation terminée.");
-    */
+    console.log("script.js initialisation terminée."); // MODIFICATION : message plus précis (script.js)
 
 
-}); 
+});

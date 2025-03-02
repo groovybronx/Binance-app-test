@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord Binance App Test</title>
-    <link rel="stylesheet" href="../css/style.css"> <----- CHEMIN CSS MODIFIÉ (../)
+    <link rel="stylesheet" href="../css/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-...vXsP1vsj" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
@@ -23,9 +23,10 @@
     <main>
         <section id="dashboard" style="display:none;">
             <h2>Tableau de Bord Binance</h2>
-            <button id="searchButtonDashboard" class="btn btn-secondary">Rechercher un Symbole</button>
+            
 
             <div id="dashboard-header-container">
+                <button id="searchButtonDashboard" class="btn btn-secondary">Rechercher un Symbole</button>
                 </div>
             <div id="dashboardConnectionStatus">
                 </div>
@@ -37,7 +38,7 @@
                 </div>
             <div id="topCryptoMoversContainerLosers">
                  </div>
-                 <div id="BalanceTable">
+                 <div id="balances">
                     <table>
                         <thead>
                             <tr>
@@ -71,9 +72,8 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script type="module" src="../js/dashboard/dashboard.js"></script> <----- CHEMIN JS MODIFIÉ (../)
-    <script type="module" src="../js/script.js"></script> <----- CHEMIN JS MODIFIÉ (../)
-
+    <script type="module" src="../js/dashboard/dashboard.js"></script>
+    <script type="module" src="../js/script.js"></script> 
 
 </body>
 </html>

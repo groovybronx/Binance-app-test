@@ -5,20 +5,14 @@ import { initCreateProfileComponent } from '../components/createProfile/createPr
 
 // --- Déclaration des éléments DOM (UNE SEULE FOIS en haut du fichier) ---
 const loginFormContainer = document.getElementById('loginFormContainer');
-const dashboardContainer = document.getElementById('dashboard');
-const assetInfoPageContainer = document.getElementById('assetInfoPage');
-const accountInfoDiv = document.getElementById('account-info');
-const accountBalanceDiv = document.getElementById('account-balance');
 const profileListContainer = document.getElementById('profileListContainer');
 const profileButtonsContainer = document.getElementById('profileButtonsContainer'); // Container pour les listes de profil
 const noProfilesMessage = document.getElementById('noProfilesMessage');
 const profileLoginForm = document.getElementById('profileLoginForm');
 const connectProfileButton = document.getElementById('connectProfileButton'); // Bouton "Se Connecter"
 const createProfileForm = document.getElementById('createProfileForm'); // Déclaration, même si le composant s'en occupe maintenant
-const logoutButton = document.getElementById('logoutButton'); // Bouton "Déconnexion"
 const showCreateProfileButton = document.getElementById('showCreateProfileButton'); // Bouton "Créer un Nouveau Profil"
 const createProfileContainer = document.getElementById('createProfileContainer'); // Déclaration, même si le composant s'en occupe maintenant
-const profileNameDropdown = document.getElementById('profileNameDropdown');
 
 
 let savedProfiles; // Déclaration de savedProfiles en portée globale (script)
@@ -33,10 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedProfileName = null;
     let currentProfileName = null;
 
-   
 
-
-    console.log("dashboard.js initialisation terminée.");
+    console.log("login.js initialisation terminée."); // MODIFICATION : message plus précis (login.js)
 
 
 
@@ -62,16 +54,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function loadProfiles() {
-        console.log("loadProfiles() appelée");
+        console.log("login.js: loadProfiles() appelée"); // MODIFICATION : message plus précis (login.js)
         const profilesJSON = localStorage.getItem('binanceProfiles');
         const loadedProfiles = profilesJSON ? JSON.parse(profilesJSON) : [];
-        console.log("Profils chargés depuis localStorage :", loadedProfiles);
+        console.log("login.js: Profils chargés depuis localStorage :", loadedProfiles); // MODIFICATION : message plus précis (login.js)
         return loadedProfiles;
     }
 
 
     function populateProfileDropdown() {
-        console.log("populateProfileDropdown() appelée (pour listes avec icônes Edit/Delete)");
+        console.log("login.js: populateProfileDropdown() appelée (pour listes avec icônes Edit/Delete)"); // MODIFICATION : message plus précis (login.js)
         profileButtonsContainer.innerHTML = '';
 
         const profileList = document.createElement('ul');
@@ -89,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         savedProfiles.forEach(profile => {
-            console.log("Traitement du profil (liste Icones Edit/Delete):", profile.profileName);
+            console.log("login.js: Traitement du profil (liste Icones Edit/Delete):", profile.profileName); // MODIFICATION : message plus précis (login.js)
 
             const profileListItem = document.createElement('li');
             profileListItem.classList.add('profile-list-item');
@@ -139,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         profileButtonsContainer.appendChild(profileList);
         profileButtonsContainer.style.display = 'block';
-        console.log("Fin de populateProfileDropdown() (pour listes avec icônes Edit/Delete)");
+        console.log("login.js: Fin de populateProfileDropdown() (pour listes avec icônes Edit/Delete)"); // MODIFICATION : message plus précis (login.js)
     }
 
 
@@ -173,18 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await axios.post('auth/connect', { apiKey: apiKey, secretKey: secretKey });
+            const response = await axios.post('/auth/connect', { apiKey: apiKey, secretKey: secretKey }); // URL API REST CORRECTE : /auth/connect
             if (response.data.success) {
-                loginFormContainer.style.display = 'none';
-                dashboardContainer.style.display = 'block';
-                assetInfoPageContainer.style.display = 'none';
-
-
-                if (typeof initWebSocket === 'function') {
-                    initWebSocket();
-                } else {
-                    console.error("Fonction initWebSocket non définie dans le scope global.");
-                }
+                   
 
 
                 if (rememberProfileCheckbox) {
@@ -198,15 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } else {
                 alert(`Échec de la connexion API REST avec le profil "${selectedProfile.profileName}": ${response.data.message}`);
-                console.error('Erreur de connexion API REST (profil):', response.data);
-                accountInfoDiv.textContent = 'Erreur de connexion API (profil). Voir la console pour les détails.';
-                accountBalanceDiv.innerHTML = '';
+                console.error('login.js: Erreur de connexion API REST (profil):', response.data); // MODIFICATION : message plus précis (login.js)
+                // accountInfoDiv.textContent = 'Erreur de connexion API (profil). Voir la console pour les détails.'; // COMMENTED OUT - REMOVED
+                // accountBalanceDiv.innerHTML = ''; // COMMENTED OUT - REMOVED
             }
         } catch (error) {
-            console.error('Erreur lors de la requête de connexion API REST (profil):', error);
+            console.error('login.js: Erreur lors de la requête de connexion API REST (profil):', error); // MODIFICATION : message plus précis (login.js)
             alert('Erreur de connexion API REST (profil). Vérifiez la console pour plus de détails.');
-            accountInfoDiv.textContent = 'Erreur de connexion API (profil). Voir la console pour les détails.';
-            accountBalanceDiv.innerHTML = '';
+            // accountInfoDiv.textContent = 'Erreur de connexion API (profil). Voir la console pour les détails.'; // COMMENTED OUT - REMOVED
+            // accountBalanceDiv.innerHTML = ''; // COMMENTED OUT - REMOVED
         }
     });
 
@@ -223,16 +206,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     async function connectAutomatically(profileName) {
-        console.log("Fonction connectAutomatically appelée pour le profil :", profileName);
+        console.log("login.js: Fonction connectAutomatically appelée pour le profil :", profileName); // MODIFICATION : message plus précis (login.js)
         const storedProfile = getProfile(profileName);
         if (storedProfile) {
 
             currentProfileName = profileName;
 
-            console.log("Debugging - getElementById results:");
-            console.log("profileApiKey element:", document.getElementById('profileApiKey'));
-            console.log("profileSecretKey element:", document.getElementById('profileSecretKey'));
-            console.log("profileCode element:", document.getElementById('profileCode'));
+            console.log("login.js: Debugging - getElementById results:"); // MODIFICATION : message plus précis (login.js)
+            console.log("login.js: profileApiKey element:", document.getElementById('profileApiKey')); // MODIFICATION : message plus précis (login.js)
+            console.log("login.js: profileSecretKey element:", document.getElementById('profileSecretKey')); // MODIFICATION : message plus précis (login.js)
+            console.log("login.js: profileCode element:", document.getElementById('profileCode')); // MODIFICATION : message plus précis (login.js)
 
 
             document.getElementById('profileApiKey').value = storedProfile.apiKey;
@@ -241,48 +224,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             try {
-                const response = await axios.post('/auth/connect', {
+                const response = await axios.post('/auth/connect', { // URL API REST CORRECTE : /auth/connect
                     apiKey: storedProfile.apiKey,
                     secretKey: storedProfile.secretKey,
                     profileCode: storedProfile.profileCode,
                     profileName: profileName
                 });
 
-                console.log("Réponse de la requête axios.post('auth/connect') dans connectAutomatically :", response);
+                console.log("login.js: Réponse de la requête axios.post('auth/connect') dans connectAutomatically :", response); // MODIFICATION : message plus précis (login.js)
 
                 if (response.data && response.data.success) {
-                    updateConnectionStatus(true, 'Connexion automatique réussie (REST API).', 'alert-success');
+                    // updateConnectionStatus(true, 'Connexion automatique réussie (REST API).', 'alert-success'); // COMMENTÉ - ON GÉRERA updateConnectionStatus PLUS TARD
                     memorizeCurrentProfile(profileName);
+                    //window.location.replace('html/dashboard.html'); // MODIFICATION IMPORTANTE : REDIRECTION AVEC replace()
 
-                    initWebSocket();
-                    loadFavorites();
+
+                    // initWebSocket(); // INITIALISATION DE WEBSOCKET - ON GÉRERA WEBSOCKET PLUS TARD
+                    // loadFavorites(); // CHARGER LES FAVORIS - ON GÉRERA FAVORIS PLUS TARD
+
 
                 } else {
-                    updateConnectionStatus(false, `Erreur de connexion automatique (REST API): ${response.data ? response.data.message : 'erreur inconnue'}`, 'alert-danger');
-                    console.error("Erreur de connexion automatique (REST API):", response.data);
+                    // updateConnectionStatus(false, `Erreur de connexion automatique (API REST): ${response.data ? response.data.message : 'erreur inconnue'}`, 'alert-danger'); // COMMENTÉ - ON GÉRERA updateConnectionStatus PLUS TARD
+                    console.error("login.js: Erreur de connexion automatique (API REST):", response.data); // MODIFICATION : message plus précis (login.js)
                 }
 
 
             } catch (error) {
-                updateConnectionStatus(false, `Erreur lors de la requête de connexion API REST automatique (profil): ${error.message}`, 'alert-danger');
-                console.error("Erreur lors de la requête de connexion API REST automatique (profil):", error);
+                // updateConnectionStatus(false, `Erreur lors de la requête de connexion API REST automatique (profil): ${error.message}`, 'alert-danger'); // COMMENTÉ - ON GÉRERA updateConnectionStatus PLUS TARD
+                console.error("login.js: Erreur lors de la requête de connexion API REST automatique (profil):", error); // MODIFICATION : message plus précis (login.js)
             }
 
 
         } else {
-            console.warn("Profil mémorisé introuvable, connexion automatique impossible.");
+            console.warn("login.js: Profil mémorisé introuvable, connexion automatique impossible."); // MODIFICATION : message plus précis (login.js)
         }
     }
 
 
     function handleEditProfile(profileName) {
-        console.log("handleEditProfile appelée pour le profil :", profileName);
+        console.log("login.js: handleEditProfile appelée pour le profil :", profileName); // MODIFICATION : message plus précis (login.js)
         alert(`Fonctionnalité d'édition du profil "${profileName}" à implémenter.`);
     }
 
 
     function handleDeleteProfile(profileName) {
-        console.log("handleDeleteProfile appelée pour le profil :", profileName);
+        console.log("login.js: handleDeleteProfile appelée pour le profil :", profileName); // MODIFICATION : message plus précis (login.js)
 
         if (confirm(`Êtes-vous sûr de vouloir supprimer le profil "${profileName}" ? Cette action est irréversible.`)) {
             savedProfiles = savedProfiles.filter(profile => profile.profileName !== profileName); // Utiliser savedProfiles en mémoire

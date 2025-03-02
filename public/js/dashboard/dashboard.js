@@ -1,6 +1,6 @@
+console.log("dashboard.js : Script dashboard.js EXÉCUTÉ (rechargement complet ?)"); // AJOUTER CE LOG AU DÉBUT DE DASHBOARD.JS
 // js/dashboard/dashboard.js
 // --- FONCTIONS DU TABLEAU DE BORD ---
-import '../script.js';
 import { TopCryptoMovers } from '../components/TopCryptoMovers.js';
 import { BalanceTable } from '../components/BalanceTable.js';
 import { DashboardConnectionStatus } from '../components/DashboardConnectionStatus.js'; // <-- AJOUTER CETTE LIGNE
@@ -22,6 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const cryptoVariationsTableBody = document.getElementById('cryptoVariationsTableBody');
     const topMoversGainersContainer = document.getElementById('topCryptoMoversContainerGainers');
     const topMoversLosersContainer = document.getElementById('topCryptoMoversContainerLosers');
+    const logoutButton = document.getElementById('logoutButton'); // <-- Déclaration du bouton Logout
+    const dashboardContainer = document.getElementById('dashboard'); // <-- Déclaration du container dashboard (pour logout)
+    const loginFormContainer = document.getElementById('loginFormContainer'); // <-- Déclaration du container loginForm (pour logout)
+    const profileButtonsContainer = document.getElementById('profileButtonsContainer'); // <-- Déclaration du container profileButtons (pour logout)
+    const accountInfoDiv = document.getElementById('accountInfoDiv'); // <-- Déclaration de accountInfoDiv (pour logout - bien que potentiellement non utilisé ici)
+    const accountBalanceDiv = document.getElementById('accountBalanceDiv'); // <-- Déclaration de accountBalanceDiv (pour logout - bien que potentiellement non utilisé ici)
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const searchButtonDashboard = document.getElementById('searchButtonDashboard'); // Bouton "Rechercher un Symbole" du Dashboard
 
 
 
@@ -32,30 +41,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const reconnectionDelay = 3000;
     const symbolsToTrack = []; // Pourrait être géré par un service plus tard
 
+
+    // --- GESTION DU BOUTON DE DECONNEXION ---
     if (logoutButton) {
         logoutButton.addEventListener('click', function () {
-            console.log("Bouton Déconnexion cliqué.");
+            console.log("dashboard.js: Bouton Déconnexion cliqué."); // MODIFICATION : message plus précis (dashboard.js)
 
             localStorage.removeItem('rememberedProfileName');
-            console.log("Profil mémorisé supprimé de localStorage (Déconnexion).");
+            console.log("dashboard.js: Profil mémorisé supprimé de localStorage (Déconnexion)."); // MODIFICATION : message plus précis (dashboard.js)
 
 
-            dashboardContainer.style.display = 'none';
-            loginFormContainer.style.display = 'block';
-            profileButtonsContainer.style.display = 'block';
-            console.log("Tableau de bord caché, formulaire de login et listes de profil affichés.");
+            if (dashboardContainer) dashboardContainer.style.display = 'none'; // CONDITION pour éviter erreurs si dashboardContainer non trouvé
+            if (loginFormContainer) loginFormContainer.style.display = 'block'; // CONDITION pour éviter erreurs si loginFormContainer non trouvé
+            if (profileButtonsContainer) profileButtonsContainer.style.display = 'block'; // CONDITION pour éviter erreurs si profileButtonsContainer non trouvé
+            console.log("dashboard.js: Tableau de bord caché, formulaire de login et listes de profil affichés."); // MODIFICATION : message plus précis (dashboard.js)
 
 
-            if (accountInfoDiv && accountBalanceDiv) {
+            if (accountInfoDiv && accountBalanceDiv) { // CONDITION pour éviter erreurs si accountInfoDiv/accountBalanceDiv non trouvés
                 accountInfoDiv.textContent = '';
                 accountBalanceDiv.innerHTML = '';
-                console.log("Infos du compte et solde réinitialisés.");
+                console.log("dashboard.js: Infos du compte et solde réinitialisés."); // MODIFICATION : message plus précis (dashboard.js)
             }
 
             alert("Déconnexion réussie.");
         });
     } else {
-        console.error("Bouton 'logoutButton' non trouvé dans le DOM. Vérifiez l'ID dans index.html.");
+        console.error("dashboard.js: Bouton 'logoutButton' non trouvé dans le DOM. Vérifiez l'ID dans dashboard.html."); // MODIFICATION : message plus précis (dashboard.js)
     }
 
 
@@ -70,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         connectionStatusComponent = new DashboardConnectionStatus('dashboardConnectionStatus');
         connectionStatusComponent.render();
     } else {
-        console.error("Conteneur HTML pour DashboardConnectionStatus avec l'ID 'dashboardConnectionStatus' non trouvé dans index.html.");
+        console.error("dashboard.js: Conteneur HTML pour DashboardConnectionStatus avec l'ID 'dashboardConnectionStatus' non trouvé dans dashboard.html."); // MODIFICATION : message plus précis (dashboard.js)
     }
 
     // Composants TopCryptoMovers (inchangés)
@@ -78,21 +89,21 @@ document.addEventListener('DOMContentLoaded', () => {
         topCryptoMoversGainersComponent = new TopCryptoMovers('topCryptoMoversContainerGainers');
         topCryptoMoversGainersComponent.render('gainers');
     } else {
-        console.error("Conteneur HTML pour TopCryptoMovers (Gainers) avec l'ID 'topCryptoMoversContainerGainers' non trouvé dans index.html.");
+        console.error("dashboard.js: Conteneur HTML pour TopCryptoMovers (Gainers) avec l'ID 'topCryptoMoversContainerGainers' non trouvé dans dashboard.html."); // MODIFICATION : message plus précis (dashboard.js)
     }
     if (topMoversLosersContainer) {
-        topCryptoMoversLosersComponent = new TopCryptoMovers('topCryptoMoversContainerLosers');
+        topCryptoMoversLosersComponent = new TopCryptoMovers('topMoversContainerLosers');
         topCryptoMoversLosersComponent.render('losers');
     } else {
-        console.error("Conteneur HTML pour TopCryptoMovers (Losers) avec l'ID 'topCryptoMoversContainerLosers' non trouvé dans index.html.");
+        console.error("dashboard.js: Conteneur HTML pour TopCryptoMovers (Losers) avec l'ID 'topMoversContainerLosers' non trouvé dans dashboard.html."); // MODIFICATION : message plus précis (dashboard.js)
     }
 
     // Composant BalanceTable - INSTANCIATION et RENDER ici :
     if (balanceTableBody) {
-        balanceTableComponent = new BalanceTable('balanceTable'); // <-- Instancier le composant BalanceTable
+        balanceTableComponent = new BalanceTable('balances'); // <-- Instancier le composant BalanceTable AVEC l'ID 'balances' (et non 'balanceTable')
         balanceTableComponent.render(); // <-- Appeler la méthode render (vide pour l'instant)
     } else {
-        console.error("Conteneur HTML pour BalanceTable avec l'ID 'balanceTable' non trouvé dans index.html.");
+        console.error("dashboard.js: Conteneur HTML pour BalanceTable avec l'ID 'balances' non trouvé dans dashboard.html."); // MODIFICATION : message plus précis (dashboard.js)
     }
 
     // Fonction pour initialiser la connexion WebSocket (à déplacer potentiellement dans un service accountService.js)
@@ -230,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             symbolsToSubscribe.forEach(symbol => {
                 websocketClient.send(JSON.stringify({ method: 'SUBSCRIBE', params: [`${symbol.toLowerCase()}@ticker`], id: 1 }));
-                console.log(`Subscribed to ${symbol} ticker stream (favorite) (dashboard.js): ${symbol}`);
+                console.log(`dashboard.js: Subscribed to ${symbol} ticker stream (favorite): ${symbol}`); // MODIFICATION : message plus précis (dashboard.js)
             });
         }
         // Mettre à jour le tableau même si WebSocket n'est pas encore ouvert (affichage initial avec 0.00%)
@@ -241,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- INITIALISATION DU DASHBOARD (SI NECESSAIRE) ---
-    console.log("dashboard.js initialisation terminée.");
+    console.log("dashboard.js initialisation terminée."); // MODIFICATION : message plus précis (dashboard.js)
     // ---  Par exemple :  Appel initial à une fonction pour récupérer les données de balances au chargement du dashboard (si applicable) ---
     // ---  Exemple :  fetchInitialDashboardData();
     initWebSocket(); // Initialiser la connexion WebSocket au chargement du dashboard
