@@ -1,69 +1,70 @@
 // js/components/BalanceTable.js
+export class BalanceTable {
+    constructor(containerId) {
+        this.tableContainer = document.getElementById(containerId);
+        if (!this.tableContainer) {
+            console.error(`Conteneur BalanceTable avec l'ID '${containerId}' non trouvé.`);
+            return;
+        }
+        this.tableBody = this.tableContainer.querySelector('tbody'); // Sélectionner le tbody
+        this.noBalancesMessage = document.getElementById('noBalancesMessage'); // Supposant que ces messages sont hors du composant, mais accessibles
+        this.balancesErrorMessage = document.getElementById('balancesErrorMessage'); // Idem
 
-function BalanceTable(containerElementId) {
-    /**
-     * Composant BalanceTable pour afficher le tableau des soldes.
-     * @param {string} containerElementId - L'ID de l'élément HTML qui contiendra le tableau des balances.
-     */
-    this.containerId = containerElementId;
-    this.container = document.getElementById(containerElementId); // Référence au conteneur HTML
-    this.table = null; // On initialisera le table element
-    this.tableBody = null; // On initialisera le tbody element
+        if (!this.tableBody) {
+            console.error("Element <tbody> non trouvé dans le conteneur BalanceTable.");
+            return;
+        }
+    }
+
+    render() {
+        // Initialisation vide pour l'instant, l'affichage sera mis à jour via updateBalances
+    }
+
+    clearBalances() {
+        this.tableBody.innerHTML = ''; // Vider le contenu du tableau
+    }
+
+    displayBalances(balances) {
+        if (!balances || balances.length === 0) {
+            this.showNoBalancesMessage();
+            return;
+        }
+
+        this.hideMessages(); // S'assurer que les messages d'erreur/vide sont cachés
+        this.clearBalances(); // Préparer le tableau en vidant son contenu
+
+        balances.forEach(balance => {
+            const row = this.tableBody.insertRow();
+            const assetCell = row.insertCell();
+            const freeBalanceCell = row.insertCell();
+            const lockedBalanceCell = row.insertCell();
+
+            assetCell.textContent = balance.asset;
+            freeBalanceCell.textContent = parseFloat(balance.free).toFixed(2);
+            lockedBalanceCell.textContent = parseFloat(balance.locked).toFixed(2);
+        });
+    }
+
+    showNoBalancesMessage() {
+        if (this.noBalancesMessage) {
+            this.noBalancesMessage.style.display = 'block';
+        }
+        this.clearBalances(); // S'assurer que le tableau est vide
+    }
+
+    showBalancesErrorMessage() {
+        if (this.balancesErrorMessage) {
+            this.balancesErrorMessage.style.display = 'block';
+        }
+        this.clearBalances(); // S'assurer que le tableau est vide
+    }
+
+    hideMessages() {
+        if (this.noBalancesMessage) {
+            this.noBalancesMessage.style.display = 'none';
+        }
+        if (this.balancesErrorMessage) {
+            this.balancesErrorMessage.style.display = 'none';
+        }
+    }
 }
-
-BalanceTable.prototype.render = function () {
-    /**
-     * Méthode pour initialiser et afficher le tableau des balances dans le conteneur.
-     */
-    if (!this.container) {
-        console.error(`BalanceTable: Conteneur HTML avec l'ID "${this.containerId}" non trouvé.`);
-        return;
-    }
-
-    // --- Création de la structure HTML du tableau dynamiquement ---
-    this.table = document.createElement('table');
-    this.table.className = 'table table-bordered table-responsive'; // Classes Bootstrap pour le style (adaptez selon vos besoins)
-    let thead = document.createElement('thead');
-    thead.innerHTML = ``;
-    this.table.appendChild(thead);
-
-
-    this.tableBody = document.createElement('tbody');
-    this.table.appendChild(this.tableBody);
-
-    this.container.appendChild(this.table); // Ajouter le tableau créé au conteneur HTML
-
-
-    console.log("BalanceTable component rendu dans le conteneur:", this.containerId);
-};
-
-BalanceTable.prototype.updateBalances = function (balancesData) {
-    /**
-     * Méthode pour mettre à jour le tableau des balances avec de nouvelles données.
-     * @param {Array<Object>} balancesData - Un tableau d'objets représentant les données de balance (ex: [{asset: 'BTC', free: '...', locked: '...'}, ...]).
-     */
-    if (!this.tableBody) {
-        console.error("BalanceTable: tableBody non initialisé. Assurez-vous d'appeler render() en premier.");
-        return;
-    }
-
-    this.tableBody.innerHTML = ''; // Effacer le contenu actuel du tableau
-
-    if (!balancesData || balancesData.length === 0) {
-        this.tableBody.innerHTML = '<tr><td colspan="3">Aucune donnée de balance disponible.</td></tr>'; // Message "Aucune donnée" si balancesData est vide
-        return;
-    }
-
-    balancesData.forEach(balance => {
-        const row = this.tableBody.insertRow(); // Créer une nouvelle ligne <tr> pour chaque balance
-        const assetCell = row.insertCell();
-        const freeBalanceCell = row.insertCell();
-        const lockedBalanceCell = row.insertCell();
-
-        assetCell.textContent = balance.asset;
-        freeBalanceCell.textContent = parseFloat(balance.free).toFixed(2);
-        lockedBalanceCell.textContent = parseFloat(balance.locked).toFixed(2);
-    });
-};
-
-export { BalanceTable };

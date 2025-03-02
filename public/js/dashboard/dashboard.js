@@ -1,55 +1,28 @@
 // js/dashboard/dashboard.js
 // --- FONCTIONS DU TABLEAU DE BORD ---
-import '../script.js'; 
+import '../script.js';
 import { TopCryptoMovers } from '../components/TopCryptoMovers.js';
+import { BalanceTable } from '../components/BalanceTable.js';
+import { DashboardConnectionStatus } from '../components/DashboardConnectionStatus.js'; // <-- AJOUTER CETTE LIGNE
 
-// Fonction pour afficher les soldes du compte dans le tableau (exemple - à adapter/déplacer vers un composant BalanceTable ?)
-export function displayAccountBalances(accountInfo) {
-    console.log("Fonction displayAccountBalances() appelée dans dashboard.js avec :", accountInfo); // Log pour vérifier l'appel 
-    if (accountInfo && accountInfo.balances) {
-        balanceTableBody.innerHTML = '';
-        noBalancesMessage.style.display = 'none';
-        balancesErrorMessage.style.display = 'none';
-
-        // Filtrer les soldes pour ne garder que ceux en USDT
-        const usdtBalances = accountInfo.balances.filter(balance => balance.asset.endsWith('USDT') && (parseFloat(balance.free) > 0 || parseFloat(balance.locked) > 0));
-
-        if (usdtBalances.length > 0) {
-            usdtBalances.forEach(balance => {
-                const row = balanceTableBody.insertRow();
-                const assetCell = row.insertCell();
-                const freeBalanceCell = row.insertCell();
-                const lockedBalanceCell = row.insertCell();
-
-                assetCell.textContent = balance.asset;
-                freeBalanceCell.textContent = parseFloat(balance.free).toFixed(2);
-                lockedBalanceCell.textContent = parseFloat(balance.locked).toFixed(2);
-            });
-        } else {
-            noBalancesMessage.style.display = 'block';
-        }
-    } else {
-        balancesErrorMessage.style.display = 'block';
-        balanceTableBody.innerHTML = '';
-        noBalancesMessage.style.display = 'none';
-    }
-};
 
 
 // --- Import des Composants et Services (si nécessaire plus tard) ---
-//import { BalanceTable } from '../components/BalanceTable.js'; // Importez BalanceTable ici quand il sera prêt
 // import { accountService } from '../services/accountService.js'; // Importez accountService ici quand il sera prêt
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("dashboard.js chargé et DOMContentLoaded écouté.");
 
-    // --- DECLARATIONS DES ELEMENTS HTML DU DASHBOARD (ADAPTEZ LES SELECTEURS SI NECESSAIRE) ---
+    // --- DECLARATIONS DES ELEMENTS HTML DU DASHBOARD
     const dashboardConnectionStatusDiv = document.getElementById('dashboardConnectionStatus');
-    const balanceTableBody = document.getElementById('balanceTableBody'); // Ref vers le tbody du tableau des balances (dans index.html)
-    const noBalancesMessage = document.getElementById('noBalancesMessage');
-    const balancesErrorMessage = document.getElementById('balancesErrorMessage');
+    const balanceTableBody = document.getElementById('balanceTableBody'); // <-- Déclaration toujours nécessaire pour le constructeur du composant
+    const noBalancesMessage = document.getElementById('noBalancesMessage'); // <-- Déclaration toujours nécessaire pour le composant
+    const balancesErrorMessage = document.getElementById('balancesErrorMessage'); // <-- Déclaration toujours nécessaire pour le composant
     const cryptoVariationsContainer = document.getElementById('cryptoVariationsContainer');
     const cryptoVariationsTableBody = document.getElementById('cryptoVariationsTableBody');
+    const topMoversGainersContainer = document.getElementById('topCryptoMoversContainerGainers');
+    const topMoversLosersContainer = document.getElementById('topCryptoMoversContainerLosers');
+
 
 
     // --- VARIABLES ET ETATS INTERNES AU DASHBOARD ---
@@ -60,15 +33,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const symbolsToTrack = []; // Pourrait être géré par un service plus tard
 
 
-    // --- Création et rendu du composant TopCryptoMovers ---
-    const topMoversContainer = document.getElementById('topCryptoMoversContainer'); // ID du conteneur dans index.html
-    if (topMoversContainer) {
-        const topCryptoMoversComponent = new TopCryptoMovers('topCryptoMoversContainer');
-        topCryptoMoversComponent.render();
+
+    // --- Composants ---
+    let connectionStatusComponent;
+    let topCryptoMoversGainersComponent, topCryptoMoversLosersComponent;
+    let balanceTableComponent; // <-- Déclarer le composant BalanceTable ici
+
+    // Composant DashboardConnectionStatus (inchangé)
+    if (dashboardConnectionStatusDiv) {
+        connectionStatusComponent = new DashboardConnectionStatus('dashboardConnectionStatus');
+        connectionStatusComponent.render();
     } else {
-        console.error("Conteneur HTML pour TopCryptoMovers avec l'ID 'topCryptoMoversContainer' non trouvé dans index.html.");
+        console.error("Conteneur HTML pour DashboardConnectionStatus avec l'ID 'dashboardConnectionStatus' non trouvé dans index.html.");
     }
 
+    // Composants TopCryptoMovers (inchangés)
+    if (topMoversGainersContainer) {
+        topCryptoMoversGainersComponent = new TopCryptoMovers('topCryptoMoversContainerGainers');
+        topCryptoMoversGainersComponent.render('gainers');
+    } else {
+        console.error("Conteneur HTML pour TopCryptoMovers (Gainers) avec l'ID 'topCryptoMoversContainerGainers' non trouvé dans index.html.");
+    }
+    if (topMoversLosersContainer) {
+        topCryptoMoversLosersComponent = new TopCryptoMovers('topCryptoMoversContainerLosers');
+        topCryptoMoversLosersComponent.render('losers');
+    } else {
+        console.error("Conteneur HTML pour TopCryptoMovers (Losers) avec l'ID 'topCryptoMoversContainerLosers' non trouvé dans index.html.");
+    }
+
+    // Composant BalanceTable - INSTANCIATION et RENDER ici :
+    if (balanceTableBody) {
+        balanceTableComponent = new BalanceTable('balanceTable'); // <-- Instancier le composant BalanceTable
+        balanceTableComponent.render(); // <-- Appeler la méthode render (vide pour l'instant)
+    } else {
+        console.error("Conteneur HTML pour BalanceTable avec l'ID 'balanceTable' non trouvé dans index.html.");
+    }
 
     // Fonction pour initialiser la connexion WebSocket (à déplacer potentiellement dans un service accountService.js)
     window.initWebSocket = function () {
@@ -80,19 +79,21 @@ document.addEventListener('DOMContentLoaded', () => {
         websocketClient = new WebSocket('wss://stream.testnet.binance.vision/ws'); // URL WebSocket - pourrait être configurable
 
         websocketClient.onopen = () => {
-            console.log('Client WebSocket connecté (dashboard.js)');
+            //console.log('Client WebSocket connecté (dashboard.js)');
             reconnectionAttempts = 0;
-            dashboardConnectionStatusDiv.textContent = 'Connecté via WebSocket - Flux de données temps réel activé.';
-            dashboardConnectionStatusDiv.classList.remove('alert-info', 'alert-danger', 'alert-warning');
-            dashboardConnectionStatusDiv.classList.add('alert-primary');
+            //dashboardConnectionStatusDiv.textContent = 'Connecté via WebSocket - Flux de données temps réel activé.';
+            //dashboardConnectionStatusDiv.classList.remove('alert-info', 'alert-danger', 'alert-warning');
+            //dashboardConnectionStatusDiv.classList.add('alert-primary');
+            connectionStatusComponent.updateStatus('Connecté via WebSocket - Flux de données temps réel activé.', 'alert-primary'); // <-- NOUVEAU CODE : Utilisation du composant
             subscribeToFavorites();
         };
 
         websocketClient.onclose = () => {
             console.log('Client WebSocket déconnecté (dashboard.js)');
-            dashboardConnectionStatusDiv.textContent = 'WebSocket déconnecté. Tentative de reconnexion...';
-            dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success');
-            dashboardConnectionStatusDiv.classList.add('alert-warning');
+            //dashboardConnectionStatusDiv.textContent = 'WebSocket déconnecté. Tentative de reconnexion...';
+            //dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success');
+            //dashboardConnectionStatusDiv.classList.add('alert-warning');
+            connectionStatusComponent.updateStatus('WebSocket déconnecté. Tentative de reconnexion...', 'alert-warning'); // <-- NOUVEAU CODE : Utilisation du composant
             reconnectWebSocket(); // Tentative de reconnexion en cas de fermeture
         };
 
@@ -111,9 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         websocketClient.onerror = (error) => {
             console.error('Erreur du Client WebSocket (dashboard.js):', error);
-            dashboardConnectionStatusDiv.textContent = `Erreur WebSocket: ${error.message}. Tentative de reconnexion...`;
-            dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success', 'alert-info');
-            dashboardConnectionStatusDiv.classList.add('alert-danger');
+            //ashboardConnectionStatusDiv.textContent = `Erreur WebSocket: ${error.message}. Tentative de reconnexion...`;
+            //dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success', 'alert-info');
+            //dashboardConnectionStatusDiv.classList.add('alert-danger');
+            connectionStatusComponent.updateStatus(`Erreur WebSocket: ${error.message}. Tentative de reconnexion...`, 'alert-primary'); // <-- NOUVEAU CODE : Utilisation du composant
             reconnectWebSocket(); // Tentative de reconnexion en cas d'erreur
         };
     };
@@ -123,12 +125,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function reconnectWebSocket() {
         if (reconnectionAttempts < maxReconnectionAttempts) {
             reconnectionAttempts++;
-            dashboardConnectionStatusDiv.textContent = `WebSocket déconnecté. Reconnexion Tentative ${reconnectionAttempts} sur ${maxReconnectionAttempts} dans ${reconnectionDelay / 1000} secondes...`;
+            //dashboardConnectionStatusDiv.textContent = `WebSocket déconnecté. Reconnexion Tentative ${reconnectionAttempts} sur ${maxReconnectionAttempts} dans ${reconnectionDelay / 1000} secondes...`;
+            connectionStatusComponent.updateStatus(`WebSocket déconnecté. Reconnexion Tentative ${reconnectionAttempts} sur ${maxReconnectionAttempts} dans ${reconnectionDelay / 1000} secondes...`, 'alert-warning'); // <-- NOUVEAU CODE : Utilisation du composant
             setTimeout(initWebSocket, reconnectionDelay); // Nouvelle tentative de connexion après un délai
         } else {
-            dashboardConnectionStatusDiv.textContent = `Échec de la reconnexion WebSocket après ${maxReconnectionAttempts} tentatives. Veuillez rafraîchir la page.`;
-            dashboardConnectionStatusDiv.classList.remove('alert-warning', 'alert-primary');
-            dashboardConnectionStatusDiv.classList.add('alert-danger');
+            //dashboardConnectionStatusDiv.textContent = `Échec de la reconnexion WebSocket après ${maxReconnectionAttempts} tentatives. Veuillez rafraîchir la page.`;
+            //dashboardConnectionStatusDiv.classList.remove('alert-warning', 'alert-primary');
+            //dashboardConnectionStatusDiv.classList.add('alert-danger');
+            connectionStatusComponent.updateStatus(`Échec de la reconnexion WebSocket après ${maxReconnectionAttempts} tentatives. Veuillez rafraîchir la page.`, 'alert-danger'); // <-- NOUVEAU CODE : Utilisation du composant
             console.error(`Reconnexion WebSocket échouée après ${maxReconnectionAttempts} tentatives (dashboard.js).`);
         }
     }
