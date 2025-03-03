@@ -6,14 +6,13 @@ export class WebsocketService {
         this.maxReconnectionAttempts = 5;
         this.reconnectionDelay = 3000;
         this.dashboardConnectionStatusDiv = dashboardConnectionStatusDiv;
-        this.onMessageCallback = onMessageCallback; // Callback pour traiter les messages
+        this.onMessageCallback = onMessageCallback; 
         this.onErrorCallback = onErrorCallback;
         this.onOpenCallback = onOpenCallback;
         this.onCloseCallback = onCloseCallback;
-        this.messageQueue = []; // Initialize an empty queue
-        this.isSocketOpen = false; // Flag to determine if socket is open
-        this.websocketUrl = 'wss://stream.testnet.binance.vision/ws';
-        
+        this.messageQueue = []; 
+        this.isSocketOpen = false; 
+        this.messageIdCounter = 1; // Added message ID counter
     }
 
     initWebSocket() {
@@ -21,7 +20,8 @@ export class WebsocketService {
             console.log('WebSocket est déjà connecté. Pas besoin de nouvelle connexion.');
             return;
         }
-        this.openWebSocket(this.websocketUrl);
+        this.openWebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
+        //this.openWebSocket('wss://testnet.binance.vision/ws');
     }
 
     openWebSocket(url) {
@@ -30,9 +30,9 @@ export class WebsocketService {
         this.websocketClient.onopen = () => {
             this.reconnectionAttempts = 0;
             console.log('Client WebSocket connecté (websocketService.js)');
-            this.isSocketOpen = true; //Set the flag
+            this.isSocketOpen = true; 
             this.onOpenCallback();
-            this.processMessageQueue(); //Process any queue messages
+            this.processMessageQueue(); 
             this.dashboardConnectionStatusDiv.textContent = 'Connecté via WebSocket - Flux de données temps réel activé.';
             this.dashboardConnectionStatusDiv.classList.remove('alert-info', 'alert-danger', 'alert-warning');
             this.dashboardConnectionStatusDiv.classList.add('alert-primary');
@@ -40,9 +40,9 @@ export class WebsocketService {
 
         this.websocketClient.onclose = () => {
             console.log('Client WebSocket déconnecté (websocketService.js)');
-            this.isSocketOpen = false; //Set the flag
+            this.isSocketOpen = false; 
             this.onCloseCallback();
-            this.reconnectWebSocket(); // Tentative de reconnexion en cas de fermeture
+            this.reconnectWebSocket(); 
             this.dashboardConnectionStatusDiv.textContent = 'WebSocket déconnecté. Tentative de reconnexion...';
             this.dashboardConnectionStatusDiv.classList.remove('alert-primary', 'alert-success');
             this.dashboardConnectionStatusDiv.classList.add('alert-warning');
@@ -54,7 +54,7 @@ export class WebsocketService {
 
         this.websocketClient.onerror = (error) => {
             console.error('Erreur du Client WebSocket (websocketService.js):', error);
-            this.isSocketOpen = false; //Set the flag
+            this.isSocketOpen = false; 
             this.onErrorCallback(error);
             this.reconnectWebSocket();
             this.dashboardConnectionStatusDiv.textContent = `Erreur WebSocket: ${error.message}. Tentative de reconnexion...`;
@@ -76,15 +76,14 @@ export class WebsocketService {
         }
     }
     sendMessage(message) {
-        if (this.isSocketOpen) { // Check if the socket is open using the flag
+        if (this.isSocketOpen) { 
           this.websocketClient.send(JSON.stringify(message));
         } else {
           console.log('WebSocket is not open yet, queuing message.');
-          this.messageQueue.push(message); // Add to queue if not open
+          this.messageQueue.push(message); 
         }
       }
     processMessageQueue() {
-        // Process any pending messages
         while (this.messageQueue.length > 0 && this.isSocketOpen) {
             const message = this.messageQueue.shift();
             this.sendMessage(message);
@@ -98,12 +97,12 @@ export class WebsocketService {
     
     subscribeToSymbols(symbols) {
       const symbolsToSubscribe = symbols.map(symbol => `${symbol.toLowerCase()}@ticker`);
-      this.sendMessage({ method: 'SUBSCRIBE', params: symbolsToSubscribe, id: 1 });
+      this.sendMessage({ method: 'SUBSCRIBE', params: symbolsToSubscribe, id: this.messageIdCounter++ });
     }
 
     unsubscribeFromSymbols(symbols) {
       const symbolsToUnsubscribe = symbols.map(symbol => `${symbol.toLowerCase()}@ticker`);
-      this.sendMessage({ method: 'UNSUBSCRIBE', params: symbolsToUnsubscribe, id: 2 });
+      this.sendMessage({ method: 'UNSUBSCRIBE', params: symbolsToUnsubscribe, id: this.messageIdCounter++ });
     }
 
 }

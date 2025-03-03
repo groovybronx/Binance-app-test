@@ -1,10 +1,10 @@
 // js/components/TopCryptoMovers.js
 
-function TopCryptoMovers(containerElementId) {
+/*function TopCryptoMovers(containerElementId) {
     /**
      * Composant TopCryptoMovers pour afficher les 5 plus grandes hausses et baisses de crypto.
      * @param {string} containerElementId - L'ID de l'élément HTML qui contiendra le composant.
-     */
+     
     this.containerId = containerElementId;
     this.container = document.getElementById(containerElementId);
     this.gainersList = null;  // Pour la liste des plus fortes hausses
@@ -51,7 +51,7 @@ TopCryptoMovers.prototype.render = async function() {
 
 TopCryptoMovers.prototype.fetchTopMovers = async function() {
     try {
-        const response = await fetch('/data/24hr-tickers'); // Endpoint pour récupérer les tickers 24h de TOUS les symboles
+        const response = await fetch('routes/data/24hr-tickers'); // Endpoint pour récupérer les tickers 24h de TOUS les symboles
         if (!response.ok) {
             throw new Error(`Erreur HTTP: ${response.status}`);
         }
@@ -126,4 +126,4 @@ TopCryptoMovers.prototype.updateDisplay = function(tickersData) {
 };
 
 
-export { TopCryptoMovers };
+export { TopCryptoMovers }; */

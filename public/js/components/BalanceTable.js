@@ -67,4 +67,8 @@ BalanceTable.prototype.updateBalances = function (balancesData) {
     });
 };
 
+BalanceTable.prototype.displayErrorMessage = function(errorMessage){
+    this.tableBody.innerHTML = `<tr><td colspan="3" class="alert alert-danger modern-alert">${errorMessage}</td></tr>`
+};
+
 export { BalanceTable };

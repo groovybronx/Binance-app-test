@@ -1,11 +1,7 @@
 // js/login/login.js
 import { initDashboard } from "../dashboard/dashboard.js";
-import { fetchAccountDataAndDisplay } from '../dashboard/dashboard.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-  // login.js - Gestion des profils de connexion (VERSION LISTES A PUCES + ICONES EDIT/DELETE)
-
-  // --- DEPLACER TOUTES LES DECLARATIONS AVEC document.getElementById ICI, AVANT loadProfiles() ---
   const loginFormContainer = document.getElementById("loginFormContainer");
   const dashboardContainer = document.getElementById("dashboard");
   const assetInfoPageContainer = document.getElementById("assetInfoPage");
@@ -15,18 +11,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileListContainer = document.getElementById("profileListContainer");
   const profileButtonsContainer = document.getElementById(
     "profileButtonsContainer"
-  ); // Container pour les listes de profil
+  );
   const noProfilesMessage = document.getElementById("noProfilesMessage");
   const profileLoginForm = document.getElementById("profileLoginForm");
-  const connectProfileButton = document.getElementById("connectProfileButton"); // Bouton "Se Connecter"
+  const connectProfileButton = document.getElementById("connectProfileButton");
   const createProfileForm = document.getElementById("createProfileForm");
-  const logoutButton = document.getElementById("logoutButton"); // Bouton "Déconnexion"
+  const logoutButton = document.getElementById("logoutButton");
   const showCreateProfileButton = document.getElementById(
     "showCreateProfileButton"
-  ); // Bouton "Créer un Nouveau Profil"
+  );
   const createProfileContainer = document.getElementById(
     "createProfileContainer"
-  ); // Container du formulaire "Créer un Profil"
+  );
   const editProfileForm = document.getElementById("editProfileForm");
   const loginSection = document.getElementById("loginSection");
 
@@ -36,35 +32,29 @@ document.addEventListener("DOMContentLoaded", () => {
   backToLoginButton.id = "backToLoginButton";
 
   let savedProfiles = [];
-  loadProfiles(); // APPELLER loadProfiles() ICI, APRES avoir déclaré savedProfiles et les éléments HTML
+  loadProfiles();
 
   let selectedProfileName = null;
 
-  // --- AJOUT DEBUT - Fonctionnalité "Rester connecté" ---
   const rememberedProfileName = localStorage.getItem("rememberedProfileName");
   console.log(
     "Au chargement de la page, profil mémorisé trouvé dans localStorage :",
     rememberedProfileName
   );
   if (rememberedProfileName) {
-    selectedProfileName = rememberedProfileName; // Définir le profil mémorisé comme profil sélectionné
-    // profileLoginForm.style.display = 'block'; // SUPPRIMER CETTE LIGNE : Ne pas afficher le formulaire de code profil lors de la connexion automatique
-    loginFormContainer.style.display = "none"; // Cacher le formulaire de login principal en attendant la connexion auto
-
+    selectedProfileName = rememberedProfileName;
+    loginFormContainer.style.display = "none";
     const selectedProfile = savedProfiles.find(
       (p) => p.profileName === rememberedProfileName
     );
     if (selectedProfile) {
-      // Tentative de connexion automatique avec le profil mémorisé
       connectAutomatically(selectedProfile);
     } else {
-      // Profil mémorisé non trouvé (supprimé ?), revenir à l'affichage normal de login
       loginFormContainer.style.display = "block";
       profileButtonsContainer.style.display = "block";
       populateProfileDropdown();
     }
   }
-  // --- FIN AJOUT DEBUT - Fonctionnalité "Rester connecté" ---
 
   function loadProfiles() {
     console.log("loadProfiles() appelée");
@@ -74,29 +64,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (savedProfiles.length > 0) {
       noProfilesMessage.style.display = "none";
-      profileButtonsContainer.style.display = "block"; // Afficher le container des listes
+      profileButtonsContainer.style.display = "block";
       populateProfileDropdown();
     } else {
       noProfilesMessage.style.display = "block";
-      profileButtonsContainer.style.display = "none"; // Cacher le container des listes s'il n'y a pas de profils
+      profileButtonsContainer.style.display = "none";
     }
   }
 
   function populateProfileDropdown() {
-    console.log(
-      "populateProfileDropdown() appelée (pour listes avec icônes Edit/Delete)"
-    );
+    console.log("populateProfileDropdown() appelée");
     profileButtonsContainer.innerHTML = "";
 
     const profileList = document.createElement("ul");
     profileList.classList.add("list-unstyled", "profile-list");
 
     savedProfiles.forEach((profile) => {
-      console.log(
-        "Traitement du profil (liste Icones Edit/Delete):",
-        profile.profileName
-      );
-
       const profileListItem = document.createElement("li");
       profileListItem.classList.add("profile-list-item");
 
@@ -116,11 +99,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       profileListItem.appendChild(profileLink);
 
-      // --- MODIFICATION DEBUT - Boutons EDITER et SUPPRIMER remplacés par des ICONES ---
       const actionsContainer = document.createElement("div");
       actionsContainer.classList.add("profile-actions");
 
-      // Bouton EDITER (ICONE STYLO)
       const editButton = document.createElement("button");
       editButton.classList.add(
         "btn",
@@ -128,9 +109,9 @@ document.addEventListener("DOMContentLoaded", () => {
         "btn-outline-primary",
         "edit-profile-button",
         "icon-button"
-      ); // Ajout de 'icon-button' pour styler les boutons d'icônes
-      editButton.innerHTML = '<i class="fas fa-pen"></i>'; // Utilisation de l'icône "fa-pen" de Font Awesome (icône stylo)
-      editButton.title = "Éditer le profil"; // Ajout d'un tooltip pour l'accessibilité
+      );
+      editButton.innerHTML = '<i class="fas fa-pen"></i>';
+      editButton.title = "Éditer le profil";
       editButton.addEventListener("click", (event) => {
         event.stopPropagation();
         event.preventDefault();
@@ -138,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       actionsContainer.appendChild(editButton);
 
-      // Bouton SUPPRIMER (ICONE CORBEILLE)
       const deleteButton = document.createElement("button");
       deleteButton.classList.add(
         "btn",
@@ -146,9 +126,9 @@ document.addEventListener("DOMContentLoaded", () => {
         "btn-outline-danger",
         "delete-profile-button",
         "icon-button"
-      ); // Ajout de 'icon-button'
-      deleteButton.innerHTML = '<i class="fas fa-trash"></i>'; // Utilisation de l'icône "fa-trash" de Font Awesome (icône corbeille)
-      deleteButton.title = "Supprimer le profil"; // Ajout d'un tooltip
+      );
+      deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+      deleteButton.title = "Supprimer le profil";
       deleteButton.addEventListener("click", (event) => {
         event.stopPropagation();
         event.preventDefault();
@@ -157,19 +137,13 @@ document.addEventListener("DOMContentLoaded", () => {
       actionsContainer.appendChild(deleteButton);
 
       profileListItem.appendChild(actionsContainer);
-      // --- MODIFICATION FIN - Boutons EDITER et SUPPRIMER remplacés par des ICONES ---
-
       profileList.appendChild(profileListItem);
     });
 
     profileButtonsContainer.appendChild(profileList);
     profileButtonsContainer.style.display = "block";
-    console.log(
-      "Fin de populateProfileDropdown() (pour listes avec icônes Edit/Delete)"
-    );
   }
 
-  // --- AJOUT DEBUT - Gestion du formulaire createProfileForm (Créer un Nouveau Profil) ---
   createProfileForm.addEventListener("submit", function (event) {
     event.preventDefault();
     const profileName = document.getElementById("newProfileName").value.trim();
@@ -197,29 +171,24 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProfiles();
     alert(`Profil "${profileName}" enregistré avec succès.`);
     createProfileForm.reset();
-    createProfileContainer.style.display = "none"; // Cacher le formulaire après la création du profil
+    createProfileContainer.style.display = "none";
     handleBackToLogin();
   });
-  // --- FIN AJOUT - Gestion du formulaire createProfileForm (Créer un Nouveau Profil) ---
-  // --- Gestion du bouton "Créer un nouveau profil" (afficher/masquer le formulaire) ---
   if (showCreateProfileButton && createProfileContainer) {
     showCreateProfileButton.addEventListener("click", function () {
-      console.log("Bouton 'Créer un Nouveau Profil' cliqué.");
-      // createProfileContainer.style.display = (createProfileContainer.style.display === 'none' || createProfileContainer.style.display === '') ? 'block' : 'none';
       createProfileContainer.appendChild(backToLoginButton);
-      loginSection.style.display = "none"; // Hide the login section
-      createProfileContainer.style.display = "block"; // Show the create profile container
+      loginSection.style.display = "none";
+      createProfileContainer.style.display = "block";
     });
   } else {
     console.error(
       "Bouton 'showCreateProfileButton' ou 'createProfileContainer' non trouvé dans le DOM. Vérifiez les IDs dans index.html."
     );
   }
-  // --- Fin gestion du bouton "Créer un nouveau profil" ---
 
   function handleBackToLogin() {
-    loginSection.style.display = "block"; // Show the login section
-    createProfileContainer.style.display = "none"; // Hide the create profile container
+    loginSection.style.display = "block";
+    createProfileContainer.style.display = "none";
     editProfileContainer.style.display = "none";
     loadProfiles();
   }
@@ -239,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .getElementById("profileCode")
       .value.trim();
     const rememberProfileCheckbox =
-      document.getElementById("rememberProfile").checked; // Récupérer l'état de la checkbox
+      document.getElementById("rememberProfile").checked;
     document.getElementById("assetActionsContainer").style.display = "block";
     document.querySelector(".dashboard-title").style.display = "block";
 
@@ -280,27 +249,16 @@ document.addEventListener("DOMContentLoaded", () => {
         secretKey: secretKey,
       });
       if (response.data.success) {
-        //displayAccountBalances(response.data.accountInfo);
         loginFormContainer.style.display = "none";
         dashboardContainer.style.display = "block";
         assetInfoPageContainer.style.display = "none";
         initDashboard();
-        fetchAccountDataAndDisplay();
 
-        // --- AJOUT MILIEU - Fonctionnalité "Rester connecté" ---
         if (rememberProfileCheckbox) {
-          localStorage.setItem("rememberedProfileName", selectedProfileName); // Enregistrer le nom du profil
-          console.log(
-            "Rester connecté coché. Profil enregistré dans localStorage :",
-            selectedProfileName
-          );
+          localStorage.setItem("rememberedProfileName", selectedProfileName);
         } else {
-          localStorage.removeItem("rememberedProfileName"); // Supprimer si non coché
-          console.log(
-            "Rester connecté non coché. Profil supprimé de localStorage."
-          );
+          localStorage.removeItem("rememberedProfileName");
         }
-        // --- FIN AJOUT MILIEU - Fonctionnalité "Rester connecté" ---
       } else {
         alert(
           `Échec de la connexion API REST avec le profil "${selectedProfile.profileName}": ${response.data.message}`
@@ -323,18 +281,9 @@ document.addEventListener("DOMContentLoaded", () => {
       accountBalanceDiv.innerHTML = "";
     }
   });
-
-  // --- AJOUT FIN - Fonctionnalité "Rester déconnecté" - Gestion du bouton Déconnexion ---
   if (logoutButton) {
-    // Vérifier si le bouton existe bien dans le DOM
     logoutButton.addEventListener("click", function () {
-      console.log("Bouton Déconnexion cliqué."); // Pour vérification dans la console
-
-      // 1. Supprimer le profil mémorisé du localStorage (désactiver "Rester connecté")
       localStorage.removeItem("rememberedProfileName");
-      console.log("Profil mémorisé supprimé de localStorage (Déconnexion).");
-
-      // 2. Réinitialiser l'affichage : Cacher le tableau de bord, afficher le formulaire de login et les listes de profil
       const dashboardContainer = document.getElementById("dashboard");
       const loginFormContainer = document.getElementById("loginFormContainer");
       const profileButtonsContainer = document.getElementById(
@@ -342,24 +291,17 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       if (dashboardContainer && loginFormContainer && profileButtonsContainer) {
-        // Vérifier que les éléments existent avant de les manipuler
-        dashboardContainer.style.display = "none"; // Cacher le tableau de bord
-        loginFormContainer.style.display = "block"; // Afficher le formulaire de login principal
-        profileButtonsContainer.style.display = "block"; // Afficher les listes de profil
-        console.log(
-          "Tableau de bord caché, formulaire de login et listes de profil affichés."
-        );
-
-        // Optionnel : Réinitialiser d'autres éléments ou variables si nécessaire (ex: vider le contenu du tableau de bord)
+        dashboardContainer.style.display = "none";
+        loginFormContainer.style.display = "block";
+        profileButtonsContainer.style.display = "block";
         const accountInfoDiv = document.getElementById("account-info");
         const accountBalanceDiv = document.getElementById("account-balance");
         if (accountInfoDiv && accountBalanceDiv) {
-          accountInfoDiv.textContent = ""; // Vider les infos du compte
-          accountBalanceDiv.innerHTML = ""; // Vider le solde
-          console.log("Infos du compte et solde réinitialisés.");
+          accountInfoDiv.textContent = "";
+          accountBalanceDiv.innerHTML = "";
         }
 
-        alert("Déconnexion réussie."); // Message de confirmation (optionnel)
+        alert("Déconnexion réussie.");
       } else {
         console.error(
           "Éléments HTML (dashboard, loginFormContainer, profileButtonsContainer) non trouvés. Vérifiez les IDs dans index.html."
@@ -371,14 +313,8 @@ document.addEventListener("DOMContentLoaded", () => {
       "Bouton 'logoutButton' non trouvé dans le DOM. Vérifiez l'ID dans index.html."
     );
   }
-  // --- FIN AJOUT - Fonctionnalité "Rester déconnecté" - Gestion du bouton Déconnexion ---
 
-  // --- AJOUT FIN - Fonctionnalité "Rester connecté" - Fonction connectAutomatically ---
   async function connectAutomatically(profile) {
-    console.log(
-      "Fonction connectAutomatically appelée pour le profil :",
-      profile.profileName
-    ); // AJOUT : Vérifier si la fonction est appelée
     const apiKey = profile.apiKey;
     const secretKey = profile.secretKey;
     document.getElementById("assetActionsContainer").style.display = "block";
@@ -389,53 +325,29 @@ document.addEventListener("DOMContentLoaded", () => {
         apiKey: apiKey,
         secretKey: secretKey,
       });
-      console.log(
-        "Réponse de la requête axios.post('auth/connect') dans connectAutomatically :",
-        response
-      ); // AJOUT : Vérifier la réponse de la requête API
 
       if (response.data.success) {
-        //displayAccountBalances(response.data.accountInfo);
         loginFormContainer.style.display = "none";
         dashboardContainer.style.display = "block";
         assetInfoPageContainer.style.display = "none";
-        console.log(
-          `Connexion automatique réussie avec le profil "${profile.profileName}".`
-        ); // Message de succès discret dans la console
         initDashboard();
-        fetchAccountDataAndDisplay();
       } else {
-        console.error(
-          "Échec de la connexion API REST automatique (profil):",
-          response.data
-        );
-        loginFormContainer.style.display = "block"; // En cas d'échec, réafficher le formulaire de login
+        loginFormContainer.style.display = "block";
         profileButtonsContainer.style.display = "block";
-        populateProfileDropdown(); // Et afficher les listes de profil
-        // alert(`Échec de la connexion automatique API REST avec le profil "${profile.profileName}". Veuillez vous connecter manuellement.`); // SUPPRIMER CETTE ALERTE
+        populateProfileDropdown();
         accountInfoDiv.textContent =
           "Erreur de connexion API (profil). Voir la console pour les détails.";
         accountBalanceDiv.innerHTML = "";
-        console.log("La connexion automatique API REST a échoué."); // AJOUT : Confirmation d'échec API
       }
     } catch (error) {
-      console.error(
-        "Erreur lors de la requête de connexion API REST automatique (profil):",
-        error
-      );
-      loginFormContainer.style.display = "block"; // En cas d'erreur, réafficher le formulaire de login
+      loginFormContainer.style.display = "block";
       profileButtonsContainer.style.display = "block";
-      populateProfileDropdown(); // Et afficher les listes de profil
-      // alert('Erreur de connexion API REST automatique (profil). Vérifiez la console pour plus de détails.'); // SUPPRIMER CETTE ALERTE
+      populateProfileDropdown();
       accountInfoDiv.textContent =
         "Erreur de connexion API (profil). Voir la console pour les détails.";
       accountBalanceDiv.innerHTML = "";
-      console.log(
-        "Erreur lors de la requête de connexion automatique API REST."
-      ); // AJOUT : Confirmation d'erreur requête
     }
-  }
-  // --- FIN AJOUT FIN - Fonctionnalité "Rester connecté" - Fonction connectAutomatically ---
+  } // --- FIN AJOUT FIN - Fonctionnalité "Rester connecté" - Fonction connectAutomatically ---
 
   function handleEditProfile(profileName) {
     console.log("handleEditProfile appelée pour le profil :", profileName);

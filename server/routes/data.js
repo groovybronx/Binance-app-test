@@ -1,6 +1,17 @@
+
 const express = require('express');
 const router = express.Router();
 const dataController = require('../controllers/dataController');
+
+// Route pour obtenir les informations d'une crypto (pour l'affichage des détails) - via REST API
+ //router.get('/:symbol', dataController.getCryptoInfo);
+
+// Route pour obtenir les données d'une crypto (pour la page d'accueil) - via REST API
+//router.get('/', dataController.getCryptoData);
+
+// Route pour obtenir les 5 plus grandes hausses et baisses de crypto - via REST API    
+//router.get('/movers', dataController.getTopCryptoMovers); 
+
 
 // Route pour obtenir le prix actuel d'un symbole (pour la recherche rapide et favoris) - via REST API
 router.get('/price', dataController.getPrice);

@@ -1,6 +1,6 @@
 // js/dashboard/dashboard.js
 // --- TABLEAU DE BORD ---
-import { TopCryptoMovers } from '../components/TopCryptoMovers.js';
+//import { TopCryptoMovers } from '../components/TopCryptoMovers.js';
 import { WebsocketService } from '../services/websocketService.js';
 import { AccountService } from '../services/accountService.js';
 import { favoriteService } from '../services/favoriteService.js';
@@ -13,29 +13,36 @@ export let websocketService = null;
 /**
     * Fetches account data and displays it.
     */
-    export async function fetchAccountDataAndDisplay() {
-        try {
-            console.log("fetchAccountDataAndDisplay() called - making API call..."); // Debugging log
-            const response = await fetch('routes/auth/connect'); // API call to your server
-            console.log("API response:", response); // Debugging log - check the full response object
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            console.log("API data:", data);
-            if (data.success) {
-                displayAccountBalances(data.accountInfo);
-                console.log('Account information fetch and display with success')
-            } else {
-                balanceTable.displayErrorMessage(data.message);
-                console.error("Error fetching account data:", data.message);
-            }
-        } catch (error) {
-            balanceTable.displayErrorMessage('Error fetching account data');
-            console.error("Error fetching account data:", error);
+export async function fetchAccountData() {
+    try {
+        console.log("fetchAccountData() called - making API call..."); // Debugging log
+        const profileName = localStorage.getItem('rememberedProfileName');
+        const headers = {
+           'remembered-profile-name': profileName, // Envoyer le nom du profil dans le header
+        };
+        const response = await fetch('/auth/account', { headers: headers }); // API call to your server
+        console.log("API response:", response); // Debugging log - check the full response object
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+        const data = await response.json();
+        console.log("API data:", data);
+        if (data.success) {
+            displayAccountBalances(data.accountInfo);
+            console.log('Account information fetch and display with success')
+        } else {
+            // Use the balanceTable to display the error
+            initDashboard();
+            balanceTable.displayErrorMessage(data.message);
+            console.error("Error fetching account data:", data.message);
+        }
+    } catch (error) {
+        // Use the balanceTable to display the error
+        initDashboard();
+        balanceTable.displayErrorMessage('Error fetching account data');
+        console.error("Error fetching account data:", error);
     }
+}
 //export the init function
 export function initDashboard() {
     console.log("dashboard.js chargé et DOMContentLoaded écouté.");
@@ -188,15 +195,15 @@ export function initDashboard() {
     );
     websocketService.initWebSocket();
 
-    // --- GESTION DU COMPOSANT TOPCRYPTOMOVERS ---
+    /* --- GESTION DU COMPOSANT TOPCRYPTOMOVERS ---
     if (topMoversContainer) {
         const topCryptoMoversComponent = new TopCryptoMovers(topMoversContainer.id);
         topCryptoMoversComponent.render();
     } else {
         console.error(`Conteneur HTML pour TopCryptoMovers avec l'ID '${topMoversContainer.id}' non trouvé.`);
     }
-
-    //no more mock data here
+    fetchAccountData();
+    //no more mock data here */
 }
 
 document.addEventListener('DOMContentLoaded', initDashboard);

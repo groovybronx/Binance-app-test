@@ -1,6 +1,7 @@
 const axios = require('axios'); // Importer le module axios pour les appels API REST
 const binanceService = require('../services/binanceService'); // Import du service Binance
 
+
 // Contrôleur pour la route /price (GET /data/price) - Récupérer le prix actuel d'un symbole
 exports.getPrice = async (req, res, next) => {
     const symbol = req.query.symbol; // Récupérer le symbole depuis les paramètres de requête
