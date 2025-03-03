@@ -10,14 +10,40 @@ import { BalanceTable } from '../components/BalanceTable.js';
 
 // Export the websocketService variable
 export let websocketService = null;
+/**
+    * Fetches account data and displays it.
+    */
+    export async function fetchAccountDataAndDisplay() {
+        try {
+            console.log("fetchAccountDataAndDisplay() called - making API call..."); // Debugging log
+            const response = await fetch('routes/auth/connect'); // API call to your server
+            console.log("API response:", response); // Debugging log - check the full response object
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("API data:", data);
+            if (data.success) {
+                displayAccountBalances(data.accountInfo);
+                console.log('Account information fetch and display with success')
+            } else {
+                balanceTable.displayErrorMessage(data.message);
+                console.error("Error fetching account data:", data.message);
+            }
+        } catch (error) {
+            balanceTable.displayErrorMessage('Error fetching account data');
+            console.error("Error fetching account data:", error);
+        }
 
+    }
 //export the init function
-export function initDashboard(){
+export function initDashboard() {
     console.log("dashboard.js chargé et DOMContentLoaded écouté.");
     // --- DECLARATIONS DES ELEMENTS HTML ---
     const dashboardConnectionStatusDiv = document.getElementById('dashboardConnectionStatus');
     const cryptoVariationsTableBody = document.getElementById('cryptoVariationsTableBody');
     const topMoversContainer = document.getElementById('topCryptoMoversContainer');
+    // ---  DECLARATION DU COMPOSANT BalanceTable ---
     const balanceTable = new BalanceTable('balanceTableContainer'); // 'dashboard-header-container' is the container ID
     balanceTable.render(); // Initialiser le composant BalanceTable
     // --- INSTANCES DES SERVICES ---
@@ -28,16 +54,15 @@ export function initDashboard(){
      * Affiche les balances du compte dans le tableau.
      * @param {Object} accountInfo - Les informations du compte contenant les balances.
      */
-        function displayAccountBalances(accountInfo) {
+    function displayAccountBalances(accountInfo) {
         console.log("Fonction displayAccountBalances() appelée avec :", accountInfo);
         if (!accountInfo || !accountInfo.balances) {
             console.error("Invalid accountInfo object:", accountInfo);
-             return;
+            return;
         }
         const usdtBalances = accountService.getUsdtBalances(accountInfo);
         balanceTable.updateBalances(usdtBalances)
     }
-
 
     /**
      * Met à jour l'affichage des variations de crypto dans le tableau.
@@ -64,6 +89,7 @@ export function initDashboard(){
             symbolCell.textContent = symbol;
             symbolCell.classList.add('symbol-cell');
             variationCell.classList.add('variation-cell');
+           
             infoIconCell.classList.add('info-icon-cell');
 
             const infoIcon = document.createElement('span');
@@ -162,29 +188,6 @@ export function initDashboard(){
     );
     websocketService.initWebSocket();
 
-   /**
-    * Fetches account data and displays it.
-    */
-    async function fetchAccountDataAndDisplay() {
-        try {
-            const response = await fetch('/auth/account'); // API call to your server
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            if(data.success){
-                displayAccountBalances(data.accountInfo);
-            } else {
-                balanceTable.displayErrorMessage(data.message);
-                console.error("Error fetching account data:", data.message);
-              }
-        } catch (error) {
-            balanceTable.displayErrorMessage('Error fetching account data');
-            console.error("Error fetching account data:", error);
-        }
-        
-    }
-
     // --- GESTION DU COMPOSANT TOPCRYPTOMOVERS ---
     if (topMoversContainer) {
         const topCryptoMoversComponent = new TopCryptoMovers(topMoversContainer.id);
@@ -196,4 +199,4 @@ export function initDashboard(){
     //no more mock data here
 }
 
-document.addEventListener('DOMContentLoaded',initDashboard);
+document.addEventListener('DOMContentLoaded', initDashboard);

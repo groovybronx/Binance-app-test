@@ -13,6 +13,7 @@ export class WebsocketService {
         this.messageQueue = []; // Initialize an empty queue
         this.isSocketOpen = false; // Flag to determine if socket is open
         this.websocketUrl = 'wss://stream.testnet.binance.vision/ws';
+        
     }
 
     initWebSocket() {

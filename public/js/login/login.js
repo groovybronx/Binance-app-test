@@ -1,5 +1,6 @@
 // js/login/login.js
 import { initDashboard } from "../dashboard/dashboard.js";
+import { fetchAccountDataAndDisplay } from '../dashboard/dashboard.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   // login.js - Gestion des profils de connexion (VERSION LISTES A PUCES + ICONES EDIT/DELETE)
@@ -284,6 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dashboardContainer.style.display = "block";
         assetInfoPageContainer.style.display = "none";
         initDashboard();
+        fetchAccountDataAndDisplay();
 
         // --- AJOUT MILIEU - Fonctionnalité "Rester connecté" ---
         if (rememberProfileCheckbox) {
@@ -401,6 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
           `Connexion automatique réussie avec le profil "${profile.profileName}".`
         ); // Message de succès discret dans la console
         initDashboard();
+        fetchAccountDataAndDisplay();
       } else {
         console.error(
           "Échec de la connexion API REST automatique (profil):",

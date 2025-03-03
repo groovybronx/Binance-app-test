@@ -1,5 +1,4 @@
 // js/script.js
-import { BalanceTable } from './components/BalanceTable.js';
 document.addEventListener('DOMContentLoaded', function () {
     console.log("script.js chargé et DOMContentLoaded écouté.");
 
