@@ -6,7 +6,8 @@ function BalanceTable(containerElementId) {
      * @param {string} containerElementId - L'ID de l'élément HTML qui contiendra le tableau des balances.
      */
     this.containerId = containerElementId;
-    this.container = document.getElementById(containerElementId); // Référence au conteneur HTML
+    this.container = document.getElementById(containerElementId);
+
     this.table = null; // On initialisera le table element
     this.tableBody = null; // On initialisera le tbody element
 }

@@ -17,12 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchButtonDashboard = document.getElementById('searchButtonDashboard'); // Bouton "Rechercher un Symbole" du Dashboard
 
 
-    // ---  DECLARATION DU COMPOSANT BalanceTable ---
-    const balanceTable = new BalanceTable('dashboard-header-container'); // 'balances' doit être l'ID du conteneur div dans index.html
-    balanceTable.render(); // Initialiser le composant BalanceTable
-
-
-    // --- FONCTIONS GLOBALES (OU DEPLACER DANS DES SERVICES SI POSSIBLE) ---
+       // --- FONCTIONS GLOBALES (OU DEPLACER DANS DES SERVICES SI POSSIBLE) ---
 
     // Gestion des favoris (localStorage) -  Pourrait être déplacé dans un service userPreferenceService.js
     window.getFavorites = function () {
