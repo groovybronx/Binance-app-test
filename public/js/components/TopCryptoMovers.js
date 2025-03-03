@@ -86,8 +86,8 @@ TopCryptoMovers.prototype.updateDisplay = function(tickersData) {
     const sortedByChange = [...usdtTickers].sort((a, b) => b.priceChangePercent - a.priceChangePercent);
 
     // Séparer les 5 plus fortes hausses et les 5 plus fortes baisses
-    const topGainers = sortedByChange.filter(ticker => ticker.priceChangePercent >= 0).slice(0, 10);
-    const topLosers = sortedByChange.filter(ticker => ticker.priceChangePercent < 0).slice(-10).reverse(); // .reverse() pour avoir du plus négatif au moins négatif
+    const topGainers = sortedByChange.filter(ticker => ticker.priceChangePercent >= 0).slice(0, 5);
+    const topLosers = sortedByChange.filter(ticker => ticker.priceChangePercent < 0).slice(-5).reverse(); // .reverse() pour avoir du plus négatif au moins négatif
 
 
     this.gainersList.innerHTML = ''; // Vider la liste des hausses

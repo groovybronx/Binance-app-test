@@ -68,4 +68,20 @@ exports.get24hrTickers = async (req, res) => {
         console.error("Erreur lors de la requête des tickers 24h à l'API Binance SPOT:", error);
         res.status(500).json({ success: false, message: "Erreur serveur lors de la récupération des tickers 24h SPOT." });
     }
+// Ajoutez cette fonction si elle n'existe pas déjà
+exports.getAccountInfo = async (req, res) => {
+    try {
+        // Remplacez ceci par la logique réelle pour récupérer les informations de compte
+        const accountInfo = {
+            balances: [
+                { asset: 'BTC', free: '0.5', locked: '0.1' },
+                { asset: 'ETH', free: '1.0', locked: '0.0' }
+            ]
+        };
+        res.json(accountInfo);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des informations du compte:', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des informations du compte' });
+    }
+};
 };

@@ -25,6 +25,34 @@ exports.connectUser = async (req, res, next) => {
         console.error('Erreur dans authController.connectUser:', error);
         next(error); // Passer l'erreur au middleware de gestion des erreurs
     }
+    res.json({ message: 'Utilisateur connecté avec succès' });
 };
 
-// -- Ici, vous pourrez ajouter d'autres fonctions de contrôleur liées à l'authentification (ex: inscription, déconnexion, etc.) --
+
+// Contrôleur pour la route /register (POST /auth/register)
+exports.registerUser = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        // Validation des données (exemple simplifié)
+        if (!username || !password) {
+            return res.status(400).json({ error: 'Nom d\'utilisateur et mot de passe requis' });
+        }
+
+        // Vérification de l'existence de l'utilisateur (exemple simplifié)
+        // Remplacez ceci par une vérification réelle dans votre base de données
+        const userExists = false; // Remplacez par la logique réelle
+        if (userExists) {
+            return res.status(409).json({ error: 'Utilisateur déjà existant' });
+        }
+
+        // Enregistrement de l'utilisateur (exemple simplifié)
+        // Remplacez ceci par l'enregistrement réel dans votre base de données
+        const newUser = { username, password }; // Remplacez par la logique réelle
+
+        res.status(201).json({ message: 'Utilisateur enregistré avec succès', user: newUser });
+    } catch (error) {
+        console.error('Erreur lors de l\'enregistrement de l\'utilisateur:', error);
+        res.status(500).json({ error: 'Erreur lors de l\'enregistrement de l\'utilisateur' });
+    }
+};

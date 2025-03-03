@@ -10,6 +10,10 @@ router.get('/24hr-ticker', dataController.get24hrTicker);
 
 // Route pour obtenir les tickers 24h de TOUS les symboles - via REST API
 router.get('/24hr-tickers', dataController.get24hrTickers);
-// -- Ici, vous pourrez ajouter d'autres routes liées aux données --
+
+// Assurez-vous que cette route est définie
+//router.get('/account/info', dataController.getAccountInfo);
 
 module.exports = router;
+// -- Ici, vous pourrez ajouter d'autres routes liées aux données --
+

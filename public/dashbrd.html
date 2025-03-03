@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Testnet Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Binance Testnet Dashboard</h1>
+
+        <div id="dashboard-header-container" class="mb-4">
+            <div id="dashboardConnectionStatus" class="alert alert-info" role="alert">
+                Statut de connexion...
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div id="topCryptoMoversContainer" class="mb-4"></div>
+
+            <div id="balances" class="mb-4">
+                <h2>Soldes du compte</h2>
+                <div id="balanceTableContainer"></div>
+                <div id="noBalancesMessage" style="display: none;">Aucun solde disponible.</div>
+                <div id="balancesErrorMessage" class="alert alert-danger" style="display: none;"></div>
+            </div>
+
+            <div id="cryptoVariations" class="mb-4">
+                <h2>Variations des cryptomonnaies</h2>
+                <div class="table-responsive">
+                    <table id="cryptoVariationsTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Symbole</th>
+                                <th>Variation 24h</th>
+                                <th>Prix actuel</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cryptoVariationsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="assetInfoContainer" class="mt-4"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
